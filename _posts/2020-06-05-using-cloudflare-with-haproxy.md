@@ -7,6 +7,7 @@ excerpt:
 
 # Introduction
 A while ago I switched to using Cloudflare for my domain names DNS. The main reason I did this was for dynamic DNS since I had a dynamic IP on my home Internet connection. I then looked into what else I could use Cloudflare for and over time have taken advantage of more of their free options.
+
 I was looking at setting up HAProxy anyway because I have a server that I use to play with all kinds of web services. I have a Icinga2 instance for monitoring, a Bookstack setup for taking notes, a Home Assistant install, and more. To make these easily accessible externally I wanted to use HAProxy with SNI. While looking into this I discovered Cloudflare Origin CA and use it in the following instructions.
 
 # Requirements
@@ -18,8 +19,11 @@ To follow this setup completely you will need:
 
 # Cloudflare Setup
 After you have followed through the [Cloudflare Getting Started guide.](https://support.cloudflare.com/hc/en-us/categories/200275218-Getting-Started)
+
 You will then need to configure [Cloudflare's Universal SSL](https://blog.cloudflare.com/universal-ssl-encryption-all-the-way-to-the-origin-for-free) by following the guide [https://support.cloudflare.com/hc/en-us/articles/115000479507]() to create a Cloudflare Origin Certificate to install onto your router.
+
 Once you have the certificate and key, you can combine them together to create a .pem file. You will then copy this .pem to somewhere on your router. I've placed mine under ```/etc/ssl/cloudflare/domain.com.pem```
+
 Also remember to backup this file somewhere secure as in that location it won't be saved during an upgrade of OpenWrt/LEDE.
 
 # HAProxy Configuration
@@ -152,6 +156,7 @@ The last thing you need to make this all work is to open port 443 on the router.
 
 ## Extra Security
 Thanks to Cloudflare having a nice text list of their IP ranges it is trivial to set your firewall to only allow connections to port 443 from CloudFlare.
+
 In the standard OpenWrt install it will not have all the packages required for this step. Install the required packages from command line or in LuCI
 
 opkg install curl
@@ -169,6 +174,7 @@ To configure a scheduled task in OpenWrt is really simple. I did it through the 
 6. Restart cron
 
 This will create a task that will run at midnight and copy the contents of the text file to a local file name cfip.v4 under /etc For more information about crontab and how it works click [HERE](https://www.adminschoice.com/crontab-quick-reference).
+
 To make sure that file is created straight away it is a good idea to run the command on the router.
 
 ```bash
