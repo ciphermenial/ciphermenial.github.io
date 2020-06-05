@@ -19,7 +19,7 @@ To follow this setup completely you will need:
 # Cloudflare Setup
 After you have followed through the [Cloudflare Getting Started guide.](https://support.cloudflare.com/hc/en-us/categories/200275218-Getting-Started)
 You will then need to configure [Cloudflare's Universal SSL](https://blog.cloudflare.com/universal-ssl-encryption-all-the-way-to-the-origin-for-free) by following the guide [https://support.cloudflare.com/hc/en-us/articles/115000479507]() to create a Cloudflare Origin Certificate to install onto your router.
-Once you have the certificate and key, you can combine them together to create a .pem file. You will then copy this .pem to somewhere on your router. I've placed mine under `/etc/ssl/cloudflare/domain.com.pem`
+Once you have the certificate and key, you can combine them together to create a .pem file. You will then copy this .pem to somewhere on your router. I've placed mine under ```/etc/ssl/cloudflare/domain.com.pem```
 Also remember to backup this file somewhere secure as in that location it won't be saved during an upgrade of OpenWrt/LEDE.
 
 # HAProxy Configuration
@@ -163,7 +163,7 @@ To configure a scheduled task in OpenWrt is really simple. I did it through the 
 1. Open up the Web UI
 2. Go to System > Scheduled Tasks
 3. In the input window paste in the following\
-`0 0 * * * curl https://www.cloudflare.com/ips-v4 > /etc/cfip.v4`
+```0 0 * * * curl https://www.cloudflare.com/ips-v4 > /etc/cfip.v4```
 4. Click Submit
 5. Go to System > Startup
 6. Restart cron
