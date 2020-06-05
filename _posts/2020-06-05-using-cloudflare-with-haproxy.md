@@ -25,13 +25,13 @@ Also remember to backup this file somewhere secure as in that location it won't 
 # HAProxy Configuration
 This is the configuration I have used but I am not sure if it is the best way to go about it. I would love some feedback about whether there is a better way to manage it. You will usually need to install the haproxy package from opkg.
 
-```
+```bash
 opkg install haproxy
 ```
 
 The haproxy configuration file is located at `/etc/haproxy.cfg`
 
-```linux-config
+```
 # Global parameters
 defaults
     timeout http-request 5s
@@ -171,12 +171,14 @@ To configure a scheduled task in OpenWrt is really simple. I did it through the 
 This will create a task that will run at midnight and copy the contents of the text file to a local file name cfip.v4 under /etc For more information about crontab and how it works click [HERE](https://www.adminschoice.com/crontab-quick-reference).
 To make sure that file is created straight away it is a good idea to run the command on the router.
 
+```bash
 curl https://www.cloudflare.com/ips-v4 > /etc/cfip.v4
+```
 
 ## ipset Configuration
 ipset can be configured like you would on any iptables firewall but I have used OpenWrt config method. It is as simple as modifying the /etc/config/firewall file and adding the following.
 
-```linux-config
+```
 config ipset
     option name 'cf'
     option match 'src_net'
@@ -194,11 +196,13 @@ config ipset
 
 You will then need to restart the firewall service
 
+```bash
 /etc/init.d/firewall restart
+```
 
 To check whether the ipset has been created you can run the command `ipset list cf` which should display results that look like the following.
 
-```linux-config
+```
 Name: cf
   Type: hash:net
   Revision: 6
