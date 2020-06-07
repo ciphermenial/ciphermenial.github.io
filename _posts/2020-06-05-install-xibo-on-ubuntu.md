@@ -137,7 +137,7 @@ sudo vim /srv/xibo-cms/vendor/xibosignage/xibo-xmr/bin/config.json
 
 Enter the following information and change the pubOn IP address to the public IP of the server.
 
-```yaml
+```json
 {
     "listenOn": "tcp://127.0.0.1:50001",
     "pubOn": ["tcp://192.168.1.1:9505"],
