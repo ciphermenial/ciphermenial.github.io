@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  Install Xibo on Ubuntu 20.04
-categories: [HTML,Code]
+categories: [Server,Linux,Install]
 excerpt: This guide shows how to install Xibo CMS 2.3.3 onto Ubuntu 20.04 LTS
 ---
 
