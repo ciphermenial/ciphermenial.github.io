@@ -145,6 +145,8 @@ Enter the following information and change the pubOn IP address to the public IP
 }
 ```
 
+Set www-data as the owner of the file.
+
 ```bash
 sudo chown www-data:www-data /srv/xibo-cms/vendor/xibosignage/xibo-xmr/bin/config.json
 ```
