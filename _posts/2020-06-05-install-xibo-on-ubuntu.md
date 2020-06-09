@@ -59,7 +59,8 @@ sudo vim /etc/apache2/sites-available/xibo-cms.conf
 ```
 
 ### xibo-cms.conf
-```
+
+```apache
 <VirtualHost *:80>
     DocumentRoot "/var/www/web"
     ServerName xibo.domain.com
@@ -144,6 +145,8 @@ Enter the following information and change the pubOn IP address to the public IP
     "debug": false
 }
 ```
+
+Set www-data as the owner of the file.
 
 ```bash
 sudo chown www-data:www-data /srv/xibo-cms/vendor/xibosignage/xibo-xmr/bin/config.json
