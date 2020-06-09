@@ -62,6 +62,5 @@ say_hello()   // "hello world!"
 1. Numbered list item 1
 2. Numbered list item 2
 
-|Table Column Title 1|Table Column Title 2|Table Column Title 3|
-|--------------------|--------------------|--------------------|
+|Table Column Title 1|Table Column Title 2|Table Column Title 3|Table Column Title 4|
 |Item 1|Item 2|Item 3|Item 4|
