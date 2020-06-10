@@ -96,7 +96,7 @@ vrrp_instance haproxy {
     authentication {
         auth_type AH
         auth_pass 12345678
-    }q:qwa
+    }
     virtual_ipaddress {
         10.0.0.100
     }
@@ -145,11 +145,11 @@ global
     maxconn 40000
     ulimit-n 81000
     daemon
-	ssl-default-bind-ciphers EECDH+AESGCM:EDH+AESGCM
-	ssl-default-bind-options no-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets
-	ssl-default-server-ciphers EECDH+AESGCM:EDH+AESGCM
-	ssl-default-server-options no-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets
-	tune.ssl.default-dh-param 2048
+    ssl-default-bind-ciphers EECDH+AESGCM:EDH+AESGCM
+    ssl-default-bind-options no-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets
+    ssl-default-server-ciphers EECDH+AESGCM:EDH+AESGCM
+    ssl-default-server-options no-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets
+    tune.ssl.default-dh-param 2048
 
 defaults
     log global
