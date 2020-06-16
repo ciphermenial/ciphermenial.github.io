@@ -134,6 +134,8 @@ This assumes you have the necessary certificate created and located under /etc/s
 sudo vim /etc/haproxy/haproxy.cfg
 ```
 
+Modify the following as needed. The reason I have the loop through haproxy is because I have some HTTPS backends and some HTTP backends.
+
 ```
 global
     log /dev/log local0
