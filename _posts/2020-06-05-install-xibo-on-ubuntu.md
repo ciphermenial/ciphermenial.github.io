@@ -17,7 +17,7 @@ I was recently testing out Xibo for use within a school. I origianlly used the D
 All of the requirements can be installed using apt.
 
 ```bash
-sudo apt install mariadb-server mariadb-client apache2 php php-cli php-json php-dom php-mysql php-zip php-soap php-curl php-xml php-mbstring php-zmq libapache2-mod-xsendfile
+sudo apt install mariadb-server mariadb-client apache2 php php-cli php-gd php-json php-dom php-mysql php-zip php-soap php-curl php-xml php-mbstring php-zmq libapache2-mod-xsendfile
 ```
 
 # Install Xibo CMS
@@ -55,6 +55,7 @@ This enables the necessary apache2 modules and creates a site configuration usin
 ```bash
 sudo a2enmod rewrite
 sudo a2enmod ssl
+sudo a2enmod session
 sudo vim /etc/apache2/sites-available/xibo-cms.conf
 ```
 
@@ -194,7 +195,7 @@ sudo systemctl status xibo-xmr.service
 ## Configure XTR
 
 ```bash
-sudo crontab -u www-data -enable
+sudo crontab -u www-data -e
 ```
 
 Select the editor you prefer and then enter the following line.
