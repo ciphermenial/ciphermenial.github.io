@@ -221,3 +221,39 @@ sudo systemctl restart apache2
 ```
 
 You can now browse to the server at the location you configured in the xibo-cms.conf
+
+# Upgrading
+
+## Backup
+
+The simplest thing to do is to stop apache2 and xibo-xmr service, moving the /srv/xibo-cms directory, and backing up the database.
+
+```bash
+sudo systemctl stop apache2 xibo-xmr
+sudo mv /srv/xibo-cms /srv/xibo-cms.backup
+sudo mysqldump xibo-cms > xibocms.sql
+```
+
+Create xibo-cms directory and change to it. Download the new version, in this example 2.3.4 extract it and copy back the necessary files. You will also need to delete the install/index.php file to stop a warning from appearing.
+
+## Installation
+
+```bash
+sudo mkdir /srv/xibo-cms
+cd /srv/xibo-cms
+sudo wget https://github.com/xibosignage/xibo-cms/releases/download/2.3.4/xibo-cms-2.3.4.tar.gz
+sudo tar -xvzf xibo-cms-2.3.4.tar.gz --strip-components=1
+sudo cp /srv/xibo-cms.backup/web/settings.php web/
+sudo cp -r /srv/xibo-cms.backup/Library .
+sudo cp /srv/xibo-cms.backup/vendor/xibosignage/xibo-xmr/bin/config.json vendor/xibosignage/xibo-xmr/bin/
+sudo chown -R www-data:www-data /srv/xibo-cms
+sudo rm web/install/index.php
+```
+
+Start up the services again.
+
+```bash
+sudo systemctl start apache2 xibo-xmr
+```
+
+After you have logged back in you may see no Layouts. Press Shift+F5 to clear cache on your browser and reload the page.
