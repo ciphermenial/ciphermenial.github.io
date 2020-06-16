@@ -231,7 +231,7 @@ The simplest thing to do is to stop apache2 and xibo-xmr service, moving the /sr
 ```bash
 sudo systemctl stop apache2 xibo-xmr
 sudo mv /srv/xibo-cms /srv/xibo-cms.backup
-sudo mysqldump xibo-cms > xibocms.sql
+sudo mysqldump xibo-cms > xibo-cms.sql
 ```
 
 Create xibo-cms directory and change to it. Download the new version, in this example 2.3.4 extract it and copy back the necessary files. You will also need to delete the install/index.php file to stop a warning from appearing.
