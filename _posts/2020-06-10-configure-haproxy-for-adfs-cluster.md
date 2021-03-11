@@ -2,7 +2,7 @@
 layout: post
 title: Configure HAProxy for Microsoft ADFS Cluster
 categories: [Network,Microsoft,Linux]
-excerpt: How to configure HAProxy to work with a Microsoft Active Director Federation Server Cluster (Updated: 11/03/2021)
+excerpt: How to configure HAProxy to work with a Microsoft Active Director Federation Server Cluster Updated on 11/03/2021
 ---
 # Introduction
 We had some aging hardware load balancers/reverse proxies that were no longer necessary for our setup. This lead to me working out how to replace them with some Ubuntu VMs.
