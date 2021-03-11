@@ -152,7 +152,7 @@ global
     ssl-default-server-ciphers EECDH+AESGCM:EDH+AESGCM
     ssl-default-server-options no-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets
     tune.ssl.default-dh-param 2048
-	crt-base /etc/ssl/domain.com/
+    crt-base /etc/ssl/domain.com/
 
 defaults
     log global
@@ -193,7 +193,7 @@ frontend fe_http
 # Frontend for HTTPS
 frontend fe_https
     bind *:443 ssl crt wildcard.pem
-	acl sts ssl_fc_sni sts.domain.com
+    acl sts ssl_fc_sni sts.domain.com
     use_backend be_sts if sts
     # This will be the webpage that is displayed if no matching FQDN is detected
     default_backend be_no-match
