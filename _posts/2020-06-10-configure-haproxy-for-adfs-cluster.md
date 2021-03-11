@@ -2,7 +2,7 @@
 layout: post
 title: Configure HAProxy for Microsoft ADFS Cluster
 categories: [Network,Microsoft,Linux]
-excerpt: How to configure HAProxy to work with a Microsoft Active Director Federation Server Cluster
+excerpt: How to configure HAProxy to work with a Microsoft Active Director Federation Server Cluster (Updated: 11/03/2021)
 ---
 # Introduction
 We had some aging hardware load balancers/reverse proxies that were no longer necessary for our setup. This lead to me working out how to replace them with some Ubuntu VMs.
@@ -60,7 +60,7 @@ vrrp_instance haproxy {
     state MASTER
     # MASTER requires a higher priority number than the SLAVE
     priority 101
-    virtual_router_id 51
+    virtual_router_id 1
     authentication {
         auth_type AH
         auth_pass 12345678
@@ -92,7 +92,7 @@ vrrp_instance haproxy {
     state BACKUP
     # BACKUP requires a lower priority number than the MASTER
     priority 100
-    virtual_router_id 51
+    virtual_router_id 1
     authentication {
         auth_type AH
         auth_pass 12345678
@@ -134,7 +134,7 @@ This assumes you have the necessary certificate created and located under /etc/s
 sudo vim /etc/haproxy/haproxy.cfg
 ```
 
-Modify the following as needed. The reason I have the loop through haproxy is because I have some HTTPS backends and some HTTP backends.
+Modify the following as needed.
 
 ```
 global
@@ -152,14 +152,14 @@ global
     ssl-default-server-ciphers EECDH+AESGCM:EDH+AESGCM
     ssl-default-server-options no-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets
     tune.ssl.default-dh-param 2048
+	crt-base /etc/ssl/domain.com/
 
 defaults
     log global
-    mode tcp
+    mode http
     option httplog
     option dontlognull
     option forwardfor
-    option http-use-htx
     timeout client 30s
     timeout server 30s
     timeout connect 5s
@@ -181,50 +181,38 @@ listen stats
     stats uri /haproxy_stats
     stats auth Username:Password
 
-# Frontend for HTTP to HTTPS redirect
+# Frontend for HTTP with letsencrypt detection
 frontend fe_http
     bind *:80
-    mode http
-    option httplog
-    log global
-    redirect scheme https code 301
+    # Test URI to see if it's a letsencrypt request
+    acl letsencrypt path_beg /.well-known/acme-challenge/
+    # Redirect HTTP to HTTPS with code 301 if not a letsencrypt request
+    http-request redirect scheme https code 301 if !letsencrypt
+    use_backend be_letsencrypt if letsencrypt
 
-# Frontend for SNI Passthrough
-frontend fe_spt
-    bind *:443
-    option forwardfor header X-Forwarded-For
-    tcp-request inspect-delay 5s
-    tcp-request content accept if { req_ssl_hello_type 1 }
-
-    # An entry is required per FQDN
-    use_backend spt_sts if { req_ssl_sni -i sts.domain.com }
-
+# Frontend for HTTPS
+frontend fe_https
+    bind *:443 ssl crt wildcard.pem
+	acl sts ssl_fc_sni sts.domain.com
+    use_backend be_sts if sts
     # This will be the webpage that is displayed if no matching FQDN is detected
-    default_backend spt_sts
+    default_backend be_no-match
 
-# Each SNI Passthrough backend requires a port to use for the normal frontend
-backend spt_sts
-    option forwardfor header X-Forwarded-For
-    server localhost 127.0.0.1:20000 check
+# Backends
+backend be_letsencrypt
+    server letsencrypt 10.0.0.103:80 check
 
-# Normal frontend
-frontend fe_sts
-    bind *:20000 ssl crt /etc/ssl/domain.com/certificate.pem
-    mode http
-    http-request set-header X-MS-Forwarded-Client-IP %[src]
-    use_backend be_sts
-
-# Normal backend
 backend be_sts
-    mode http
-    log global
     balance roundrobin
     option httpchk GET /adfs/ls/IdpInitiatedSignon.aspx HTTP/1.1\r\nHost:\ sts.domain.com
     option forwardfor header X-Client
     http-check expect status 200
     http-request add-header X-Forwarded-Proto https if { ssl_fc }
-    server adfs01 10.0.0.98:443 ssl verify none check check-sni sts.domain.com sni ssl_fc_sni inter 3s rise 2 fall 3
-    server adfs02 10.0.0.99:443 ssl verify none check check-sni sts.domain.com sni ssl_fc_sni inter 3s rise 2 fall 3
+    server adfs1 10.0.0.98:443 ssl verify none check check-sni sts.domain.com sni ssl_fc_sni inter 3s rise 2 fall 3
+    server adfs2 10.0.0.99:443 ssl verify none check check-sni sts.domain.com sni ssl_fc_sni inter 3s rise 2 fall 3
+
+backend be_no-match
+    http-request deny deny_status 403
 ```
 
 Make sure that you copy this configuration to your backup server.
