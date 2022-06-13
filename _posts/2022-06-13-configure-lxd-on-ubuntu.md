@@ -1,5 +1,5 @@
 ---
-title: Part 1: Configure LXD on Ubuntu 22.04
+title: Configure LXD on Ubuntu 22.04
 date: 2022-06-13
 categories: [guides, lxd]
 tags: [linux, ubuntu, lxd, guide, lxc]
@@ -7,7 +7,7 @@ tags: [linux, ubuntu, lxd, guide, lxc]
 
 # Introduction
 
-This guide is a look into how I setup my homelab.
+This guide is a look into how I setup my homelab. This is the first part to a group of guides I am writing.
 
 ## Requirements
 
