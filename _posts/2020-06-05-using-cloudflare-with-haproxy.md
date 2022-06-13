@@ -1,5 +1,4 @@
 ---
-layout: post
 title: Using Cloudflare With HAProxy
 categories: [Guides,HAProxy]
 tags: [guides,haproxy,linux,cloudflare,openwrt]
