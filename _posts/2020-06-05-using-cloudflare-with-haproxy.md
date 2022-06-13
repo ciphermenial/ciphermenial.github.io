@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Using Cloudflare With HAProxy
-categories: [Network,Linux]
-excerpt: This guide goes through configuration of HAProxy on OpenWrt and using Cloudflare proxy.
+categories: [Guides,HAProxy]
+tags: [guides,haproxy,linux,cloudflare,openwrt]
 ---
 
 # Introduction
