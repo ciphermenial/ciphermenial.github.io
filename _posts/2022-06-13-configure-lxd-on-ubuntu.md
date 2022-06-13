@@ -1,6 +1,5 @@
 ---
-title: Configure LXD on Ubuntu 22.04
-date: 2022-06-13
+title: Configure LXD on Ubuntu
 categories: [guides, lxd]
 tags: [linux, ubuntu, lxd, guide, lxc]
 ---
