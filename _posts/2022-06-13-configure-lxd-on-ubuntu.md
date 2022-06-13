@@ -4,8 +4,6 @@ categories: [guides, lxd]
 tags: [linux, ubuntu, lxd, guide, lxc]
 ---
 
-# Introduction
-
 This guide is a look into how I setup my homelab. This is the first part to a group of guides I am writing.
 
 ## Requirements
