@@ -1,7 +1,7 @@
 ---
 title: Configure LXD on Ubuntu
-categories: [guides, lxd]
-tags: [linux, ubuntu, lxd, guide, lxc]
+categories: [Guides, LXD]
+tags: [linux, ubuntu, lxd, guides, lxc]
 ---
 
 This guide is a look into how I setup my homelab. This is the first part to a group of guides I am writing.
