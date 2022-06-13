@@ -1,9 +1,9 @@
 ---
 title:  Install Guacamole on Ubuntu
-categories: [Server,Linux,Install]
+categories: [Guides,Guacamole]
+tags: [guides,ubuntu,linux,guacamole,apache,tomcat,totp,mariadb]
 ---
 
-# Introduction
 This was done to provide remote access to a server and make it as secure as possible.
 
 ## Notes
