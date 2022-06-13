@@ -4,7 +4,6 @@ categories: [Guides,HAProxy]
 tags: [guides,haproxy,linux,cloudflare,openwrt]
 ---
 
-# Introduction
 A while ago I switched to using Cloudflare for my domain names DNS. The main reason I did this was for dynamic DNS since I had a dynamic IP on my home Internet connection. I then looked into what else I could use Cloudflare for and over time have taken advantage of more of their free options.
 
 I was looking at setting up HAProxy anyway because I have a server that I use to play with all kinds of web services. I have a Icinga2 instance for monitoring, a Bookstack setup for taking notes, a Home Assistant install, and more. To make these easily accessible externally I wanted to use HAProxy with SNI. While looking into this I discovered Cloudflare Origin CA and use it in the following instructions.
