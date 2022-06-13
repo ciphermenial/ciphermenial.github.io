@@ -1,9 +1,11 @@
 ---
 layout: post
-title:  Install Tandoor Recipes in Ubuntu 21.10
-categories: [Server,Linux,Install]
-excerpt: This guide shows how to manually install Tandoor Recipes onto Ubuntu 21.10
+title:  Install Tandoor Recipes in Ubuntu
+categories: [Guides,Tandoor Recipes]
+tags: [guides,tandoor recipes,linux,ubuntu,lxd,postgresql]
 ---
+
+In this guide we will look at manually installing Tandoor Recipes. I have done this in a LXD container but you should be able to follow it using sudo commands for a normal install.
 
 ## Notes
 - This install was done in a LXD container.
