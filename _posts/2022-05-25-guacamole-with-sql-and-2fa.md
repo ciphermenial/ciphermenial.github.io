@@ -11,6 +11,7 @@ This was done to provide remote access to a server and make it as secure as poss
 - This is only a secure install if running behind a reverse proxy and is only accessible from the reverse proxy server/s.
 - In this example I have only installed the requirements for RDP and SSH connections.
 - [Guacamole is not compatible with Tomcat 10](https://issues.apache.org/jira/browse/GUACAMOLE-1325)
+- Default username and password is guacadmin/guacadmin
 
 # Install Requirements
 All of the requirements can be installed using apt.
