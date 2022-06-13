@@ -1,5 +1,5 @@
 ---
-title:  Install Guacamole on Ubuntu 20.04 LTS
+title:  Install Guacamole on Ubuntu
 categories: [Server,Linux,Install]
 ---
 
