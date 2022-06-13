@@ -1,10 +1,9 @@
 ---
-layout: post
 title: Access Your Modem Through OpenWrt Router
-categories: [Network,Linux]
-excerpt: How to access your bridged modem through an OpenWrt router
+categories: [Guides,OpenWrt]
+tags: [openwrt,guides,modem,network,firewall]
 ---
-# Introduction
+
 This guide goes through how to configure your OpenWrt router to allow access to the web interface of your bridged xDSL modem.
 
 ## Prerequisites
