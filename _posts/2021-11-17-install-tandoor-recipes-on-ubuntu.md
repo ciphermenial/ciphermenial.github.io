@@ -1,5 +1,4 @@
 ---
-layout: post
 title:  Install Tandoor Recipes in Ubuntu
 categories: [Guides,Tandoor Recipes]
 tags: [guides,tandoor recipes,linux,ubuntu,lxd,postgresql]
