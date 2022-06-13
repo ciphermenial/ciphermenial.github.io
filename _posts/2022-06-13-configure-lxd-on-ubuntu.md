@@ -21,9 +21,9 @@ This guide is a look into how I setup my homelab. This is the first part to a gr
 
 You can install Ubuntu Desktop if you feel more comforatble having a GUI, but it's unnecessary as all my guides will be using CLI.
 
-I am not going to go through this as there are lots of guides around about how to install Ubuntu.
+I am not going to go through installing Ubuntu Server, as there are lots of guides around about how to install Ubuntu.
 
-I alway update everything and configure timezone correctly.
+After install; I alway update everything and configure timezone correctly.
 
 ```bash
 sudo apt update
@@ -33,13 +33,13 @@ sudo dpkg-reconfigure tzdata
 
 # Initialise LXD
 
-First make sure you know what the location of the second block device for container storage. You can check with the following.
+First make sure you know the location of the second block device for container storage. You can check with the following command.
 
 ```bash
 sudo lshw -short -c disk
 ```
 
-Which will output something similar to this. And in my case is /dev/sdb
+Which will output something similar to this. And in my case the block device for LXD storage is /dev/sdb.
 
 ```bash
 H/W path               Device      Class          Description
@@ -48,7 +48,7 @@ H/W path               Device      Class          Description
 /0/100/1f.5/0.0.0      /dev/sdb    disk           500GB HARDDISK
 ```
 
-To configure LXD you run lxd init. Note that I am also setting the IPv4 address range for the bridge to 10.10.10.1/24. This will be used in other guides. Also because I am weird I set the ipv6 range to the lowest [unique local address](https://en.wikipedia.org/wiki/Unique_local_address) possible! You can select auto here for both.
+To configure LXD you run `lxd init`. Note that I am also setting the IPv4 address range for the bridge to 10.10.10.1/24. This will be used in other guides. Also because I am weird I set the ipv6 range to the lowest [unique local address](https://en.wikipedia.org/wiki/Unique_local_address) possible! You can select auto here for both and take note of the IPv4 address range.
 
 ```
 Would you like to use LXD clustering? (yes/no) [default=no]: no
