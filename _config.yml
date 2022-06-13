@@ -33,14 +33,14 @@ url: 'https://ciphermenial.github.io'
 github:
   username: ciphermenial             # change to your github username
 
-#twitter:
-#  username:           # change to your twitter username
+twitter:
+  username: ubuntu          # change to your twitter username
 
 social:
   # Change to your full name.
   # It will be displayed as the default author of the posts and the copyright owner in the Footer
   name: Cipher Menial
-#  email:             # change to your email address
+  email:  ciphermenial@gmail.com           # change to your email address
   links:
     # The first element serves as the copyright owner's link
     # change to your twitter homepage
