@@ -10,7 +10,6 @@ This was done to provide remote access to a server and make it as secure as poss
 - This install was done in an LXD container behind a HAProxy reverse proxy.
 - This is only a secure install if running behind a reverse proxy and is only accessible from the reverse proxy server/s.
 - In this example I have only installed the requirements for RDP and SSH connections.
-- [Guacamole is not compatible with Tomcat 10](https://issues.apache.org/jira/browse/GUACAMOLE-1325)
 - Default username and password is guacadmin/guacadmin
 
 # Install Requirements
@@ -22,6 +21,10 @@ libossp-uuid-dev freerdp2-dev libssh2-1-dev libpango1.0-dev mariadb-server
 ```
 
 # Install Tomcat 9.0.63
+
+[Guacamole is not compatible with Tomcat 10](https://issues.apache.org/jira/browse/GUACAMOLE-1325)
+{: .prompt-danger }
+
 When I am configuring server software outside of a package manager I always place it under the /srv folder. I will be installing Tomcat and Guacamole under /srv/tomcat.
 
 ```bash
