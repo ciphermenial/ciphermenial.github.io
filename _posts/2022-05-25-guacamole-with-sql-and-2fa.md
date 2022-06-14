@@ -47,7 +47,7 @@ vim /etc/systemd/system/tomcat.service
 
 ## tomcat.service file contents
 
-```bash
+```
 [Unit]
 Description=Tomcat 9 servlet container
 After=network.target
@@ -163,11 +163,9 @@ wget https://downloads.mariadb.com/Connectors/java/connector-java-2.7.5/mariadb-
 
 # Create Guacamole Database
 
-```bash
-mariadb
-```
+Enter the mariadb console by running `mariadb`
 
-```bash
+```sql
 CREATE DATABASE guacamole;
 CREATE USER 'guacamole' IDENTIFIED by 'PASSWORD';
 GRANT SELECT,INSERT,UPDATE,DELETE on guacamole.* to 'guacamole';
