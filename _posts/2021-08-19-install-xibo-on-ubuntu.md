@@ -100,10 +100,9 @@ sudo a2ensite xibo-cms.conf
 ```
 
 ## Configure MariaDB
-This configures a root password for MariaDB. Make sure to change MY_NEW_PASSWORD to your password of choice.
+This configures a root password for MariaDB. Make sure to change MY_NEW_PASSWORD to your password of choice. First enter mysql console by runinng `sudo mysql`, then run these SQL commands.
 
-```bash
-sudo mysql
+```mysql
 ALTER USER 'root'@'localhost' IDENTIFIED BY 'MY_NEW_PASSWORD';
 FLUSH PRIVILEGES;
 quit
