@@ -79,4 +79,5 @@ We are now ready to start creating containers.
 - `lxc list` to view a list of containers.
 - `lxc config show <container name>` to view teh containers configuration.
 - `lxd init --dump` to view the intial configuration for LXD.
-- `lxc exec <containter name> bash` to connect a container terminal session using bash
+- `lxc exec <containter name> bash` to connect a container terminal session using bash.
+- `snap run --shell lxd` to switch to the shell of the LXD snap. This allows to run commands e.g. zpool.
