@@ -28,7 +28,7 @@ When I am configuring server software outside of a package manager I always plac
 
 ```bash
 cd /srv
-wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.63/bin/apache-tomcat-9.0.63.tar.gz
+wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.64/bin/apache-tomcat-9.0.64.tar.gz
 ```
 
 This extracts the contents of the archive and places it into a directory named tomcat.
