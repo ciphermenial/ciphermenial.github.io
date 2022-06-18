@@ -21,7 +21,8 @@ libossp-uuid-dev freerdp2-dev libssh2-1-dev libpango1.0-dev mariadb-server
 
 # Install Tomcat 9.0.64
 
-> [Guacamole is not compatible with Tomcat 10](https://issues.apache.org/jira/browse/GUACAMOLE-1325) {: .prompt-danger }
+> [Guacamole is not compatible with Tomcat 10](https://issues.apache.org/jira/browse/GUACAMOLE-1325)
+{: .prompt-danger }
 
 When I am configuring server software outside of a package manager I always place it under the /srv folder. I will be installing Tomcat and Guacamole under /srv/tomcat.
 
@@ -152,7 +153,8 @@ cp guacamole-auth-totp-1.4.0/guacamole-auth-totp-1.3.0.jar /srv/guacamole/extens
 
 ## Install MariaDB Library
 
-> Guacamole does not work with version 3.0.5 of the connector {: .prompt-danger }
+> Guacamole does not work with version 3.0.5 of the connector
+{: .prompt-danger }
 
 ```bash
 mkdir /srv/guacamole/lib
