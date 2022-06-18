@@ -19,10 +19,9 @@ apt install gcc libcairo2-dev default-jdk make libjpeg-dev libtool-bin \
 libossp-uuid-dev freerdp2-dev libssh2-1-dev libpango1.0-dev mariadb-server
 ```
 
-# Install Tomcat 9.0.63
+# Install Tomcat 9.0.64
 
-> [Guacamole is not compatible with Tomcat 10](https://issues.apache.org/jira/browse/GUACAMOLE-1325)
-{: .prompt-danger }
+> [Guacamole is not compatible with Tomcat 10](https://issues.apache.org/jira/browse/GUACAMOLE-1325) {: .prompt-danger }
 
 When I am configuring server software outside of a package manager I always place it under the /srv folder. I will be installing Tomcat and Guacamole under /srv/tomcat.
 
@@ -35,8 +34,8 @@ This extracts the contents of the archive and places it into a directory named t
 
 ```bash
 mkdir /srv/tomcat
-tar -xzf apache-tomcat-9.0.63.tar.gz --strip-components=1 -C /srv/tomcat
-rm apache-tomcat-9.0.63.tar.gz
+tar -xzf apache-tomcat-9.0.64.tar.gz --strip-components=1 -C /srv/tomcat
+rm apache-tomcat-9.0.64.tar.gz
 ```
 
 Now you will need to create a systemd service for autostarting Tomcat.
@@ -139,7 +138,7 @@ wget https://dlcdn.apache.org/guacamole/1.4.0/binary/guacamole-auth-jdbc-1.4.0.t
 mkdir /srv/guacamole/extensions
 tar -xzf guacamole-auth-jdbc-1.4.0.tar.gz
 rm guacamole-auth-jdbc-1.4.0.tar.gz
-cp guacamole-auth-jdbc-1.4.0/mysql/guacamole-auth-jdbc-mysql-1.3.0.jar /srv/guacamole/extensions
+cp guacamole-auth-jdbc-1.4.0/mysql/guacamole-auth-jdbc-mysql-1.4.0.jar /srv/guacamole/extensions
 ```
 
 ## Install TOTP Extension for 2FA
@@ -153,7 +152,7 @@ cp guacamole-auth-totp-1.4.0/guacamole-auth-totp-1.3.0.jar /srv/guacamole/extens
 
 ## Install MariaDB Library
 
-I have tested version 3.0.4 and it does not work. I am not sure why because I can't be bothered looking into it.
+> Guacamole does not work with version 3.0.5 of the connector {: .prompt-danger }
 
 ```bash
 mkdir /srv/guacamole/lib
