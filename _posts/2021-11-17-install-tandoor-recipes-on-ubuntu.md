@@ -15,7 +15,7 @@ In this guide we will look at manually installing Tandoor Recipes. I have done t
 The requirements can be installed using apt and npm. I also am creating a user for this app called recipes.
 
 ```bash
-apt install gettext libjpeg9 libwebp6 build-essential musl-dev cargo python3.9-venv python3.9-dev libldap2-dev libssl-dev libsasl2-dev npm nginx
+apt install gettext libjpeg9 libwebp6 build-essential musl-dev cargo python3.9-venv python3.9-dev libldap2-dev libssl-dev libsasl2-dev npm nginx python3-is-python
 npm install yarn -g
 useradd recipes
 ```
@@ -57,10 +57,10 @@ POSTGRES_DB=recipes
 Now create a Python virtual env. and install the requirements.
 
 ```bash
-python3.9 -m venv venv
+python -m venv venv
 source venv/bin/activate
-python3.9 -m pip install --upgrade pip
-pip3.9 install -r requirements.txt 
+python -m pip install --upgrade pip
+pip install -r requirements.txt 
 ```
 
 Now install the frontend requirements and build them.
@@ -80,7 +80,7 @@ python3.9 manage.py collectstatic_js_reverse
 python3.9 manage.py collectstatic
 ```
 
-Change ownership of the recipes directory and give appropriate access to the medaifiles directory.
+Change ownership of the recipes directory and give appropriate access to the mediafiles directory.
 
 ```bash
 chown -R recipes:www-data /srv/recipes
@@ -157,13 +157,14 @@ Activate the python venv and run update commands.
 
 ```bash
 source venv/bin/activate
-pip3.9 install -r requirements.txt
-python3.9 manage.py migrate
-python3.9 manage.py collectstatic
-python3.9 manage.py collectstatic_js_reverse
+pip install -r requirements.txt
 cd vue
 yarn install
 yarn build
+cd ..
+python manage.py migrate
+python manage.py collectstatic_js_reverse
+python manage.py collectstatic
 ```
 
 Restart the recipes service and you're done.
@@ -180,11 +181,16 @@ After the upgrade I had to delete and rebuild the Python venv. For some reason I
 apt install python3.10-venv
 cd /srv/recipes
 rm -r venv/
-python3.10 -m venv venv
+rm staticfiles/staticfiles.json
+python -m venv venv
 source venv/bin/activate
-python3.10 -m pip install --upgrade pip
-pip3.10 install -r requirements.txt
-python3.10 manage.py collectstatic
-python3.10 manage.py collectstatic_js_reverse
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+cd vue
+yarn install
+yarn build
+cd ..
+python manage.py collectstatic_js_reverse
+python manage.py collectstatic
 systemctl start recipes
 ```
