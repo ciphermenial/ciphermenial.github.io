@@ -77,7 +77,7 @@ frontend frontend_snipt
 # Backend for SNI Passthrough
 backend backend_snipt_1
     mode tcp
-    localhost 127.0.0.1:7000 check
+    server localhost 127.0.0.1:7000 check
 
 backend backend_snipt_2
     mode tcp
