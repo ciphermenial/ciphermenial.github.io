@@ -4,8 +4,6 @@ categories: [Guides,HAProxy]
 tags: [guides,ubuntu,linux,lxc,lxd,haproxy,cloudflare,certificates]
 ---
 
-# HAProxy Config
-
 This is a explanation of my HAProxy config, mostly as a reminder for myself. This has evolved over time. Most recently I have added a redirection for external or internal traffic to backends. The reason for this was due to adding a Jellyfin server and I didn't want that running over Cloudflare if the connection was coming from the internal network.
 
 Here is a copy of my HAProxy config in full
