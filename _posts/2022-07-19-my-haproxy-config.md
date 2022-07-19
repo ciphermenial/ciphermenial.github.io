@@ -137,7 +137,7 @@ backend be_jellyfin
 # Traffic Flow
 
 ```mermaid
-graph LR
+graph TD
     IU[/Internal User\] --http://media.domain.com--- FE_HTTP[HTTP Frontend]
     EU[/External User\] --http://media.domain.com--- CF[Cloudflare]
     CF --- FE_HTTPS
