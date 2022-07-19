@@ -154,7 +154,7 @@ graph TD
 
 # Breakdown
 
-This is some brief explanations on important sections of my configuration. For an explanation of the important parts of the configuration; [This](https://www.haproxy.com/blog/the-four-essential-sections-of-an-haproxy-configuration) is an excellent write-up of this.
+This is some brief explanations on important sections of my configuration. For an explanation of the important parts of the configuration; [This](https://www.haproxy.com/blog/the-four-essential-sections-of-an-haproxy-configuration) is an excellent write-up of how each section functions.
 
 ### Global
 
