@@ -5,9 +5,9 @@ tags: [guides,ubuntu,linux,lxc,lxd,haproxy,cloudflare,certificates]
 mermaid: true
 ---
 
-This is an explanation of my HAProxy config, mostly as a reminder for myself. This has evolved over time. Most recently I have added a redirection for external or internal traffic to backends. The reason for this was due to adding a Jellyfin server and I didn't want that running over Cloudflare if the connection was coming from the internal network.
+This is an explanation of my [HAProxy](https://www.haproxy.org) config, mostly as a reminder for myself. This has evolved over time. Most recently I have added a redirection for external or internal traffic to backends. The reason for this was due to adding a [Jellyfin](https://jellyfin.org) server and I didn't want that running over [Cloudflare](https://www.cloudflare.com) if the connection was coming from the internal network.
 
-Here is a copy of my HAProxy config in full
+Here is a copy of my HAProxy config in full:
 
 ```bash
 global
@@ -136,6 +136,8 @@ backend be_jellyfin
 ```
 # Traffic Flow
 
+This shows how traffic flows internally or externally from the user to the services behind my HAProxy server.
+
 ```mermaid
 graph TD
     IU[/Internal User\] --http://media.domain.com--- FE_HTTP[HTTP Frontend]
@@ -151,6 +153,8 @@ graph TD
 ```
 
 # Breakdown
+
+This is some brief explanations on important sections of my configuration. For an explanation of the important parts of the configuration; [This](https://www.haproxy.com/blog/the-four-essential-sections-of-an-haproxy-configuration) is an excellent write-up of this.
 
 ### Global
 
@@ -216,7 +220,7 @@ This is self explanatory.
 
 ### Redirect Frontend
 
-The purpose of this frontend is to redirect the connection to a backend based on whether the connection is coming from my internal subnet. The reason I do this is because I am using Cloudflare as a proxy for connections to my services. Because of this I require the frontend from Cloudflare to use a Cloudflare Origins certificate, which will come up with a certificate error for internal users directly connecting to the HAProxy server. This was implemented due to traffic concerns because I set up a Jellyfin server. If I left it how I had it previously it would have meant looping a lot of traffic out to the Internet and then back in through Cloudflare.
+The purpose of this frontend is to redirect the connection to a backend based on whether the connection is coming from my internal subnet. The reason I do this is because I am using Cloudflare as a proxy for connections to my services. Because of this I require the frontend from Cloudflare to use a [Cloudflare Origins](https://www.cloudflare.com/en-au/learning/cdn/glossary/origin-server) certificate, which will come up with a certificate error for internal users directly connecting to the HAProxy server. This was implemented due to traffic concerns because I set up a Jellyfin server. If I left it how I had it previously it would have meant looping a lot of traffic out to the Internet and then back in through Cloudflare.
 
 ```bash
 # Frontend to redirect based on IP range
@@ -234,7 +238,7 @@ frontend fe_redirect
 
 This is the default frontend and all traffic going to HTTPS will hit it. This one is configured for tcp mode as it does not need to see anything in the headers.
 
-I have an acl configured that matches my internal network range of 192.168.88.0/24
+I have an ACL configured that matches my internal network range of 192.168.88.0/24
 
 It will then redirect traffic to my internal backend (be_int) if it matches the rule, otherwise it will send it to my external backend (be_ext)
 
@@ -270,9 +274,9 @@ frontend fe_ext
     default_backend be_no-match
 ```
 
-This frontend is bound to port 7000. You can use any port that you want. There is not good reason that I chose 7000. The domain.com.pem is the Cloudflare origins certificate.
+This frontend is bound to port 7000. You can use any port that you want. There is no good reason that I chose 7000. The domain.com.pem is the Cloudflare origins certificate.
 
-Backends are selected based on an SNI match for each acl.
+Backends are selected based on an SNI match for each ACL.
 
 If it doesn't match any of the ACLs it is will send it to a backend that shows a failure page.
 
@@ -292,9 +296,9 @@ frontend fe_int
     default_backend be_no-match
 ```
 
-This frontend is bound to 7001, simply because it is the next number on from the External Frontend. The certificate is a wildcard certificate that I auto-generate with Let's Encrypt.
+This frontend is bound to 7001, simply because it is the next number on from the External Frontend. The certificate is a wildcard certificate that I auto-generate with [Let's Encrypt](https://letsencrypt.org).
 
-The bind line is the only part different from External Frontend.
+The bind line is the only part different from External Frontend. You can set it identically to the External Frontend.
 
 ## Backends
 
