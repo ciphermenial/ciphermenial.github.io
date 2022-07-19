@@ -4,7 +4,7 @@ categories: [Guides,HAProxy]
 tags: [guides,ubuntu,linux,lxc,lxd,haproxy,cloudflare,certificates]
 ---
 
-This is a explanation of my HAProxy config, mostly as a reminder for myself. This has evolved over time. Most recently I have added a redirection for external or internal traffic to backends. The reason for this was due to adding a Jellyfin server and I didn't want that running over Cloudflare if the connection was coming from the internal network.
+This is an explanation of my HAProxy config, mostly as a reminder for myself. This has evolved over time. Most recently I have added a redirection for external or internal traffic to backends. The reason for this was due to adding a Jellyfin server and I didn't want that running over Cloudflare if the connection was coming from the internal network.
 
 Here is a copy of my HAProxy config in full
 
@@ -132,6 +132,21 @@ backend be_paperless
 
 backend be_jellyfin
     server jellyfin jellyfin.lxd:8096 check
+```
+# Traffic Flow
+
+```mermaid
+graph LR
+    IU[/Internal User\] --http://media.domain.com--- FE_HTTP[HTTP Frontend]
+    EU[/External User\] --http://media.domain.com--- CF[Cloudflare]
+    CF --- FE_HTTPS
+    FE_HTTP --- FE_HTTPS[HTTPS Frontend]
+    FE_HTTPS --Internal User?--- BE_INT[Internal Backend]
+    FE_HTTPS --External User?--- BE_EXT[External Backend]
+    BE_INT --- FE_INT[Internal Frontend]
+    BE_EXT --- FE_EXT[External Frontend]
+    FE_INT --- S[Web Service]
+    FE_EXT --- S
 ```
 
 # Breakdown
