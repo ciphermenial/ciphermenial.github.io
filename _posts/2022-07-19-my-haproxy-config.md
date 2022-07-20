@@ -140,16 +140,18 @@ This shows how traffic flows internally or externally from the user to the servi
 
 ```mermaid
 graph TD
+    EU[/External User\] -.http://media.domain.com.- CF[Cloudflare]
+    CF -.- FE_HTTPS
     IU[/Internal User\] --http://media.domain.com--- FE_HTTP[HTTP Frontend]
-    EU[/External User\] --http://media.domain.com--- CF[Cloudflare]
-    CF --- FE_HTTPS
-    FE_HTTP --- FE_HTTPS[HTTPS Frontend]
-    FE_HTTPS --Internal User?--- BE_INT[Internal Backend]
-    FE_HTTPS --External User?--- BE_EXT[External Backend]
-    BE_INT --- FE_INT[Internal Frontend]
-    BE_EXT --- FE_EXT[External Frontend]
-    FE_INT --- S[Web Service]
-    FE_EXT --- S
+    subgraph HAProxy
+        FE_HTTPS -.External User?.- BE_EXT[External Backend]
+        FE_HTTPS --Internal User?--- BE_INT[Internal Backend]
+        FE_HTTP --- FE_HTTPS[HTTPS Frontend]
+        BE_EXT -.- FE_EXT[External Frontend]
+        BE_INT --- FE_INT[Internal Frontend]
+    end
+    FE_EXT -.- S[Web Service]
+    FE_INT --- S
 ```
 
 # Breakdown
