@@ -160,7 +160,7 @@ graph TD
 
 These are some brief explanations on important sections of my configuration. For an explanation of the important parts of the configuration in general; [This](https://www.haproxy.com/blog/the-four-essential-sections-of-an-haproxy-configuration) is an excellent write-up of how each section functions.
 
-### Global
+## Global
 
 In this section all the bits that globally apply to HAProxy are entered.
 
@@ -180,7 +180,7 @@ global
 
 Most of this is standard in a Ubuntu install of HAProxy. The only part I added was the base location for the certificates I use.
 
-### Defaults
+## Defaults
 
 I only use a single defaults section since there are only a small amount of deviations from them in the frontends and backends.
 
@@ -200,7 +200,7 @@ Because most of my frontends and backends use http mode I set it here, along wit
 
 All the rest is common configuration.
 
-### Stats Page
+## Stats Page
 
 I am using an almost default set-up for the listen for statistics page.
 
