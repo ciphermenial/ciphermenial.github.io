@@ -46,7 +46,7 @@ frontend fe_http
     # Redirect HTTP to HTTPS with code 301
     http-request redirect scheme https code 301
 
-# Frontend for SNI Passthrough
+# Frontend for redirecting internal or external traffic to the frontend with the required certificate.
 frontend fe_redirect
     bind *:443
     mode tcp
@@ -58,6 +58,7 @@ frontend fe_redirect
     use_backend be_int if int_net
     default_backend be_ext
 
+# Frontend for external users that a connecting through Cloudflare
 frontend fe_ext
     bind *:7000 ssl crt domain.com.pem
 
@@ -84,6 +85,7 @@ frontend fe_ext
     # This redirects to a failure page
     default_backend be_no-match
 
+# Frontend for internal users connecting directly to HAProxy
 frontend fe_int
     bind *:7001 ssl crt int.domain.com.pem
 
@@ -94,7 +96,7 @@ frontend fe_int
     # This redirects to a failure page
     default_backend be_no-match
 
-# Redirect to frontend based on internal or external connections
+# Redirect to frontend based on origin
 backend be_ext
     mode tcp
     server localhost 127.0.0.1:7000 check
