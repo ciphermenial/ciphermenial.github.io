@@ -10,3 +10,7 @@ I am writing a bunch of guides on how I configure my homelab. I will mark off ea
 - [x] [Configure LXD on Ubuntu 22.04](/posts/configure-lxd-on-ubuntu/)
 - [x] [Setup & Configure HAProxy Container with Cloudflare Origins](/posts/configure-haproxy-container/)
 - [ ] Install & Configure SMTP Outbound Container
+- [ ] Install & Configure MariaDB Container
+- [ ] Install & Configure PostgreSQL Container
+- [ ] Install & Configure Keycloak Container
+- [ ] Install & Configure Apache Guacamole Container
