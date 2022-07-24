@@ -4,13 +4,13 @@ categories: [Guides,HAProxy]
 tags: [guides,haproxy,linux,cloudflare,openwrt]
 ---
 
-A while ago I switched to using Cloudflare for my domain names DNS. The main reason I did this was for dynamic DNS since I had a dynamic IP on my home Internet connection. I then looked into what else I could use Cloudflare for and over time have taken advantage of more of their free options.
+A while ago I switched to using [Cloudflare](https://www.cloudflare.com) for my domain names [DNS](https://en.wikipedia.org/wiki/Domain_Name_System). The main reason I did this was for dynamic DNS since I had a dynamic IP on my home Internet connection. I then looked into what else I could use Cloudflare for and over time have taken advantage of more of their free options.
 
-I was looking at setting up HAProxy anyway because I have a server that I use to play with all kinds of web services. I have a Icinga2 instance for monitoring, a Bookstack setup for taking notes, a Home Assistant install, and more. To make these easily accessible externally I wanted to use HAProxy with SNI. While looking into this I discovered Cloudflare Origin CA and use it in the following instructions.
+I was looking at setting up [HAProxy](https://www.haproxy.org) anyway because I have a server that I use to play with all kinds of web services. I have a [Icinga2](https://icinga.com) instance for monitoring, a [Bookstack](https://www.bookstackapp.com) setup for taking notes, a [Home Assistant](https://www.home-assistant.io) install, and more. To make these easily accessible externally I wanted to use HAProxy with [SNI](https://en.wikipedia.org/wiki/Server_Name_Indication). While looking into this I discovered Cloudflare Origin CA and use it in the following instructions.
 
 # Requirements
 To follow this setup completely you will need:
-- An OpenWrt/LEDE based router
+- An [OpenWrt](https://openwrt.org) based router
 - A public domain name
 - A Cloudflare account
   - https://support.cloudflare.com/hc/en-us/categories/200275218-Getting-Started
@@ -22,7 +22,7 @@ You will then need to configure [Cloudflare's Universal SSL](https://blog.cloudf
 
 Once you have the certificate and key, you can combine them together to create a .pem file. You will then copy this .pem to somewhere on your router. I've placed mine under ```/etc/ssl/cloudflare/domain.com.pem```
 
-Also remember to backup this file somewhere secure as in that location it won't be saved during an upgrade of OpenWrt/LEDE.
+Also remember to backup this file somewhere secure as in that location it won't be saved during an upgrade of OpenWrt.
 
 # HAProxy Configuration
 This is the configuration I have used but I am not sure if it is the best way to go about it. I would love some feedback about whether there is a better way to manage it. You will usually need to install the haproxy package from opkg.
@@ -171,7 +171,7 @@ To configure a scheduled task in OpenWrt is really simple. I did it through the 
 5. Go to System > Startup
 6. Restart cron
 
-This will create a task that will run at midnight and copy the contents of the text file to a local file name cfip.v4 under /etc For more information about crontab and how it works click [HERE](https://www.adminschoice.com/crontab-quick-reference).
+This will create a task that will run at midnight and copy the contents of the text file to a local file name cfip.v4 under /etc For more information about crontab and how it works click [here](https://www.adminschoice.com/crontab-quick-reference).
 
 To make sure that file is created straight away it is a good idea to run the command on the router.
 
