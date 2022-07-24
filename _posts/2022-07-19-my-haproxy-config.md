@@ -286,7 +286,7 @@ If it doesn't match any of the ACLs it is will send it to a backend that shows a
 
 ### Internal Frontend
 
-This frontend can be a mirror of the External Frontend if you want all internal connection to come through it. I currently on have Jellyfin passed to it internally due to data requirements. All the other services I am using, I am not concerned about data usage.
+This frontend can be a mirror of the External Frontend if you want all internal connection to come through it. I currently only have Jellyfin passed to it internally due to data requirements. All the other services I am using, I am not concerned about data usage.
 
 ```bash
 frontend fe_int
