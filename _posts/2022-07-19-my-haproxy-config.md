@@ -302,7 +302,7 @@ frontend fe_int
 
 This frontend is bound to 7001, simply because it is the next number on from the External Frontend. The certificate is a wildcard certificate that I auto-generate with [Let's Encrypt](https://letsencrypt.org).
 
-The bind line is the only part different from External Frontend. You can set it identically to the External Frontend.
+The bind line is the only part different from External Frontend. Every other line can be set identically to the External Frontend.
 
 ## Backends
 
