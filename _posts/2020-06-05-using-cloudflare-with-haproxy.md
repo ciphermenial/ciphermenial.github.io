@@ -13,10 +13,10 @@ To follow this setup completely you will need:
 - An [OpenWrt](https://openwrt.org) based router
 - A public domain name
 - A Cloudflare account
-  - [https://support.cloudflare.com/hc/en-us/categories/200275218-Getting-Started](https://support.cloudflare.com/hc/en-us/categories/200275218-Getting-Started)
+  - [Getting Started](https://developers.cloudflare.com/fundamentals/get-started/)
 
 # Cloudflare Setup
-After you have followed through the [Cloudflare Getting Started guide.](https://support.cloudflare.com/hc/en-us/categories/200275218-Getting-Started)
+After you have followed through the [Cloudflare Getting Started guide.](https://developers.cloudflare.com/fundamentals/get-started/)
 
 You will then need to configure [Cloudflare's Universal SSL](https://blog.cloudflare.com/universal-ssl-encryption-all-the-way-to-the-origin-for-free) by following the guide [https://support.cloudflare.com/hc/en-us/articles/115000479507](https://support.cloudflare.com/hc/en-us/articles/115000479507) to create a Cloudflare Origin Certificate to install onto your router.
 
