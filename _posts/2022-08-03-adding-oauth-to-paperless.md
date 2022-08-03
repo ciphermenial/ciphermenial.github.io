@@ -119,5 +119,33 @@ DEFAULT_FROM_EMAIL = os.getenv("PAPERLESS_DEFAULT_FROM_EMAIL", "webmaster@localh
 ACCOUNT_EMAIL_SUBJECT_PREFIX = os.getenv("PAPERLESS_ACCOUNT_EMAIL_SUBJECT_PREFIX", "[Paperless] ") # Django Allauth sender prefix
 ```
 
-urls.py
+# urls.py
+This part breaks the pretty login form because it starts to use the default login forms that come with django-allauth. This was changed on ```src/paperless/urls.py```.
+I changed ```path("accounts/", include("django.contrib.auth.urls")),``` to ```path("accounts/", include("allauth.urls")),```.
+
+# paperless.conf
+All of the changes made here are matched up with the changes in settings.py. The only one that needs some explanation is the PAPERLESS_ENABLE_ALLAUTH_PROVIDERS and PAPERLESS_ALLAUTH_PROVIDERS which is explained by [Tandoor Recipes docs](https://docs.tandoor.dev/features/authentication).
+
+```python
+# Django Allauth settings
+# If you are running Paperless behind a reverse proxy you will need to enable this
+PAPERLESS_REVERSE_PROXY_AUTH=true
+# Enable the use of Django Allauth
+PAPERLESS_ENABLE_ALLAUTH=true
+# Comma seperated list of Allauth providers https://django-allauth.readthedocs.io/en/latest/installation.html
+PAPERLESS_ENABLE_ALLAUTH_PROVIDERS=allauth.socialaccount.providers.keycloak
+PAPERLESS_ALLAUTH_PROVIDERS={"keycloak":{"KEYCLOAK_URL":"https://keycloak.domain.com","KEYCLOAK_REALM":"master"}}
+
+# Outbound Mail
+# Outbound email configuration
+PAPERLESS_EMAIL_HOST=smtp.lxd
+PAPERLESS_EMAIL_PORT=25
+#PAPERLESS_EMAIL_HOST_USER=
+#PAPERLESS_EMAIL_HOST_PASSWORD=
+PAPERLESS_EMAIL_USE_TLS=false
+PAPERLESS_EMAIL_USE_TLS=false
+PAPERLESS_DEFAULT_FROM_EMAIL=paperless@domain.com
+#PAPERLESS_ACCOUNT_EMAIL_SUBJECT_PREFIX=
+```
+
 
