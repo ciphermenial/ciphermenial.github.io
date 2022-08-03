@@ -150,13 +150,23 @@ PAPERLESS_DEFAULT_FROM_EMAIL=paperless@domain.com
 # Django Admin Configuration
 I then needed to do the configuration in django admin.
 First you need to modify the Site to the FQDN that it will be working with. In the example I have used domain.com.
+
 ![](/assets/img/django-allauth-sites.png)
+
 Then you need to go to the Social Application section and click on
+
 ![](/assets/img/django-allauth-add-socialapp.png)
+
 Fill out the add social application as needed.
+
 ![](/assets/img/django-allauth-socialapp.png)
+
 Next you need to create a user to link to your Keycloak Account. Once the user is created you can go to Social Account section and click on
+
 ![](/assets/img/django-allauth-add-socialaccount.png)
+
 Fill out the add social application as needed.
+
 ![](/assets/img/django-allauth-socialaccount.png)
+
 You should now be able to sign out and sign back in by clicking on Keycloak.
