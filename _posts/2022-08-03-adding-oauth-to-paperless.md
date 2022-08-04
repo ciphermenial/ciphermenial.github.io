@@ -6,13 +6,13 @@ tags: [ubuntu,linux,paperless-ngx,haproxy,django,oauth]
 
 When I am deciding on web services to use on my home lab, I lean towards ones that support [SSO](https://en.wikipedia.org/wiki/Single_sign-on). I do this because I have Keycloak configured and working with my Yubikeys for [MFA](https://en.wikipedia.org/wiki/Multi-factor_authentication).
 
-The problem here is a recently decided to try [Paperless-ngx](https://paperless-ngx.readthedocs.io) since so many people use it in their home labs. It does not have SSO support. However it is built with [django](https://www.djangoproject.com). I have previously configured [Tandoor Recipes](https://docs.tandoor.dev) in my home lab and it also uses django and supports SSO. It supports [OAuth](https://oauth.net) by using the project [django-allauth](https://django-allauth.readthedocs.io).
+The problem here is I recently decided to try [Paperless-ngx](https://paperless-ngx.readthedocs.io) since so many people use it in their home labs. It does not have SSO support. However it is built with [django](https://www.djangoproject.com). I have previously configured [Tandoor Recipes](https://docs.tandoor.dev) in my home lab and it also uses django and supports SSO. It supports [OAuth](https://oauth.net) by using the project [django-allauth](https://django-allauth.readthedocs.io).
 
 I thought I would see how that all fit together and try to make django-allauth work with Paperless-ngx. I have managed to make it work (it's not pretty though) and this is what bits I changed.
 
 # requirements.txt
 The first thing you need to do is make sure django-allauth is installed so Paperless-ngx can access it. To do this I added it to the requirements.txt with the line ```django-allauth==0.51.0```
-Then I switched to the python venv and reran ```pip install -r requirements.txt```. You can simply switch to the venv and install django-allauth.
+Then I switched to the python venv and reran ```pip install -r requirements.txt```. You can simply switch to the venv and install django-allauth instead.
 
 # settings.py
 Now I needed to make modifications to ```src/paperless/settings.py``` because currently Paperless-ngx has no idea about django-allauth.
@@ -41,7 +41,7 @@ This sets the variable ENABLE_ALLAUTH to True or False based on what PAPERLESS_E
 ALLAUTH_DEFAULT_ACCESS = __get_boolean("PAPERLESS_ALLAUTH_DEFAULT_ACCESS")
 ALLAUTH_DEFAULT_GROUP = os.getenv('PAPERLESS_ALLAUTH_DEFAULT_GROUP', 'guest')
 ```
-This was another part taken from Tandoor Recipes that I am not suer I need.
+This was another part taken from Tandoor Recipes that I am not sure I need.
 
 ```python
 if ENABLE_ALLAUTH:
