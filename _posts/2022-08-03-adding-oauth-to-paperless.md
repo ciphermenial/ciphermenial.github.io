@@ -18,7 +18,7 @@ Then I switched to the python venv and reran ```pip install -r requirements.txt`
 Now I needed to make modifications to ```src/paperless/settings.py``` because currently Paperless-ngx has no idea about django-allauth.
 The first part I added was right at the start. I added ```import ast``` because that is required for a part I used from Tandoor Recipes. I don't know if it is required because I have no idea what I am doing.
 
-One of the problems I had was that I have a reverse proxy doing TLS offloading. This caused a problem with django-allauth. I'm not exactly sure what the problem was but when it tried to auth to my Keycloak server it didn't even reach it and redirected back to the Paperless-ngx login. To resolve that I needed to set up settings to make django aware of the reverse proxy.
+One of the issues I had was that I have a reverse proxy doing TLS offloading. This caused a problem with django-allauth. I'm not exactly sure what the problem was but when it tried to auth to my Keycloak server it didn't even reach it and redirected back to the Paperless-ngx login. To resolve that I needed to set up settings to make django aware of the reverse proxy.
 
 ```python
 # Reverse Proxy requirements
@@ -59,7 +59,16 @@ if ENABLE_ALLAUTH:
         "allauth.account.auth_backends.AuthenticationBackend",
     ]
 ```
-This sets the necessary parameters is ENABLE_ALLAUTH is set to true.
+This sets the necessary parameters if ENABLE_ALLAUTH is set to true.
+
+```python
+    # Points to custom account adapter to disable signup
+    ACCOUNT_ADAPTER = "paperless.adapter.CustomAccountAdapter"
+
+    # Variable to tell CustomAccountAdapter whether to allow signups
+    ACCOUNT_ALLOW_SIGNUPS = False
+```
+This part was added to the above to make sure sign up was unavailable. Otherwise anyone could create a new account. See adapter.py for the remaining configuration.
 
 The next part is required to verify the email address associated with the user. It is not necessary because you can login with your Paperless-ngx admin user
 
@@ -107,6 +116,11 @@ if ENABLE_ALLAUTH:
         "django.contrib.auth.backends.ModelBackend",
         "allauth.account.auth_backends.AuthenticationBackend",
     ]
+    # Points to custom account adapter to disable signup
+    ACCOUNT_ADAPTER = "paperless.adapter.CustomAccountAdapter"
+
+    # Variable to tell CustomAccountAdapter whether to allow signups
+    ACCOUNT_ALLOW_SIGNUPS = False
 
 # Outbound email configuration
 EMAIL_HOST = os.getenv("PAPERLESS_EMAIL_HOST", "")
@@ -117,6 +131,24 @@ EMAIL_USE_TLS = __get_boolean("PAPERLESS_EMAIL_USE_TLS")
 EMAIL_USE_SSL = __get_boolean("PAPERLESS_EMAIL_USE_SSL")
 DEFAULT_FROM_EMAIL = os.getenv("PAPERLESS_DEFAULT_FROM_EMAIL", "webmaster@localhost")
 ACCOUNT_EMAIL_SUBJECT_PREFIX = os.getenv("PAPERLESS_ACCOUNT_EMAIL_SUBJECT_PREFIX", "[Paperless] ") # Django Allauth sender prefix
+```
+# adapter.py
+I added an adapter.py file to ```src/paperless``` to stop people from creating new accounts.
+
+```python
+from django.conf import settings
+
+from allauth.account.adapter import DefaultAccountAdapter
+
+class CustomAccountAdapter(DefaultAccountAdapter):
+    def is_open_for_signup(self, request):
+        """
+        Whether to allow sign ups.
+        """
+        allow_signups = super(
+            CustomAccountAdapter, self).is_open_for_signup(request)
+        # Override with setting, otherwise default to super.
+        return getattr(settings, 'ACCOUNT_ALLOW_SIGNUPS', allow_signups)
 ```
 
 # urls.py
