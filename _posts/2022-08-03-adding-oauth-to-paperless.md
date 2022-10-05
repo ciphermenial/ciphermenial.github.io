@@ -201,4 +201,4 @@ Fill out the add social application as needed.
 
 ![](/assets/img/django-allauth-socialaccount.png)
 
-You should now be able to sign out and sign back in by clicking on Keycloak.
+You should now be able to sign out and sign back in, by clicking on Keycloak.
