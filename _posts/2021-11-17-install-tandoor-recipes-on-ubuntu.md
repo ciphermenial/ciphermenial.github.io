@@ -4,18 +4,19 @@ categories: [Guides,Tandoor Recipes]
 tags: [guides,tandoor recipes,linux,ubuntu,lxd,postgresql]
 ---
 
-In this guide we will look at manually installing Tandoor Recipes. I have done this in a LXD container but you should be able to follow it using sudo commands for a normal install.
+In this guide we will look at manually installing [Tandoor Recipes](https://docs.tandoor.dev/). I have done this in a LXD container but you should be able to follow it using sudo commands for a normal install.
 
 ## Notes
 - This install was done in a LXD container.
 - I have a haproxy runing in front of this.
 - I already have a postgresql server in place and built a database named *recipes* with a user with the same name.
+- I installed Node.js from [NodeSource](https://github.com/nodesource/distributions/blob/master/README.md)
 
 # Installation
-The requirements can be installed using apt and npm. I also am creating a user for this app called recipes.
+The requirements can be installed using apt and npm. I also am creating a user for this app called recipes. Don't forget to install Node.js.
 
 ```bash
-apt install gettext libjpeg9 libwebp6 build-essential musl-dev cargo python3.9-venv python3.9-dev libldap2-dev libssl-dev libsasl2-dev npm nginx python3-is-python
+apt install gettext libjpeg9 libwebp6 build-essential musl-dev cargo python3-venv python3-dev libldap2-dev libssl-dev libsasl2-dev nginx python-is-python3
 npm install yarn -g
 useradd recipes
 ```
@@ -75,9 +76,9 @@ Fill the database and collect the static files.
 
 ```bash
 cd ..
-python3.9 manage.py migrate
-python3.9 manage.py collectstatic_js_reverse
-python3.9 manage.py collectstatic
+python manage.py migrate
+python manage.py collectstatic_js_reverse
+python manage.py collectstatic
 ```
 
 Change ownership of the recipes directory and give appropriate access to the mediafiles directory.
@@ -178,7 +179,7 @@ I had an issue after upgrading to 22.04 LTS because it went from Python 3.9 to P
 After the upgrade I had to delete and rebuild the Python venv. For some reason I also had to install venv again.
 
 ```bash
-apt install python3.10-venv
+apt install python3-venv
 cd /srv/recipes
 rm -r venv/
 rm staticfiles/staticfiles.json
