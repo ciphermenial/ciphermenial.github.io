@@ -62,15 +62,15 @@ frontend fe_redirect
 frontend fe_ext
     bind *:7000 ssl crt domain.com.pem
 
-    acl bookstack ssl_fc_sni bookstack.domain.com
-    acl phpmyadmin ssl_fc_sni phpmyadmin.domain.com
-    acl guac ssl_fc_sni guac.domain.com
-    acl recipes ssl_fc_sni recipes.domain.com
-    acl keycloak ssl_fc_sni accounts.domain.com
-    acl pgadmin ssl_fc_sni pgadmin.domain.com
-    acl pi-hole ssl_fc_sni pi-hole.domain.com
-    acl paperless ssl_fc_sni paperless.domain.com
-    acl jellyfin ssl_fc_sni media.domain.com
+    acl bookstack hdr(host) -i bookstack.domain.com
+    acl phpmyadmin hdr(host) -i phpmyadmin.domain.com
+    acl guac hdr(host) -i guac.domain.com
+    acl recipes hdr(host) -i recipes.domain.com
+    acl keycloak hdr(host) -i accounts.domain.com
+    acl pgadmin hdr(host) -i pgadmin.domain.com
+    acl pi-hole hdr(host) -i pi-hole.domain.com
+    acl paperless hdr(host) -i paperless.domain.com
+    acl jellyfin hdr(host) -i media.domain.com
 
     use_backend be_bookstack if bookstack
     use_backend be_phpmyadmin if phpmyadmin
@@ -89,7 +89,7 @@ frontend fe_ext
 frontend fe_int
     bind *:7001 ssl crt int.domain.com.pem
 
-    acl jellyfin ssl_fc_sni media.domain.com
+    acl jellyfin hdr(host) -i media.domain.com
 
     use_backend be_jellyfin if jellyfin
 
@@ -254,15 +254,15 @@ This frontend is the one that works with connections coming from Cloudflare. It 
 frontend fe_ext
     bind *:7000 ssl crt domain.com.pem
 
-    acl bookstack ssl_fc_sni bookstack.domain.com
-    acl phpmyadmin ssl_fc_sni phpmyadmin.domain.com
-    acl guac ssl_fc_sni guac.domain.com
-    acl recipes ssl_fc_sni recipes.domain.com
-    acl keycloak ssl_fc_sni accounts.domain.com
-    acl pgadmin ssl_fc_sni pgadmin.domain.com
-    acl pi-hole ssl_fc_sni pi-hole.domain.com
-    acl paperless ssl_fc_sni paperless.domain.com
-    acl jellyfin ssl_fc_sni media.domain.com
+    acl bookstack hdr(host) -i bookstack.domain.com
+    acl phpmyadmin hdr(host) -i phpmyadmin.domain.com
+    acl guac hdr(host) -i guac.domain.com
+    acl recipes hdr(host) -i recipes.domain.com
+    acl keycloak hdr(host) -i accounts.domain.com
+    acl pgadmin hdr(host) -i pgadmin.domain.com
+    acl pi-hole hdr(host) -i pi-hole.domain.com
+    acl paperless hdr(host) -i paperless.domain.com
+    acl jellyfin hdr(host) -i media.domain.com
 
     use_backend be_bookstack if bookstack
     use_backend be_phpmyadmin if phpmyadmin
@@ -292,7 +292,7 @@ This frontend can be a mirror of the External Frontend if you want all internal 
 frontend fe_int
     bind *:7001 ssl crt int.domain.com.pem
 
-    acl jellyfin ssl_fc_sni media.domain.com
+    acl jellyfin hdr(host) -i media.domain.com
 
     use_backend be_jellyfin if jellyfin
 
