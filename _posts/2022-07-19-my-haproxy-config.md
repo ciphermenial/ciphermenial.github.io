@@ -7,7 +7,7 @@ mermaid: true
 
 This is an explanation of my [HAProxy](https://www.haproxy.org) config, mostly as a reminder for myself. This has evolved over time. Most recently I have added a redirection for external or internal traffic to backends. The reason for this was due to adding a [Jellyfin](https://jellyfin.org) server and I didn't want that running over [Cloudflare](https://www.cloudflare.com) if the connection was coming from the internal network.
 
-Update: I have now added CrowdSec into the mix and increased security by using [CF-Connecting-IP](https://developers.cloudflare.com/fundamentals/get-started/reference/http-request-headers/#cf-connecting-ip) instead of X-Forwarded-For header for capturing client IPs. See [this article from Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) on why X-Forwarded-For header is insecure.
+Update: I have now added [CrowdSec](https://www.crowdsec.net/) into the mix and increased security by using [CF-Connecting-IP](https://developers.cloudflare.com/fundamentals/get-started/reference/http-request-headers/#cf-connecting-ip) instead of X-Forwarded-For header for capturing client IPs. See [this article from Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) on why X-Forwarded-For header is insecure.
 
 Here is a copy of my HAProxy config in full:
 
@@ -294,12 +294,15 @@ It will then redirect traffic to my internal backend (be_int) if it matches the 
 
 ### External Frontend
 
-This frontend is the one that works with connections coming from Cloudflare. It has a Cloudflare Origins certificate associated with it.
+This frontend is the one that works with connections coming from Cloudflare. It has a Cloudflare Origins certificate associated with it. This is where I convert Cloudflare's CF-Connecting-IP header into X-Forwarded-For to avoid spoofing.
+
+The Crowsec configuration is slightly modified from their recommendations. I have an [issue](https://github.com/crowdsecurity/cs-haproxy-bouncer/issues/13) submitted with them around detecting client IPs in a different way to support other configurations.
 
 ```bash
 frontend fe_ext
     bind *:7000 ssl crt domain.com.pem
 
+    # SNI ACLs
     acl bookstack hdr(host) -i bookstack.domain.com
     acl phpmyadmin hdr(host) -i phpmyadmin.domain.com
     acl guac hdr(host) -i guac.domain.com
@@ -310,6 +313,7 @@ frontend fe_ext
     acl paperless hdr(host) -i paperless.domain.com
     acl jellyfin hdr(host) -i media.domain.com
 
+    # Send to backend based on SNI ACL
     use_backend be_bookstack if bookstack
     use_backend be_phpmyadmin if phpmyadmin
     use_backend be_guac if guac
@@ -319,6 +323,25 @@ frontend fe_ext
     use_backend be_pi-hole if pi-hole
     use_backend be_paperless if paperless
     use_backend be_jellyfin if jellyfin
+    
+    # CloudFlare CF-Connecting-IP header to X-Forwarded-For header to avoid spoofing
+    acl from_cf src -f /etc/haproxy/CF_ips.lst
+    acl cf_ip_hdr req.hdr(CF-Connecting-IP) -m found
+    http-request set-header X-Forwarded-For %[req.hdr(CF-Connecting-IP)] if from_cf cf_ip_hdr
+
+    # Crowdsec bouncer
+    # Declare a stick table to cache captcha verifications
+    stick-table type ip size 10k expire 30m
+    # Action to identify crowdsec remediation
+    http-request lua.crowdsec_allow
+    # Cache captcha allow decision
+    http-request track-sc0 req.hdr_ip(CF-Connecting-IP,-1) if { var(req.remediation) -m str "captcha-allow" }
+    # Redirect to initial url
+    http-request redirect location %[var(req.redirect_uri)] if { var(req.remediation) -m str "captcha-allow" }
+    # Serve captcha template if remediation is captcha
+    http-request use-service lua.reply_captcha if { var(req.remediation) -m str "captcha" }
+    # Serve ban template if remediation is ban
+    http-request use-service lua.reply_ban if { var(req.remediation) -m str "ban" }
 
     # This redirects to a failure page
     default_backend be_no-match
@@ -371,4 +394,19 @@ These are set to tcp mode as they don't need to see headers. They are sent to th
 
 ### Normal Backends
 
-The remaining backends are normal ones. There is nothing special that needs to be explained there.
+Since I removed forwardfor from the defaults above and now that CF-Connicting-IP header is setting the X-Forwarded-For header, I need to enable it for the remaining backends.
+
+```bash
+# enable X-Forwarded-For for backends
+defaults
+    option forwardfor
+    mode http
+    option httplog
+    option dontlognull
+    log global
+    timeout client 30s
+    timeout server 30s
+    timeout connect 5s
+```
+
+The remaining backends are pretty standard. There is nothing special that needs to be explained there.
