@@ -7,6 +7,8 @@ mermaid: true
 
 This is an explanation of my [HAProxy](https://www.haproxy.org) config, mostly as a reminder for myself. This has evolved over time. Most recently I have added a redirection for external or internal traffic to backends. The reason for this was due to adding a [Jellyfin](https://jellyfin.org) server and I didn't want that running over [Cloudflare](https://www.cloudflare.com) if the connection was coming from the internal network.
 
+Update: I have now added CrowdSec into the mix and increased security by using [CF-Connecting-IP](https://developers.cloudflare.com/fundamentals/get-started/reference/http-request-headers/#cf-connecting-ip) instead of X-Forwarded-For header for capturing client IPs. See [this article from Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) on why X-Forwarded-For header is insecure.
+
 Here is a copy of my HAProxy config in full:
 
 ```bash
@@ -22,15 +24,26 @@ global
     ulimit-n 81000
     crt-base /etc/haproxy/certificates/
 
+    # Crowdsec bouncer
+    lua-prepend-path /usr/lib/crowdsec/lua/haproxy/?.lua
+    lua-load /usr/lib/crowdsec/lua/haproxy/crowdsec.lua
+    setenv CROWDSEC_CONFIG /etc/crowdsec/bouncers/crowdsec-haproxy-bouncer.conf
+
 defaults
     mode http
     option httplog
     option dontlognull
-    option forwardfor
     log global
     timeout client 30s
     timeout server 30s
     timeout connect 5s
+    errorfile 400 /etc/haproxy/errors/400.http
+    errorfile 403 /etc/haproxy/errors/403.http
+    errorfile 408 /etc/haproxy/errors/408.http
+    errorfile 500 /etc/haproxy/errors/500.http
+    errorfile 502 /etc/haproxy/errors/502.http
+    errorfile 503 /etc/haproxy/errors/503.http
+    errorfile 504 /etc/haproxy/errors/504.http
 
 listen stats
     bind *:8404
@@ -52,9 +65,7 @@ frontend fe_redirect
     mode tcp
     tcp-request inspect-delay 5s
     tcp-request content accept if { req_ssl_hello_type 1 }
-
     acl int_net src 192.168.88.1/24
-
     use_backend be_int if int_net
     default_backend be_ext
 
@@ -62,6 +73,7 @@ frontend fe_redirect
 frontend fe_ext
     bind *:7000 ssl crt domain.com.pem
 
+    # SNI ACLs
     acl bookstack hdr(host) -i bookstack.domain.com
     acl phpmyadmin hdr(host) -i phpmyadmin.domain.com
     acl guac hdr(host) -i guac.domain.com
@@ -72,6 +84,7 @@ frontend fe_ext
     acl paperless hdr(host) -i paperless.domain.com
     acl jellyfin hdr(host) -i media.domain.com
 
+    # Send to backend based on SNI ACL
     use_backend be_bookstack if bookstack
     use_backend be_phpmyadmin if phpmyadmin
     use_backend be_guac if guac
@@ -81,6 +94,19 @@ frontend fe_ext
     use_backend be_pi-hole if pi-hole
     use_backend be_paperless if paperless
     use_backend be_jellyfin if jellyfin
+    
+    # CloudFlare CF-Connecting-IP header to X-Forwarded-For header to avoid spoofing
+    acl from_cf src -f /etc/haproxy/CF_ips.lst
+    acl cf_ip_hdr req.hdr(CF-Connecting-IP) -m found
+    http-request set-header X-Forwarded-For %[req.hdr(CF-Connecting-IP)] if from_cf cf_ip_hdr
+
+    # Crowdsec bouncer
+    stick-table type ip size 10k expire 30m # declare a stick table to cache captcha verifications
+    http-request lua.crowdsec_allow # action to identify crowdsec remediation
+    http-request track-sc0 req.hdr_ip(CF-Connecting-IP,-1) if { var(req.remediation) -m str "captcha-allow" } # cache captcha allow decision 
+    http-request redirect location %[var(req.redirect_uri)] if { var(req.remediation) -m str "captcha-allow" } # redirect to initial url
+    http-request use-service lua.reply_captcha if { var(req.remediation) -m str "captcha" } # serve captcha template if remediation is captcha
+    http-request use-service lua.reply_ban if { var(req.remediation) -m str "ban" } # serve ban template if remediation is ban
 
     # This redirects to a failure page
     default_backend be_no-match
@@ -89,14 +115,16 @@ frontend fe_ext
 frontend fe_int
     bind *:7001 ssl crt int.domain.com.pem
 
+    # SNI ACLs
     acl jellyfin hdr(host) -i media.domain.com
 
+    # Send to backend based on SNI ACL
     use_backend be_jellyfin if jellyfin
 
     # This redirects to a failure page
     default_backend be_no-match
-
-# Redirect to frontend based on origin
+    
+# Redirect to frontend based on internal or external connections
 backend be_ext
     mode tcp
     server localhost 127.0.0.1:7000 check
@@ -135,6 +163,14 @@ backend be_paperless
 
 backend be_jellyfin
     server jellyfin jellyfin.lxd:8096 check
+    
+# Backend for google to allow DNS resolution if using reCAPTCHA
+backend captcha_verifier
+    server captcha_verifier www.google.com:443 check
+
+# Backend for crowdsec to allow DNS resolution
+backend crowdsec
+    server crowdsec localhost:8080 check
 ```
 # Traffic Flow
 
