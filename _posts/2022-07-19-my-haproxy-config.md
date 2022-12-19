@@ -178,18 +178,25 @@ This shows how traffic flows internally or externally from the user to the servi
 
 ```mermaid
 graph TD
-    EU[/External User\] -.http://media.domain.com.- CF[Cloudflare]
-    CF -.- FE_HTTPS
-    IU[/Internal User\] --http://media.domain.com--- FE_HTTP[HTTP Frontend]
-    subgraph HAProxy
-        FE_HTTPS -.External User?.- BE_EXT[External Backend]
-        FE_HTTPS --Internal User?--- BE_INT[Internal Backend]
-        FE_HTTP --- FE_HTTPS[HTTPS Frontend]
-        BE_EXT -.- FE_EXT[External Frontend]
-        BE_INT --- FE_INT[Internal Frontend]
-    end
-    FE_EXT -.- S[Web Service]
-    FE_INT --- S
+ EU[/External User\] -.http://media.domain.com.-> CF[Cloudflare]
+ CF -.-> FE_HTTPS
+ IU[/Internal User\] --http://media.domain.com--> FE_HTTP[HTTP Frontend]
+ subgraph HAProxy
+ FE_HTTPS -- Internal User? --> BE_INT[Internal Backend]
+ FE_HTTP --> FE_HTTPS[HTTPS Frontend]
+ BE_EXT -.-> FE_EXT[External Frontend]
+ BE_INT --> FE_INT[Internal Frontend]
+ FE_HTTPS -. External User? .-> CS_DEC[(CrowdSec Decision)]
+ subgraph CrowdSec
+ CS_DEC ==Require CAPTCHA==> CS_CAPTCHA[CAPTCHA Page]
+ CS_DEC ==Banned IP==> CS_BAN[Ban Page]
+ CS_DEC -.Not In Decisions.-> BE_EXT[External Backend]
+ CS_CAPTCHA ==CAPTCHA remediated==> BE_EXT
+ CS_CAPTCHA ==CAPTCHA failed==> CS_DEC
+ end
+ end
+ FE_EXT -.-> S[Web Service]
+ FE_INT --> S
 ```
 
 # Breakdown
