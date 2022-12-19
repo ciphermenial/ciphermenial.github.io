@@ -196,11 +196,11 @@ graph TD
  subgraph CrowdSec
  CS_DEC ==Require CAPTCHA==> CS_CAPTCHA[CAPTCHA Page]
  CS_DEC ==Banned IP==> CS_BAN[Ban Page]
- CS_DEC -.Not In Decisions.-> BE_EXT[External Backend]
- CS_CAPTCHA ==CAPTCHA remediated==> BE_EXT
  CS_CAPTCHA ==CAPTCHA failed==> CS_DEC
  end
  end
+ CS_DEC ==Captcha Remediated==> BE_EXT[External Backend]
+ CS_DEC -.Not In Decisions.-> BE_EXT
  FE_EXT -.-> S[Web Service]
  FE_INT --> S
 ```
