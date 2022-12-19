@@ -101,12 +101,18 @@ frontend fe_ext
     http-request set-header X-Forwarded-For %[req.hdr(CF-Connecting-IP)] if from_cf cf_ip_hdr
 
     # Crowdsec bouncer
-    stick-table type ip size 10k expire 30m # declare a stick table to cache captcha verifications
-    http-request lua.crowdsec_allow # action to identify crowdsec remediation
-    http-request track-sc0 req.hdr_ip(CF-Connecting-IP,-1) if { var(req.remediation) -m str "captcha-allow" } # cache captcha allow decision 
-    http-request redirect location %[var(req.redirect_uri)] if { var(req.remediation) -m str "captcha-allow" } # redirect to initial url
-    http-request use-service lua.reply_captcha if { var(req.remediation) -m str "captcha" } # serve captcha template if remediation is captcha
-    http-request use-service lua.reply_ban if { var(req.remediation) -m str "ban" } # serve ban template if remediation is ban
+    # Declare a stick table to cache captcha verifications
+    stick-table type ip size 10k expire 30m
+    # Action to identify crowdsec remediation
+    http-request lua.crowdsec_allow
+    # Cache captcha allow decision
+    http-request track-sc0 req.hdr_ip(CF-Connecting-IP,-1) if { var(req.remediation) -m str "captcha-allow" }
+    # Redirect to initial url
+    http-request redirect location %[var(req.redirect_uri)] if { var(req.remediation) -m str "captcha-allow" }
+    # Serve captcha template if remediation is captcha
+    http-request use-service lua.reply_captcha if { var(req.remediation) -m str "captcha" }
+    # Serve ban template if remediation is ban
+    http-request use-service lua.reply_ban if { var(req.remediation) -m str "ban" }
 
     # This redirects to a failure page
     default_backend be_no-match
@@ -225,21 +231,20 @@ Most of this is standard in a Ubuntu install of HAProxy. The only part I added w
 
 ## Defaults
 
-I only use a single defaults section since there are only a small amount of deviations from them in the frontends and backends.
+I only use a single defaults section since there are only a small amount of deviations from them in the frontends and backends. I don't set ```option forwardfor``` here because I change the X-Forwarded-For header to reflect the IP of CF-Connecting-IP.
 
 ```bash
 defaults
     mode http
     option httplog
     option dontlognull
-    option forwardfor
     log global
     timeout client 30s
     timeout server 30s
     timeout connect 5s
 ```
 
-Because most of my frontends and backends use http mode I set it here, along with other http based options like "forwardfor"
+Because most of my frontends and backends use http mode I set it here.
 
 All the rest is common configuration.
 
@@ -276,9 +281,7 @@ frontend fe_redirect
     mode tcp
     tcp-request inspect-delay 5s
     tcp-request content accept if { req_ssl_hello_type 1 }
-
     acl int_net src 192.168.88.0/24
-
     use_backend be_int if int_net
     default_backend be_ext
 ```
