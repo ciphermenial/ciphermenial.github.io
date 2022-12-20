@@ -139,6 +139,17 @@ backend be_int
     mode tcp
     server localhost 127.0.0.1:7001 check
 
+# Enable X-Forwarded-For for backends
+defaults
+    mode http
+    option forwardfor
+    option httplog
+    option dontlognull
+    log global
+    timeout client 30s
+    timeout server 30s
+    timeout connect 5s
+
 # Normal Backends
 backend be_no-match
     http-request deny deny_status 403
@@ -397,10 +408,10 @@ These are set to tcp mode as they don't need to see headers. They are sent to th
 Since I removed forwardfor from the defaults above and now that CF-Connicting-IP header is setting the X-Forwarded-For header, I need to enable it for the remaining backends.
 
 ```bash
-# enable X-Forwarded-For for backends
+# Enable X-Forwarded-For for backends
 defaults
-    option forwardfor
     mode http
+    option forwardfor
     option httplog
     option dontlognull
     log global
