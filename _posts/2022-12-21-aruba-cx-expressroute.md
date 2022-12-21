@@ -41,7 +41,6 @@ I used the following subnets and VLANs for this:
 - VLAN 200 for Azure ExpressRoute
   
 - 10.0.0.0/8 for advertised routes (you would want to change this to the smallest amount required)
-  
 
 In my configuration it is a bit mixed up with primary and secondary data centres. The VSX pairs primary and secondary is opposite to the ISP Router primary and secondary configuration. The primary ExpressRoute hand-off is connected to the secondary data centre primary switch. Here is a diagram of my configuration:
 
@@ -51,7 +50,7 @@ In my configuration it is a bit mixed up with primary and secondary data centres
 
 ### Core Switch 1
 
-```coffee
+```
 vlan 100
     name iBGP
 vlan 200
@@ -113,7 +112,7 @@ router bgp 65500
 
 ### Core Switch 2
 
-```coffee
+```
 vlan 100
     name iBGP
 !
@@ -135,7 +134,7 @@ router bgp 65500
 
 ### Core Switch 3
 
-```coffee
+```
 vlan 100
     name iBGP
 vlan 200
@@ -196,7 +195,7 @@ router bgp 65500
 
 ### Core Switch 4
 
-```coffee
+```
 vlan 100
     name iBGP
 !
