@@ -164,12 +164,20 @@ backend be_guac
     server guac guacamole.lxd:8080 check
 
 backend be_phpmyadmin
-    server mariadb phpmyadmin.lxd:80 check
+    # Set root path for redirect
+    acl path_root path /
+    # Redirect to phpmyadmin subdirectory
+    redirect location https://phpmyadmin.domain.com/phpmyadmin if path_root
+    server phpmyadmin phpmyadmin.lxd:80 check
 
 backend be_bookstack
     server bookstack bookstack.lxd:80 check
 
 backend be_pgadmin
+    # Set root path for redirect
+    acl path_root path /
+    # Redirect to pgadmin4 subdirectory
+    redirect location https://pgadmin.domain.com/pgadmin4 if path_root
     server pgadmin pgadmin.lxd:80 check
 
 backend be_pi-hole
