@@ -19,7 +19,7 @@ apt install gcc libcairo2-dev default-jdk make libjpeg-dev libtool-bin \
 libossp-uuid-dev freerdp2-dev libssh2-1-dev libpango1.0-dev mariadb-server
 ```
 
-# Install Tomcat 9.0.64
+# Install Tomcat 9.0.72
 
 > [Guacamole is not compatible with Tomcat 10](https://issues.apache.org/jira/browse/GUACAMOLE-1325)
 {: .prompt-danger }
@@ -28,15 +28,15 @@ When I am configuring server software outside of a package manager I always plac
 
 ```bash
 cd /srv
-wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.64/bin/apache-tomcat-9.0.64.tar.gz
+wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.72/bin/apache-tomcat-9.0.72.tar.gz
 ```
 
 This extracts the contents of the archive and places it into a directory named tomcat.
 
 ```bash
 mkdir /srv/tomcat
-tar -xzf apache-tomcat-9.0.64.tar.gz --strip-components=1 -C /srv/tomcat
-rm apache-tomcat-9.0.64.tar.gz
+tar -xzf apache-tomcat-9.0.72.tar.gz --strip-components=1 -C /srv/tomcat
+rm apache-tomcat-9.0.72.tar.gz
 ```
 
 Now you will need to create a systemd service for autostarting Tomcat.
@@ -77,7 +77,7 @@ systemctl daemon-reload
 systemctl enable --now tomcat
 ```
 
-# Install Guacamole Server 1.4.0
+# Install Guacamole Server 1.5.0
 I use git to clone the latest version. You can find out exactly what all of these commands are doing by reading the [official Guacamole documentation](https://guacamole.apache.org/doc/gug/installing-guacamole.html).
 
 ```bash
@@ -99,12 +99,12 @@ sudo systemctl start guacd
 sudo systemctl enable guacd
 ```
 
-# Install Guacamole Client 1.4.0
+# Install Guacamole Client 1.5.0
 
 ```bash
 mkdir /srv/guacamole
 cd /srv/guacamole
-wget https://downloads.apache.org/guacamole/1.4.0/binary/guacamole-1.4.0.war -O guacamole.war
+wget https://downloads.apache.org/guacamole/1.5.0/binary/guacamole-1.5.0.war -O guacamole.war
 ln -s /srv/guacamole/guacamole.war /srv/tomcat/webapps
 ln -s /srv/guacamole /etc/guacamole
 vim guacamole.properties
@@ -135,20 +135,20 @@ totp-issuer: Guacamole
 
 ```bash
 cd
-wget https://dlcdn.apache.org/guacamole/1.4.0/binary/guacamole-auth-jdbc-1.4.0.tar.gz
+wget https://dlcdn.apache.org/guacamole/1.5.0/binary/guacamole-auth-jdbc-1.5.0.tar.gz
 mkdir /srv/guacamole/extensions
-tar -xzf guacamole-auth-jdbc-1.4.0.tar.gz
-rm guacamole-auth-jdbc-1.4.0.tar.gz
-cp guacamole-auth-jdbc-1.4.0/mysql/guacamole-auth-jdbc-mysql-1.4.0.jar /srv/guacamole/extensions
+tar -xzf guacamole-auth-jdbc-1.5.0.tar.gz
+rm guacamole-auth-jdbc-1.5.0.tar.gz
+cp guacamole-auth-jdbc-1.5.0/mysql/guacamole-auth-jdbc-mysql-1.4.0.jar /srv/guacamole/extensions
 ```
 
 ## Install TOTP Extension for 2FA
 
 ```bash
-wget https://dlcdn.apache.org/guacamole/1.4.0/binary/guacamole-auth-totp-1.4.0.tar.gz
-tar -xzf guacamole-auth-totp-1.4.0.tar.gz
-rm guacamole-auth-totp-1.4.0.tar.gz
-cp guacamole-auth-totp-1.4.0/guacamole-auth-totp-1.3.0.jar /srv/guacamole/extensions
+wget https://dlcdn.apache.org/guacamole/1.5.0/binary/guacamole-auth-totp-1.5.0.tar.gz
+tar -xzf guacamole-auth-totp-1.5.0.tar.gz
+rm guacamole-auth-totp-1.5.0.tar.gz
+cp guacamole-auth-totp-1.5.0/guacamole-auth-totp-1.5.0.jar /srv/guacamole/extensions
 ```
 
 ## Install MariaDB Library
@@ -159,7 +159,7 @@ cp guacamole-auth-totp-1.4.0/guacamole-auth-totp-1.3.0.jar /srv/guacamole/extens
 ```bash
 mkdir /srv/guacamole/lib
 cd /srv/guacamole/lib
-wget https://downloads.mariadb.com/Connectors/java/connector-java-2.7.5/mariadb-java-client-2.7.5.jar
+wget https://downloads.mariadb.com/Connectors/java/connector-java-2.7.8/mariadb-java-client-2.7.8.jar
 ```
 
 # Create Guacamole Database
@@ -178,7 +178,7 @@ QUIT;
 
 ```bash
 cd
-cat guacamole-auth-jdbc-1.3.0/mysql/schema/*.sql | mariadb guacamole
+cat guacamole-auth-jdbc-1.5.0/mysql/schema/*.sql | mariadb guacamole
 ```
 
 # Finishing Up
