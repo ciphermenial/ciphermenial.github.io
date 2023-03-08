@@ -32,6 +32,7 @@ global
 defaults
     mode http
     option httplog
+    option forwardfor
     option dontlognull
     log global
     timeout client 30s
