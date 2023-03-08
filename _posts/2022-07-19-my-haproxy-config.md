@@ -53,25 +53,37 @@ listen stats
     stats uri /haproxy_stats
     stats auth HAProxy:Password
 
-frontend fe_http
+# Frontend to redirect HTTP to HTTPS with code 301
+frontend http-redirect
     bind *:80
-
-    # Redirect HTTP to HTTPS with code 301
     http-request redirect scheme https code 301
 
-# Frontend for redirecting internal or external traffic to the frontend with the required certificate.
-frontend fe_redirect
+# Frontend for redirecting traffic to the required frontend
+frontend https-redirect
     bind *:443
     mode tcp
+	option tcplog
     tcp-request inspect-delay 5s
     tcp-request content accept if { req_ssl_hello_type 1 }
-    acl int_net src 192.168.88.1/24
-    use_backend be_int if int_net
-    default_backend be_ext
+    acl internal src 192.168.88.1/24
+	acl cloudflare src -f /etc/haproxy/CF_ips.lst
+    use_backend cloudflare if cloudflare
+    use_backend internal if internal
 
 # Frontend for external users that a connecting through Cloudflare
-frontend fe_ext
-    bind *:7000 ssl crt domain.com.pem
+frontend cloudflare
+    bind *:7000 accept-proxy ssl crt domain.com.pem
+
+    # CloudFlare CF-Connecting-IP header to source IP for Crowdsec decisions
+    http-request set-src req.hdr(CF-Connecting-IP)
+
+    # Crowdsec bouncer
+    stick-table type ip size 10k expire 30m # declare a stick table to cache captcha verifications
+    http-request lua.crowdsec_allow # action to identify crowdsec remediation
+    http-request track-sc0 src if { var(req.remediation) -m str "captcha-allow" } # cache captcha allow decision
+    http-request redirect location %[var(req.redirect_uri)] if { var(req.remediation) -m str "captcha-allow" } # redirect to initial url
+    http-request use-service lua.reply_captcha if { var(req.remediation) -m str "captcha" } # serve captcha template if remediation is captcha
+    http-request use-service lua.reply_ban if { var(req.remediation) -m str "ban" } # serve ban template if remediation is ban
 
     # SNI ACLs
     acl bookstack hdr(host) -i bookstack.domain.com
@@ -85,108 +97,78 @@ frontend fe_ext
     acl jellyfin hdr(host) -i media.domain.com
 
     # Send to backend based on SNI ACL
-    use_backend be_bookstack if bookstack
-    use_backend be_phpmyadmin if phpmyadmin
-    use_backend be_guac if guac
-    use_backend be_recipes if recipes
-    use_backend be_keycloak if keycloak
-    use_backend be_pgadmin if pgadmin
-    use_backend be_pi-hole if pi-hole
-    use_backend be_paperless if paperless
-    use_backend be_jellyfin if jellyfin
-    
-    # CloudFlare CF-Connecting-IP header to X-Forwarded-For header to avoid spoofing
-    acl from_cf src -f /etc/haproxy/CF_ips.lst
-    acl cf_ip_hdr req.hdr(CF-Connecting-IP) -m found
-    http-request set-header X-Forwarded-For %[req.hdr(CF-Connecting-IP)] if from_cf cf_ip_hdr
-
-    # Crowdsec bouncer
-    # Declare a stick table to cache captcha verifications
-    stick-table type ip size 10k expire 30m
-    # Action to identify crowdsec remediation
-    http-request lua.crowdsec_allow
-    # Cache captcha allow decision
-    http-request track-sc0 req.hdr_ip(CF-Connecting-IP,-1) if { var(req.remediation) -m str "captcha-allow" }
-    # Redirect to initial url
-    http-request redirect location %[var(req.redirect_uri)] if { var(req.remediation) -m str "captcha-allow" }
-    # Serve captcha template if remediation is captcha
-    http-request use-service lua.reply_captcha if { var(req.remediation) -m str "captcha" }
-    # Serve ban template if remediation is ban
-    http-request use-service lua.reply_ban if { var(req.remediation) -m str "ban" }
+    use_backend bookstack if bookstack
+    use_backend phpmyadmin if phpmyadmin
+    use_backend guac if guac
+    use_backend recipes if recipes
+    use_backend keycloak if keycloak
+    use_backend pgadmin if pgadmin
+    use_backend pi-hole if pi-hole
+    use_backend paperless if paperless
+    use_backend jellyfin if jellyfin
 
     # This redirects to a failure page
-    default_backend be_no-match
+    default_backend no-match
 
 # Frontend for internal users connecting directly to HAProxy
-frontend fe_int
-    bind *:7001 ssl crt int.domain.com.pem
+frontend internal
+    bind *:7001 accept-proxy ssl crt int.domain.com.pem
 
     # SNI ACLs
     acl jellyfin hdr(host) -i media.domain.com
 
     # Send to backend based on SNI ACL
-    use_backend be_jellyfin if jellyfin
+    use_backend jellyfin if jellyfin
 
     # This redirects to a failure page
-    default_backend be_no-match
+    default_backend no-match
     
 # Redirect to frontend based on internal or external connections
-backend be_ext
+backend cloudflare
     mode tcp
-    server localhost 127.0.0.1:7000 check
+    server loopback-for-tls 127.0.0.1:7000 send-proxy-v2
 
-backend be_int
+backend internal
     mode tcp
-    server localhost 127.0.0.1:7001 check
-
-# Enable X-Forwarded-For for backends
-defaults
-    mode http
-    option forwardfor
-    option httplog
-    option dontlognull
-    log global
-    timeout client 30s
-    timeout server 30s
-    timeout connect 5s
+    server loopback-for-tls 127.0.0.1:7001 send-proxy-v2
 
 # Normal Backends
-backend be_no-match
+backend no-match
     http-request deny deny_status 403
 
-backend be_recipes
+backend recipes
     server recipes recipes.lxd:8002 check
 
-backend be_keycloak
+backend keycloak
     server keycloak keycloak.lxd:8080 check
 
-backend be_guac
+backend guac
     server guac guacamole.lxd:8080 check
 
-backend be_phpmyadmin
+backend phpmyadmin
     # Set root path for redirect
     acl path_root path /
     # Redirect to phpmyadmin subdirectory
     redirect location https://phpmyadmin.domain.com/phpmyadmin if path_root
     server phpmyadmin phpmyadmin.lxd:80 check
 
-backend be_bookstack
+backend bookstack
     server bookstack bookstack.lxd:80 check
 
-backend be_pgadmin
+backend pgadmin
     # Set root path for redirect
     acl path_root path /
     # Redirect to pgadmin4 subdirectory
     redirect location https://pgadmin.domain.com/pgadmin4 if path_root
     server pgadmin pgadmin.lxd:80 check
 
-backend be_pi-hole
+backend pi-hole
     server pi-hole pi-hole.lxd:80 check
 
-backend be_paperless
+backend paperless
     server paperless paperless.lxd:8000 check
 
-backend be_jellyfin
+backend jellyfin
     server jellyfin jellyfin.lxd:8096 check
     
 # Backend for google to allow DNS resolution if using reCAPTCHA
@@ -207,10 +189,10 @@ graph TD
  CF -.-> FE_HTTPS
  IU[/Internal User\] --http://media.domain.com--> FE_HTTP[HTTP Frontend]
  subgraph HAProxy
- FE_HTTPS -- Internal User? --> BE_INT[Internal Backend]
+ FE_HTTPS -- Internal User? --> INT[Internal Backend]
  FE_HTTP --> FE_HTTPS[HTTPS Frontend]
- BE_EXT -.-> FE_EXT[External Frontend]
- BE_INT --> FE_INT[Internal Frontend]
+ EXT -.-> FE_EXT[External Frontend]
+ INT --> FE_INT[Internal Frontend]
  FE_HTTPS -. External User? .-> CS_DEC[(CrowdSec Decision)]
  subgraph CrowdSec
  CS_DEC ==Require CAPTCHA==> CS_CAPTCHA[CAPTCHA Page]
@@ -218,8 +200,8 @@ graph TD
  CS_CAPTCHA ==CAPTCHA failed==> CS_DEC
  end
  end
- CS_DEC ==Captcha Remediated==> BE_EXT[External Backend]
- CS_DEC -.Not In Decisions.-> BE_EXT
+ CS_DEC ==Captcha Remediated==> EXT[External Backend]
+ CS_DEC -.Not In Decisions.-> EXT
  FE_EXT -.-> S[Web Service]
  FE_INT --> S
 ```
@@ -250,12 +232,13 @@ Most of this is standard in a Ubuntu install of HAProxy. The only part I added w
 
 ## Defaults
 
-I only use a single defaults section since there are only a small amount of deviations from them in the frontends and backends. I don't set ```option forwardfor``` here because I change the X-Forwarded-For header to reflect the IP of CF-Connecting-IP.
+I only use a single defaults section since there are only a small amount of deviations from them in the frontends and backends.
 
 ```bash
 defaults
     mode http
     option httplog
+	option forwardfor
     option dontlognull
     log global
     timeout client 30s
@@ -280,10 +263,8 @@ I have placed all the frontends together which might be a bit confusing. The con
 The first frontend I have configured is for redirecting HTTP to HTTPS and nothing more.
 
 ```bash
-frontend fe_http
+frontend http-redirect
     bind *:80
-
-    # Redirect HTTP to HTTPS with code 301
     http-request redirect scheme https code 301
 ```
 
@@ -294,32 +275,48 @@ This is self explanatory.
 The purpose of this frontend is to redirect the connection to a backend based on whether the connection is coming from my internal subnet. The reason I do this is because I am using Cloudflare as a proxy for connections to my services. Because of this I require the frontend from Cloudflare to use a [Cloudflare Origins](https://www.cloudflare.com/en-au/learning/cdn/glossary/origin-server) certificate, which will come up with a certificate error for internal users directly connecting to the HAProxy server. This was implemented due to traffic concerns because I set up a Jellyfin server. If I left it how I had it previously it would have meant looping a lot of traffic out to the Internet and then back in through Cloudflare.
 
 ```bash
-# Frontend to redirect based on IP range
-frontend fe_redirect
+# Frontend for redirecting traffic to the required frontend
+frontend https-redirect
     bind *:443
     mode tcp
+    option tcplog
     tcp-request inspect-delay 5s
     tcp-request content accept if { req_ssl_hello_type 1 }
-    acl int_net src 192.168.88.0/24
-    use_backend be_int if int_net
-    default_backend be_ext
+    acl internal src 192.168.88.1/24
+    acl cloudflare src -f /etc/haproxy/CF_ips.lst
+    use_backend cloudflare if cloudflare
+    use_backend internal if internal
 ```
 
 This is the default frontend and all traffic going to HTTPS will hit it. This one is configured for tcp mode as it does not need to see anything in the headers.
 
 I have an ACL configured that matches my internal network range of 192.168.88.0/24
 
-It will then redirect traffic to my internal backend (be_int) if it matches the rule, otherwise it will send it to my external backend (be_ext)
+It will then redirect traffic to my internal backend (int) if it matches the rule, otherwise it will send it to my external backend (ext)
 
 ### External Frontend
 
-This frontend is the one that works with connections coming from Cloudflare. It has a Cloudflare Origins certificate associated with it. This is where I convert Cloudflare's CF-Connecting-IP header into X-Forwarded-For to avoid spoofing.
+This frontend is the one that works with connections coming from Cloudflare. It has a Cloudflare Origins certificate associated with it.
 
-The Crowsec configuration is slightly modified from their recommendations. I have an [issue](https://github.com/crowdsecurity/cs-haproxy-bouncer/issues/13) submitted with them around detecting client IPs in a different way to support other configurations.
+> The Crowsec configuration is slightly modified from their recommendations. I have an [issue](https://github.com/crowdsecurity/cs-haproxy-bouncer/issues/13) submitted with them around detecting client IPs in a different way to support other configurations.
+
+I went about this in the most complicated way orignally, when all I needed to do was set CF-Connecting-IP to the source IP. This is how I have done it, thanks to the devs for the bouncer.
 
 ```bash
-frontend fe_ext
-    bind *:7000 ssl crt domain.com.pem
+# Frontend for external users that a connecting through Cloudflare
+frontend cloudflare
+    bind *:7000 accept-proxy ssl crt domain.com.pem
+
+    # CloudFlare CF-Connecting-IP header to source IP for Crowdsec decisions
+    http-request set-src req.hdr(CF-Connecting-IP)
+
+    # Crowdsec bouncer
+    stick-table type ip size 10k expire 30m # declare a stick table to cache captcha verifications
+    http-request lua.crowdsec_allow # action to identify crowdsec remediation
+    http-request track-sc0 src if { var(req.remediation) -m str "captcha-allow" } # cache captcha allow decision
+    http-request redirect location %[var(req.redirect_uri)] if { var(req.remediation) -m str "captcha-allow" } # redirect to initial url
+    http-request use-service lua.reply_captcha if { var(req.remediation) -m str "captcha" } # serve captcha template if remediation is captcha
+    http-request use-service lua.reply_ban if { var(req.remediation) -m str "ban" } # serve ban template if remediation is ban
 
     # SNI ACLs
     acl bookstack hdr(host) -i bookstack.domain.com
@@ -333,37 +330,18 @@ frontend fe_ext
     acl jellyfin hdr(host) -i media.domain.com
 
     # Send to backend based on SNI ACL
-    use_backend be_bookstack if bookstack
-    use_backend be_phpmyadmin if phpmyadmin
-    use_backend be_guac if guac
-    use_backend be_recipes if recipes
-    use_backend be_keycloak if keycloak
-    use_backend be_pgadmin if pgadmin
-    use_backend be_pi-hole if pi-hole
-    use_backend be_paperless if paperless
-    use_backend be_jellyfin if jellyfin
-    
-    # CloudFlare CF-Connecting-IP header to X-Forwarded-For header to avoid spoofing
-    acl from_cf src -f /etc/haproxy/CF_ips.lst
-    acl cf_ip_hdr req.hdr(CF-Connecting-IP) -m found
-    http-request set-header X-Forwarded-For %[req.hdr(CF-Connecting-IP)] if from_cf cf_ip_hdr
-
-    # Crowdsec bouncer
-    # Declare a stick table to cache captcha verifications
-    stick-table type ip size 10k expire 30m
-    # Action to identify crowdsec remediation
-    http-request lua.crowdsec_allow
-    # Cache captcha allow decision
-    http-request track-sc0 req.hdr_ip(CF-Connecting-IP,-1) if { var(req.remediation) -m str "captcha-allow" }
-    # Redirect to initial url
-    http-request redirect location %[var(req.redirect_uri)] if { var(req.remediation) -m str "captcha-allow" }
-    # Serve captcha template if remediation is captcha
-    http-request use-service lua.reply_captcha if { var(req.remediation) -m str "captcha" }
-    # Serve ban template if remediation is ban
-    http-request use-service lua.reply_ban if { var(req.remediation) -m str "ban" }
+    use_backend bookstack if bookstack
+    use_backend phpmyadmin if phpmyadmin
+    use_backend guac if guac
+    use_backend recipes if recipes
+    use_backend keycloak if keycloak
+    use_backend pgadmin if pgadmin
+    use_backend pi-hole if pi-hole
+    use_backend paperless if paperless
+    use_backend jellyfin if jellyfin
 
     # This redirects to a failure page
-    default_backend be_no-match
+    default_backend no-match
 ```
 
 This frontend is bound to port 7000. You can use any port that you want. There is no good reason that I chose 7000. The domain.com.pem is the Cloudflare origins certificate.
@@ -377,15 +355,15 @@ If it doesn't match any of the ACLs it is will send it to a backend that shows a
 This frontend can be a mirror of the External Frontend if you want all internal connection to come through it. I currently only have Jellyfin passed to it internally due to data requirements. All the other services I am using, I am not concerned about data usage.
 
 ```bash
-frontend fe_int
-    bind *:7001 ssl crt int.domain.com.pem
+frontend internal
+    bind *:7001 accept-proxy ssl crt int.domain.com.pem
 
     acl jellyfin hdr(host) -i media.domain.com
 
-    use_backend be_jellyfin if jellyfin
+    use_backend jellyfin if jellyfin
 
     # This redirects to a failure page
-    default_backend be_no-match
+    default_backend no-match
 ```
 
 This frontend is bound to 7001, simply because it is the next number on from the External Frontend. The certificate is a wildcard certificate that I auto-generate with [Let's Encrypt](https://letsencrypt.org).
@@ -400,32 +378,17 @@ These are the backends that redirect traffic to the necessary frontends based on
 
 ```bash
 # Redirect to frontend based on internal or external connections
-backend be_ext
+backend cloudflare
     mode tcp
-    server localhost 127.0.0.1:7000 check
+    server loopback-for-tls 127.0.0.1:7000 send-proxy-v2
 
-backend be_int
+backend internal
     mode tcp
-    server localhost 127.0.0.1:7001 check
+    server loopback-for-tls 127.0.0.1:7001 send-proxy-v2
 ```
 
 These are set to tcp mode as they don't need to see headers. They are sent to the loopback address of the server so that they then connect to the frontends running on port 7000 or 7001.
 
 ### Normal Backends
-
-Since I removed forwardfor from the defaults above and now that CF-Connicting-IP header is setting the X-Forwarded-For header, I need to enable it for the remaining backends.
-
-```bash
-# Enable X-Forwarded-For for backends
-defaults
-    mode http
-    option forwardfor
-    option httplog
-    option dontlognull
-    log global
-    timeout client 30s
-    timeout server 30s
-    timeout connect 5s
-```
 
 The remaining backends are pretty standard. There is nothing special that needs to be explained there.
