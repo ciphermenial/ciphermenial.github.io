@@ -63,11 +63,11 @@ frontend http-redirect
 frontend https-redirect
     bind *:443
     mode tcp
-	option tcplog
+    option tcplog
     tcp-request inspect-delay 5s
     tcp-request content accept if { req_ssl_hello_type 1 }
     acl internal src 192.168.88.1/24
-	acl cloudflare src -f /etc/haproxy/CF_ips.lst
+    acl cloudflare src -f /etc/haproxy/CF_ips.lst
     use_backend cloudflare if cloudflare
     use_backend internal if internal
 
@@ -239,7 +239,7 @@ I only use a single defaults section since there are only a small amount of devi
 defaults
     mode http
     option httplog
-	option forwardfor
+    option forwardfor
     option dontlognull
     log global
     timeout client 30s
