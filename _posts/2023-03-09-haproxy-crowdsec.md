@@ -6,7 +6,8 @@ tags: [guides,ubuntu,linux,haproxy,crowdsec]
 
 With the recent release of the official HAProxy [bouncer](https://doc.crowdsec.net/docs/next/bouncers/haproxy) for [Crowdsec](https://www.crowdsec.net/) I thought I would give it a go. In doing this I found out that CrowdSec bouncer was detecting the IP using source IP, which required the use of CF-Connecting-IP to be set as the source IP. I was having issues because I have a loop in my HAProxy configuration that meant it was grabbing 127.0.0.1 as the client IP. I have resolved all of these issues and it is now working perfectly.
 
-> This guide assumes you have HAProxy 2.5 or higher running. I am using Ubuntu. {: .prompt-info }
+> This guide assumes you have HAProxy 2.5 or higher running. I am using Ubuntu.
+{: .prompt-info }
 
 # Requirements
 
