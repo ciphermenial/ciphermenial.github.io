@@ -23,7 +23,7 @@ sudo apt update
 All of the requirements can be installed using apt.
 
 ```bash
-sudo apt install mariadb-server mariadb-client apache2 libapache2-mod-xsendfile php7.4-{cli,gd,json,dom,mysql,zip,soap,curl,xml,mbstring,zmq}
+sudo apt install mariadb-server mariadb-client apache2 libapache2-mod-xsendfile libapache2-mod-php7.4 php7.4-{cli,gd,json,dom,mysql,zip,soap,curl,xml,mbstring,zmq}
 ```
 
 # Install Xibo CMS
@@ -120,7 +120,7 @@ quit
 PHP configuration needs to be modified to allow upload of larger files.
 
 ```bash
-sudo vim /etc/php/7.4/cli/php.ini
+sudo vim /etc/php/7.4/apache2/php.ini
 ```
 
 You need to modify the file to change the following settings
@@ -138,13 +138,13 @@ session.cookie_samesite = Lax
 You can do this quickly with sed.
 
 ```bash
-sudo sed -i 's/max_execution_time = 30/max_execution_time = 300/g' /etc/php/7.4/cli/php.ini
-sudo sed -i 's/memory_limit = -1/memory_limit = 256M/g' /etc/php/7.4/cli/php.ini
-sudo sed -i 's/post_max_size = 8M/post_max_size = 2G/g' /etc/php/7.4/cli/php.ini
-sudo sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 2G/g' /etc/php/7.4/cli/php.ini
-sudo sed -i 's/;session.cookie_secure =/session.cookie_secure = Off/g' /etc/php/7.4/cli/php.ini
-sudo sed -i 's/session.cookie_httponly =/session.cookie_httponly = On/g' /etc/php/7.4/cli/php.ini
-sudo sed -i 's/session.cookie_samesite =/session.cookie_samesite = Lax/g' /etc/php/7.4/cli/php.ini
+sudo sed -i 's/max_execution_time = 30/max_execution_time = 300/g' /etc/php/7.4/apache2/php.ini
+sudo sed -i 's/memory_limit = -1/memory_limit = 256M/g' /etc/php/7.4/apache2/php.ini
+sudo sed -i 's/post_max_size = 8M/post_max_size = 2G/g' /etc/php/7.4/apache2/php.ini
+sudo sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 2G/g' /etc/php/7.4/apache2/php.ini
+sudo sed -i 's/;session.cookie_secure =/session.cookie_secure = Off/g' /etc/php/7.4/apache2/php.ini
+sudo sed -i 's/session.cookie_httponly =/session.cookie_httponly = On/g' /etc/php/7.4/apache2/php.ini
+sudo sed -i 's/session.cookie_samesite =/session.cookie_samesite = Lax/g' /etc/php/7.4/apache2/php.ini
 ```
 
 ## Configure XMR
