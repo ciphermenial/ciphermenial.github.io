@@ -301,7 +301,7 @@ This frontend is the one that works with connections coming from Cloudflare. It 
 
 > The Crowsec configuration is slightly modified from their recommendations. I have an [issue](https://github.com/crowdsecurity/cs-haproxy-bouncer/issues/13) submitted with them around detecting client IPs in a different way to support other configurations.
 
-I went about this in the most complicated way orignally, when all I needed to do was set CF-Connecting-IP to the source IP. This is how I have done it, thanks to the devs for the bouncer.
+As quoted above I went about this in the most complicated way, when all I needed to do was set CF-Connecting-IP to the source IP. This is how I have done it, thanks to the devs for the bouncer.
 
 ```bash
 # Frontend for external users that a connecting through Cloudflare
@@ -375,7 +375,7 @@ The bind line is the only part different from External Frontend. Every other lin
 
 ### Redirect Backends
 
-These are the backends that redirect traffic to the necessary frontends based on the certificate that needs to be supplied.
+These are the backends that redirect traffic to the necessary frontends based on the certificate that needs to be supplied. This uses the proxy protocol (send-proxy-v2) to make sure the IP is passed through to the backends. The frontends accept the proxy protocol.
 
 ```bash
 # Redirect to frontend based on internal or external connections
