@@ -199,9 +199,9 @@ graph TD
  CS_DEC ==Require CAPTCHA==> CS_CAPTCHA[CAPTCHA Page]
  CS_DEC ==Banned IP==> CS_BAN[Ban Page]
  CS_CAPTCHA ==CAPTCHA failed==> CS_DEC
- end
- end
  CS_DEC ==Captcha Remediated==> EXT[External Backend]
+ end
+ end
  CS_DEC -.Not In Decisions.-> EXT
  FE_EXT -.-> S[Web Service]
  FE_INT --> S
