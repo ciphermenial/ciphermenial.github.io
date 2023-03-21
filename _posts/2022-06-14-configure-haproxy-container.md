@@ -96,7 +96,7 @@ apt full-upgrade
 apt install haproxy
 ```
 
-We need to configure the haproxy.cfg. The following is an example of what I use. I have a section for letsencrypt certificates that I am not currently using. I plan to set this up for internal access to my services rather than going out to the Internet and back in through CloudFlare.
+We need to configure the haproxy.cfg. For a write-up of my complete finalised HAProxy configuration click [here](https://ciphermenial.github.io/posts/my-haproxy-config/).
 
 ```
 global
@@ -124,12 +124,7 @@ defaults
 # HTTP Frontend
 frontend fe_http
     bind *:80
-
-    # Test URI to see if it's a letsencrypt request
-    acl letsencrypt path_beg /.well-known/acme-challenge/
-
-    # Redirect HTTP to HTTPS with code 301 if not a letsencrypt request
-    http-request redirect scheme https code 301 if !letsencrypt
+    http-request redirect scheme https code 301
 
 # HTTPS Frontend
 frontend fe_https
@@ -155,7 +150,7 @@ When we add other containers with services I will show how to configure this fil
 
 ## Edge Certificate
 
-When you sign up to Cloudflare with your domain you receive a Universal SSL certificate which is enabled by default. I am not sure what the default settings are but mine is set as follows but you can decide how you want to manage it.
+When you sign up to Cloudflare with your domain you receive a Universal SSL certificate which is enabled by default. I am not sure what the default settings are but mine is set as follows but you can decide how you want to manage it. If you need backwards compatibility for TLS, you can set those setting as you please.
 
 - Always Use HTTPS: True
   
