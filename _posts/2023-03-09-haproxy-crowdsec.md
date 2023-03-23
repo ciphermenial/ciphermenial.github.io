@@ -9,14 +9,14 @@ With the recent release of the official HAProxy [bouncer](https://doc.crowdsec.n
 > This guide assumes you have HAProxy 2.5 or higher running. I am using Ubuntu.
 {: .prompt-info }
 
-# Requirements
+## Requirements
 
 - HAProxy 2.5 or higher
 - Cloudflare account
 - [CrowdSec account](https://app.crowdsec.net/signup)
 - Backend Web Services
 
-# Install CrowdSec Agent & Bouncer
+## Install CrowdSec Agent & Bouncer
 
 There isn't much to this. You simply need to run the following.
 
@@ -32,7 +32,7 @@ The bouncer is also installed from apt.
 sudo apt install crowdsec-haproxy-bouncer
 ```
 
-# CrowdSec Configuration
+## CrowdSec Configuration
 
 It is simple to add your CrowdSec agent to the console. Sign into your CrowdSec console and under the Instances section, click [Instances](https://app.crowdsec.net/instances).
 
@@ -44,7 +44,7 @@ sudo cscli console enroll abcd1e2fg3456hi789jklmn0o
 
 Run that command and approve it on the console.
 
-# Bouncer Configuration
+## Bouncer Configuration
 
 I had to manually add a bouncer for CrowdSec after installation to get a API key.
 
@@ -96,7 +96,7 @@ CAPTCHA_TEMPLATE_PATH=/var/lib/crowdsec/lua/haproxy/templates/captcha.html
 CAPTCHA_EXPIRATION=3600
 ```
 
-# HAProxy Configuration
+## HAProxy Configuration
 
 Under the global section you add the following
 
@@ -165,7 +165,7 @@ backend crowdsec
     server crowdsec localhost:8080 check
 ```
 
-# Captcha Configuration
+## Captcha Configuration
 
 There is nothing special to do here and you can follow the [official documentation](https://doc.crowdsec.net/docs/next/bouncers/haproxy#setup-captcha) for this.
 
