@@ -6,7 +6,7 @@ tags: [guides,azure,expressroute,aruba,aos-cx,bgp]
 
 I recently had to configure BGP on 2 pairs of Aruba CX switches configured as VSX pairs.
 
-# Requirements
+## Requirements
 
 To follow this setup completely you will need:
 
@@ -14,7 +14,7 @@ To follow this setup completely you will need:
 - Q-in-Q configured on the circuit by your ISP
 - Aruba CX in a square topology (it shouldn't take much to modify for different configurations)
 
-# ExpressRoute Setup
+## ExpressRoute Setup
 
 Once the circuit is configured by your ISP, you will need to create a peering. In this guide I am using Azure private peering and will only be configuring IPv4.
 
@@ -24,7 +24,7 @@ The configuration I am using is as follows:
 
 ![](/assets/img/2022-12-21-expressroute-peering.png)
 
-# Aruba CX Configuration
+## Aruba CX Configuration
 
 The following configuration is what I ended up with after lots of testing. I am not completely sure whether it is the best option but it is working well.
 
@@ -46,9 +46,9 @@ In my configuration it is a bit mixed up with primary and secondary data centres
 
 ![](/assets/img/2022-12-21-aruba-cx-layout.png)
 
-## Configuration
+### Configuration
 
-### Core Switch 1
+#### Core Switch 1
 
 ```
 vlan 100
@@ -110,7 +110,7 @@ router bgp 65500
     exit-address-family
 ```
 
-### Core Switch 2
+#### Core Switch 2
 
 ```
 vlan 100
@@ -132,7 +132,7 @@ router bgp 65500
     exit-address-family
 ```
 
-### Core Switch 3
+#### Core Switch 3
 
 ```
 vlan 100
@@ -193,7 +193,7 @@ router bgp 65500
     exit-address-family
 ```
 
-### Core Switch 4
+#### Core Switch 4
 
 ```
 vlan 100
