@@ -33,6 +33,9 @@ opkg install haproxy
 
 The haproxy configuration file is located at `/etc/haproxy.cfg`
 
+> This is a poor configuration that I used when still learning. I have changed a lot of what I do since then. You can see that [here](https://ciphermenial.github.io/posts/my-haproxy-config/).
+{: .prompt-warning }
+
 ```
 # Global parameters
 defaults
