@@ -9,6 +9,8 @@ This is an explanation of my [HAProxy](https://www.haproxy.org) config, mostly a
 
 Update: I have now added [CrowdSec](https://www.crowdsec.net/) into the mix and increased security by using [CF-Connecting-IP](https://developers.cloudflare.com/fundamentals/get-started/reference/http-request-headers/#cf-connecting-ip) instead of X-Forwarded-For header for capturing client IPs. See [this article from Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) on why X-Forwarded-For header is insecure.
 
+Update 2: I have massively reduced the size of my configuration file by usings a map for backend selection.
+
 Here is a copy of my HAProxy config in full:
 
 ```bash
@@ -86,43 +88,15 @@ frontend cloudflare
     http-request use-service lua.reply_captcha if { var(req.remediation) -m str "captcha" } # serve captcha template if remediation is captcha
     http-request use-service lua.reply_ban if { var(req.remediation) -m str "ban" } # serve ban template if remediation is ban
 
-    # SNI ACLs
-    acl bookstack hdr(host) -i bookstack.domain.com
-    acl phpmyadmin hdr(host) -i phpmyadmin.domain.com
-    acl guac hdr(host) -i guac.domain.com
-    acl recipes hdr(host) -i recipes.domain.com
-    acl keycloak hdr(host) -i accounts.domain.com
-    acl pgadmin hdr(host) -i pgadmin.domain.com
-    acl pi-hole hdr(host) -i pi-hole.domain.com
-    acl paperless hdr(host) -i paperless.domain.com
-    acl jellyfin hdr(host) -i media.domain.com
-
-    # Send to backend based on SNI ACL
-    use_backend bookstack if bookstack
-    use_backend phpmyadmin if phpmyadmin
-    use_backend guac if guac
-    use_backend recipes if recipes
-    use_backend keycloak if keycloak
-    use_backend pgadmin if pgadmin
-    use_backend pi-hole if pi-hole
-    use_backend paperless if paperless
-    use_backend jellyfin if jellyfin
-
-    # This redirects to a failure page
-    default_backend no-match
+    # Select backend based on services.map file or use backend no-match if not found.
+    use_backend %[req.hdr(host),lower,map(/etc/haproxy/services.map,no-match)]
 
 # Frontend for internal users connecting directly to HAProxy
 frontend internal
     bind *:7001 accept-proxy ssl crt int.domain.com.pem
 
-    # SNI ACLs
-    acl jellyfin hdr(host) -i media.domain.com
-
-    # Send to backend based on SNI ACL
-    use_backend jellyfin if jellyfin
-
-    # This redirects to a failure page
-    default_backend no-match
+    # Select backend based on services.map file or use backend no-match if not found.
+    use_backend %[req.hdr(host),lower,map(/etc/haproxy/services.map,no-match)]
     
 # Redirect to frontend based on internal or external connections
 backend cloudflare
@@ -319,30 +293,8 @@ frontend cloudflare
     http-request use-service lua.reply_captcha if { var(req.remediation) -m str "captcha" } # serve captcha template if remediation is captcha
     http-request use-service lua.reply_ban if { var(req.remediation) -m str "ban" } # serve ban template if remediation is ban
 
-    # SNI ACLs
-    acl bookstack hdr(host) -i bookstack.domain.com
-    acl phpmyadmin hdr(host) -i phpmyadmin.domain.com
-    acl guac hdr(host) -i guac.domain.com
-    acl recipes hdr(host) -i recipes.domain.com
-    acl keycloak hdr(host) -i accounts.domain.com
-    acl pgadmin hdr(host) -i pgadmin.domain.com
-    acl pi-hole hdr(host) -i pi-hole.domain.com
-    acl paperless hdr(host) -i paperless.domain.com
-    acl jellyfin hdr(host) -i media.domain.com
-
-    # Send to backend based on SNI ACL
-    use_backend bookstack if bookstack
-    use_backend phpmyadmin if phpmyadmin
-    use_backend guac if guac
-    use_backend recipes if recipes
-    use_backend keycloak if keycloak
-    use_backend pgadmin if pgadmin
-    use_backend pi-hole if pi-hole
-    use_backend paperless if paperless
-    use_backend jellyfin if jellyfin
-
-    # This redirects to a failure page
-    default_backend no-match
+    # Select backend based on services.map file or use backend no-match if not found.
+    use_backend %[req.hdr(host),lower,map(/etc/haproxy/services.map,no-match)]
 ```
 
 This frontend is bound to port 7000. You can use any port that you want. There is no good reason that I chose 7000. The domain.com.pem is the Cloudflare origins certificate.
@@ -353,18 +305,14 @@ If it doesn't match any of the ACLs it is will send it to a backend that shows a
 
 ### Internal Frontend
 
-This frontend can be a mirror of the External Frontend if you want all internal connection to come through it. I currently only have Jellyfin passed to it internally due to data requirements. All the other services I am using, I am not concerned about data usage.
+This frontend can be a mirror of the External Frontend if you want all internal connection to come through it. This is using the same map as the cloudflare frontend.
 
 ```bash
 frontend internal
     bind *:7001 accept-proxy ssl crt int.domain.com.pem
 
-    acl jellyfin hdr(host) -i media.domain.com
-
-    use_backend jellyfin if jellyfin
-
-    # This redirects to a failure page
-    default_backend no-match
+    # Select backend based on services.map file or use backend no-match if not found.
+    use_backend %[req.hdr(host),lower,map(/etc/haproxy/services.map,no-match)]
 ```
 
 This frontend is bound to 7001, simply because it is the next number on from the External Frontend. The certificate is a wildcard certificate that I auto-generate with [Let's Encrypt](https://letsencrypt.org).
