@@ -319,6 +319,14 @@ This frontend is bound to 7001, simply because it is the next number on from the
 
 The bind line is the only part different from External Frontend. Every other line can be set identically to the External Frontend.
 
+You will need to create a file named `/etc/haproxy/services.map` and enter in the host to backend information. The first part is the FQDN of the host and the second is the backend name. Example as follows (I have only listed a few and not all backends shown in the config).
+
+```bash
+recipes.domain.com recipes
+jellyfin.domain.com jellyfin
+paperless.domain.com paperless
+```
+
 ## Backends
 
 ### Redirect Backends
