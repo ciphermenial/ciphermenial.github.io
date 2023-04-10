@@ -267,7 +267,7 @@ This is the default frontend and all traffic going to HTTPS will hit it. This on
 
 I have an ACL configured that matches my internal network range of 192.168.88.0/24
 
-It will then redirect traffic to my internal backend (int) if it matches the rule, otherwise it will send it to my external backend (ext)
+It will then redirect traffic to my internal backend (internal) if it matches the rule, otherwise it will send it to my external backend (cloudflare)
 
 ### External Frontend
 
