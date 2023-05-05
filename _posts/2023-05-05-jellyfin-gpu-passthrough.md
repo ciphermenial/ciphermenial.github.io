@@ -82,8 +82,13 @@ You can now test that it is working by running `watch -d -n 0.5 nvidia-smi` on t
 ## Intel Configuration
 ### Install Intel GPU Tools
 
-All you need to do is run `sudo apt install intel-gpu-tools`
-You can check this is working by running the command `sudo intel_gpu_frequency` and you will see a printout of the following if successful.
+All you need to do is run
+
+```bash
+sudo apt install intel-gpu-tools
+```
+
+You can check this is working by running the command `sudo intel_gpu_frequency` and you will see a printout, like below, if successful.
 
 ```bash
 cur: 350 MHz
@@ -94,8 +99,18 @@ max: 1150 MHz
 
 ### Configure Jellyfin Container
 
-This is much simpler to do than the Nvidia configuration. You should only need to pass through the gpu to the server. The difference here was the requirement to allow access by setting the GID of the video group in the container. All the containers I checked had the video group with the GID or 44. You can check by running `lxc exec jellyfin -- grep video /etc/group`.
+This is much simpler to do than the Nvidia configuration. You should only need to pass through the gpu to the server. The difference here was the requirement to allow access by setting the GID of the video group in the container. All the containers I checked had the video group with the GID or 44. You can check by running
 
-The command is as simple as `lxc config device add container gpu gpu gid=44`.
+```bash
+lxc exec jellyfin -- grep video /etc/group
+```
 
-You now need to enable Intel transcoding in Jellyfin. To test that it is working, play a video, and on the host run `intel_gpu_top`.
+The command is as simple as the following.
+
+```bash
+lxc config device add jellyfin gpu gpu gid=44 id=2
+```
+
+The id comes from the `lshw` from above as used in the Nvidia configuration.
+
+You now need to enable Intel transcoding in Jellyfin. To test that it is working, play a video, and on the host run `intel_gpu_top`. I have tested this and it works to switch between the hardware transcoding.
