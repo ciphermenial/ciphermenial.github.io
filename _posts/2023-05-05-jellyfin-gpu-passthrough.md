@@ -1,6 +1,6 @@
 ---
-title: Configure GPU passthrough on Ubuntu 22.04 for Jellyfin
-categories: [Guides,Jellyfin]
+title: Configure GPU Passthrough to LXD Container
+categories: [Guides,LXD]
 tags: [guides,ubuntu,linux,jellyfin,nvidia,lxd]
 ---
 
@@ -66,12 +66,11 @@ This will show an output like this.
 ```
 
 You can see the physical ID for the Nvidia GPU is 0. Now we con configure the jellyfin container.
-The following commands add the necessary nvidia requirements to the container, add a device named gpu and tell it to using the gpu with the id of 0.
+The following commands add the necessary nvidia requirements to the container, add a device named nvidia-gpu and tell it to using the gpu with the id of 0.
+For more information about GPU devices, you can see the [LXD documentation](https://linuxcontainers.org/lxd/docs/latest/reference/devices_gpu/).
 
 ```bash
-lxc config set jellyfin nvidia.driver.capabilities=all
-lxc config set jellyfin nvidia.runtime=true
-lxc config device add jellyfin gpu gpu id=0
+lxc config device add jellyfin nvidia-gpu gpu id=0 nvidia.runtime=true nvidia.driver.capabilities=all
 lxc restart jellyfin
 ```
 
@@ -105,10 +104,10 @@ This is much simpler to do than the Nvidia configuration. You should only need t
 lxc exec jellyfin -- grep video /etc/group
 ```
 
-The command is as simple as the following.
+The command is as simple as the following. Here I have used intel-gpu as the device name. You can set the name to anything you would like.
 
 ```bash
-lxc config device add jellyfin gpu gpu gid=44 id=2
+lxc config device add jellyfin intel-gpu gpu gid=44 id=2
 ```
 
 The id comes from the `lshw` from above as used in the Nvidia configuration.
