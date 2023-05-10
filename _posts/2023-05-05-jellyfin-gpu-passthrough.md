@@ -18,7 +18,7 @@ I recently got hold of a mini PC with a Nvidia GPU and wanted to get hardware tr
 ## Nvidia Configuration
 ### Install Nvidia Drivers & Tools
 
-After much playing I found the best wat to get this working is to install using the following.
+After much playing I found the best way to get this working is to install using the following.
 
 ```bash
 sudo apt install nvidia-headless-530
