@@ -112,3 +112,84 @@ lxc config device add jellyfin intel-gpu gpu gid=44 pci=0000:00:02.0
 The pci address comes from the `lshw` from above as used in the Nvidia configuration.
 
 You now need to enable Intel transcoding in Jellyfin. To test that it is working, play a video, and on the host run `intel_gpu_top`. I have tested this and it works to switch between the hardware transcoding.
+
+## Testing Passthrough With CUDA Toolkit
+If you aren't using Jellyfin, this will show you how to test the passthrough using Nvidia's CUDA utilities. First, you will need to install NVIDIA CUDA toolkit.
+
+```bash
+sudo apt install nvidia-cuda-toolkit --no-install-recommends
+```
+
+> --no-install-recommends parameter will stop it from installing recommended packages that require a full GUI to be installed.
+{: .prompt-info }
+
+Now you can clone the Nvidia CUDA samples from github with the following and then change to the bandwidthTest utility sample directory.
+
+```bash
+git clone https://github.com/NVIDIA/cuda-samples.git
+cd cuda-samples/Samples/1_Utilities/bandwidthTest
+```
+
+You will need to edit the Makefile to point to the correct location for the `nvcc` binary using your preferred editor. Change the file as shown below.
+
+```bash
+# Location of the CUDA Toolkit
+CUDA_PATH ?= /usr
+```
+
+Now run the command `make`. I ran into an error when attempting this:
+
+```bash
+/usr/bin/nvcc -ccbin g++ -I../../../Common -m64 --threads 0 --std=c++11 -gencode arch=compute_50,code=sm_50 -gencode arch=compute_52,code=sm_52 -gencode arch=compute_60,code=sm_60 -gencode arch=compute_61,code=sm_61 -gencode arch=compute_70,code=sm_70 -gencode arch=compute_75,code=sm_75 -gencode arch=compute_80,code=sm_80 -gencode arch=compute_86,code=sm_86 -gencode arch=compute_89,code=sm_89 -gencode arch=compute_90,code=sm_90 -gencode arch=compute_90,code=compute_90 -o bandwidthTest.o -c bandwidthTest.cu
+nvcc fatal   : Unsupported gpu architecture 'compute_89'
+make: *** [Makefile:324: bandwidthTest.o] Error 1
+```
+
+I had to remove `89` and `90` from the make file and re-ran the `make` command.
+
+```diff
+# Gencode arguments
+ifeq ($(TARGET_ARCH),$(filter $(TARGET_ARCH),armv7l aarch64 sbsa))
+SMS ?= 53 61 70 72 75 80 86 87 90
+else
+- SMS ?= 50 52 60 61 70 75 80 86 89 90
++ SMS ?= 50 52 60 61 70 75 80 86
+endif
+```
+
+Once successful in compiling you can run `./bandwidthTest` and you will see the following.
+
+```bash
+[CUDA Bandwidth Test] - Starting...
+Running on...
+
+ Device 0: Quadro P600
+ Quick Mode
+
+ Host to Device Bandwidth, 1 Device(s)
+ PINNED Memory Transfers
+   Transfer Size (Bytes)        Bandwidth(GB/s)
+   32000000                     6.4
+
+ Device to Host Bandwidth, 1 Device(s)
+ PINNED Memory Transfers
+   Transfer Size (Bytes)        Bandwidth(GB/s)
+   32000000                     6.6
+
+ Device to Device Bandwidth, 1 Device(s)
+ PINNED Memory Transfers
+   Transfer Size (Bytes)        Bandwidth(GB/s)
+   32000000                     52.9
+
+Result = PASS
+
+NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.
+```
+
+Now to test this, you can copy the bandwidthTest binary to your LXD container that you have configured passthrough and run it. Make sure to change container to the name of your container when running this command.
+
+```
+lxc file push ~/cuda-samples/Samples/1_Utilities/bandwidthTest/bandwidthTest container/root/
+lxc exec container -- /root/bandwidthTest
+```
+If successful, you will see the same printout as above that you ran on the host.
