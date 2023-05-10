@@ -29,7 +29,7 @@ Restart the computer now.
 
 ### Configure Jellyfin Container
 
-First you need to discover the pci address of the GPU. That is done by running the following.
+First you need to discover the PCI address of the GPU. That is done by running the following.
 
 `sudo lshw -C display`
 
@@ -63,8 +63,8 @@ This will show an output like this.
        resources: irq:135 memory:f5000000-f5ffffff memory:d0000000-dfffffff ioport:f000(size=64)
 ```
 
-You can see the PCI address under bus info for the Nvidia GPU is 0000:01:00.0. Now we con configure the jellyfin container.
-The following commands add the necessary nvidia requirements to the container, add a device named nvidia-gpu and tell it to using the gpu with the id of 0.
+You can see the PCI address under bus info for the Nvidia GPU is 0000:01:00.0. Now we can configure the jellyfin container.
+The following commands add the necessary nvidia requirements to the container, add a device named nvidia-gpu and tell it to use the gpu with the PCI address of of 0000:01:00.0.
 For more information about GPU devices, you can see the [LXD documentation](https://linuxcontainers.org/lxd/docs/latest/reference/devices_gpu/).
 
 ```bash
@@ -97,7 +97,7 @@ max: 1150 MHz
 
 ### Configure Jellyfin Container
 
-This is much simpler to do than the Nvidia configuration. You should only need to pass through the gpu to the server. The difference here was the requirement to allow access by setting the GID of the video group in the container. All the containers I checked had the video group with the GID or 44. You can check by running
+This is much simpler to do than the Nvidia configuration. You should only need to pass through the GPU to the server. The difference here was the requirement to allow access by setting the GID of the video group in the container. All the containers I checked had the video group with the GID or 44. You can check by running
 
 ```bash
 lxc exec jellyfin -- grep video /etc/group
@@ -114,6 +114,7 @@ The pci address comes from the `lshw` from above as used in the Nvidia configura
 You now need to enable Intel transcoding in Jellyfin. To test that it is working, play a video, and on the host run `intel_gpu_top`. I have tested this and it works to switch between the hardware transcoding.
 
 ## Testing Passthrough With CUDA Toolkit
+
 If you aren't using Jellyfin, this will show you how to test the passthrough using Nvidia's CUDA utilities. First, you will need to install NVIDIA CUDA toolkit.
 
 ```bash
@@ -187,7 +188,7 @@ Result = PASS
 NOTE: The CUDA Samples are not meant for performance measurements. Results may vary when GPU Boost is enabled.
 ```
 
-Now to test this, you can copy the bandwidthTest binary to your LXD container that you have configured passthrough and run it. Make sure to change container to the name of your container when running this command.
+Now to test this, you can copy the bandwidthTest binary to your LXD container, that you have configured passthrough, and run it. Make sure to change "container" to the name of your container when running this command.
 
 ```bash
 lxc file push ~/cuda-samples/Samples/1_Utilities/bandwidthTest/bandwidthTest container/root/
