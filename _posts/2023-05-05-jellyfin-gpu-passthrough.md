@@ -35,7 +35,7 @@ First you need to discover the pci address of the GPU. That is done by running t
 
 This will show an output like this.
 
-```bash
+```
   *-display
        description: VGA compatible controller
        product: GP107GL [Quadro P600]
@@ -88,7 +88,7 @@ sudo apt install intel-gpu-tools
 
 You can check this is working by running the command `sudo intel_gpu_frequency` and you will see a printout, like below, if successful.
 
-```bash
+```
 cur: 350 MHz
 min: 350 MHz
 RP1: 350 MHz
@@ -140,7 +140,7 @@ You will need to edit the Makefile to point to the correct location for the `nvc
 
 Now run the command `make`. I ran into an error when attempting this:
 
-```bash
+```
 /usr/bin/nvcc -ccbin g++ -I../../../Common -m64 --threads 0 --std=c++11 -gencode arch=compute_50,code=sm_50 -gencode arch=compute_52,code=sm_52 -gencode arch=compute_60,code=sm_60 -gencode arch=compute_61,code=sm_61 -gencode arch=compute_70,code=sm_70 -gencode arch=compute_75,code=sm_75 -gencode arch=compute_80,code=sm_80 -gencode arch=compute_86,code=sm_86 -gencode arch=compute_89,code=sm_89 -gencode arch=compute_90,code=sm_90 -gencode arch=compute_90,code=compute_90 -o bandwidthTest.o -c bandwidthTest.cu
 nvcc fatal   : Unsupported gpu architecture 'compute_89'
 make: *** [Makefile:324: bandwidthTest.o] Error 1
@@ -160,7 +160,7 @@ endif
 
 Once successful in compiling you can run `./bandwidthTest` and you will see the following.
 
-```bash
+```
 [CUDA Bandwidth Test] - Starting...
 Running on...
 
@@ -189,8 +189,9 @@ NOTE: The CUDA Samples are not meant for performance measurements. Results may v
 
 Now to test this, you can copy the bandwidthTest binary to your LXD container that you have configured passthrough and run it. Make sure to change container to the name of your container when running this command.
 
-```
+```bash
 lxc file push ~/cuda-samples/Samples/1_Utilities/bandwidthTest/bandwidthTest container/root/
 lxc exec container -- /root/bandwidthTest
 ```
+
 If successful, you will see the same printout as above that you ran on the host.
