@@ -96,9 +96,9 @@ comments:
   # Giscus options › https://giscus.app
   giscus:
     repo: ciphermenial/ciphermenial.github.io
-    repo_id:
+    repo_id: R_kgDOHffdLQ
     category: Comments
-    category_id:
+    category_id: DIC_kwDOHffdLc4CWYy4
     mapping: # optional, default to 'pathname'
     input_position: # optional, default to 'bottom'
     lang: # optional, default to the value of `site.lang`
