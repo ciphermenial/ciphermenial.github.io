@@ -70,7 +70,8 @@ The following commands add the necessary nvidia requirements to the container, a
 For more information about GPU devices, you can see the [LXD documentation](https://linuxcontainers.org/lxd/docs/latest/reference/devices_gpu/).
 
 ```bash
-lxc config device add jellyfin nvidia-gpu gpu id=0 nvidia.runtime=true nvidia.driver.capabilities=all
+lxc config set jellyfin nvidia.runtime=true nvidia.driver.capabilities=all
+lxc config device add jellyfin nvidia-gpu gpu id=0
 lxc restart jellyfin
 ```
 
