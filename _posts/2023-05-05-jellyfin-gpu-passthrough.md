@@ -21,11 +21,9 @@ I recently got hold of a mini PC with a Nvidia GPU and wanted to get hardware tr
 After much playing I found the best wat to get this working is to install using the following.
 
 ```bash
-sudo apt install nvidia-driver-530 --no-install-recommends
+sudo apt install nvidia-headless-530
 sudo apt install nvidia-utils-530
 ```
-
-The parameter --no-install-recommends stops the installation of all the GUI components for Ubuntu. If you have a GUI already on your system you can ignore that.
 
 Restart the computer now.
 
