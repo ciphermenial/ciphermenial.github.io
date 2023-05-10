@@ -31,7 +31,7 @@ Restart the computer now.
 
 ### Configure Jellyfin Container
 
-First you need to discover the id number of the GPU. That is done by running the following.
+First you need to discover the pci address of the GPU. That is done by running the following.
 
 `sudo lshw -C display`
 
