@@ -132,9 +132,10 @@ cd cuda-samples/Samples/1_Utilities/bandwidthTest
 
 You will need to edit the Makefile to point to the correct location for the `nvcc` binary using your preferred editor. Change the file as shown below.
 
-```bash
+```diff
 # Location of the CUDA Toolkit
-CUDA_PATH ?= /usr
+- CUDA_PATH ?= /usr/local/cuda
++ CUDA_PATH ?= /usr
 ```
 
 Now run the command `make`. I ran into an error when attempting this:
