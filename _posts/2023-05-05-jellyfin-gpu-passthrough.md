@@ -65,13 +65,13 @@ This will show an output like this.
        resources: irq:135 memory:f5000000-f5ffffff memory:d0000000-dfffffff ioport:f000(size=64)
 ```
 
-You can see the physical ID for the Nvidia GPU is 0. Now we con configure the jellyfin container.
+You can see the PCI address under bus info for the Nvidia GPU is 0000:01:00.0. Now we con configure the jellyfin container.
 The following commands add the necessary nvidia requirements to the container, add a device named nvidia-gpu and tell it to using the gpu with the id of 0.
 For more information about GPU devices, you can see the [LXD documentation](https://linuxcontainers.org/lxd/docs/latest/reference/devices_gpu/).
 
 ```bash
 lxc config set jellyfin nvidia.runtime=true nvidia.driver.capabilities=all
-lxc config device add jellyfin nvidia-gpu gpu id=0
+lxc config device add jellyfin nvidia-gpu gpu pci=0000:01:00.0
 lxc restart jellyfin
 ```
 
@@ -108,9 +108,9 @@ lxc exec jellyfin -- grep video /etc/group
 The command is as simple as the following. Here I have used intel-gpu as the device name. You can set the name to anything you would like.
 
 ```bash
-lxc config device add jellyfin intel-gpu gpu gid=44 id=2
+lxc config device add jellyfin intel-gpu gpu gid=44 pci=0000:00:02.0
 ```
 
-The id comes from the `lshw` from above as used in the Nvidia configuration.
+The pci address comes from the `lshw` from above as used in the Nvidia configuration.
 
 You now need to enable Intel transcoding in Jellyfin. To test that it is working, play a video, and on the host run `intel_gpu_top`. I have tested this and it works to switch between the hardware transcoding.
