@@ -10,11 +10,11 @@ The problem here is I recently decided to try [Paperless-ngx](https://paperless-
 
 I thought I would see how that all fit together and try to make django-allauth work with Paperless-ngx. I have managed to make it work (it's not pretty though) and this is what bits I changed.
 
-# requirements.txt
+## requirements.txt
 The first thing you need to do is make sure django-allauth is installed so Paperless-ngx can access it. To do this I added it to the requirements.txt with the line ```django-allauth==0.51.0```
 Then I switched to the python venv and reran ```pip install -r requirements.txt```. You can simply switch to the venv and install django-allauth instead.
 
-# settings.py
+## settings.py
 Now I needed to make modifications to ```src/paperless/settings.py``` because currently Paperless-ngx has no idea about django-allauth.
 The first part I added was right at the start. I added ```import ast``` because that is required for a part I used from Tandoor Recipes. I don't know if it is required because I have no idea what I am doing.
 
@@ -94,7 +94,7 @@ DEFAULT_FROM_EMAIL = os.getenv("PAPERLESS_DEFAULT_FROM_EMAIL", "webmaster@localh
 ACCOUNT_EMAIL_SUBJECT_PREFIX = os.getenv("PAPERLESS_ACCOUNT_EMAIL_SUBJECT_PREFIX", "[Paperless] ") # Django Allauth sender prefix
 ```
 
-## All changes to settings.py
+### All changes to settings.py
 ```python
 import ast
 
@@ -142,7 +142,8 @@ EMAIL_USE_SSL = __get_boolean("PAPERLESS_EMAIL_USE_SSL")
 DEFAULT_FROM_EMAIL = os.getenv("PAPERLESS_DEFAULT_FROM_EMAIL", "webmaster@localhost")
 ACCOUNT_EMAIL_SUBJECT_PREFIX = os.getenv("PAPERLESS_ACCOUNT_EMAIL_SUBJECT_PREFIX", "[Paperless] ") # Django Allauth sender prefix
 ```
-# adapter.py
+
+## adapter.py
 I added an adapter.py file to ```src/paperless``` to stop people from creating new accounts.
 
 ```python
@@ -161,7 +162,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         return getattr(settings, 'ACCOUNT_ALLOW_SIGNUPS', allow_signups)
 ```
 
-# urls.py
+## urls.py
 This part breaks the pretty login form because it starts to use the default login forms that come with django-allauth. This was changed on ```src/paperless/urls.py```.
 Change is as follows.
 
@@ -170,7 +171,7 @@ Change is as follows.
 +path("accounts/", include("allauth.urls")),
 ```
 
-# paperless.conf
+## paperless.conf
 All of the changes made here are matched up with the changes in settings.py. The only one that needs some explanation is the PAPERLESS_ENABLE_ALLAUTH_PROVIDERS and PAPERLESS_ALLAUTH_PROVIDERS which is explained by [Tandoor Recipes docs](https://docs.tandoor.dev/features/authentication).
 
 ```python
@@ -194,7 +195,7 @@ PAPERLESS_EMAIL_USE_TLS=false
 PAPERLESS_DEFAULT_FROM_EMAIL=paperless@domain.com
 #PAPERLESS_ACCOUNT_EMAIL_SUBJECT_PREFIX=
 ```
-# Django Admin Configuration
+## Django Admin Configuration
 I then needed to do the configuration in django admin.
 First you need to modify the Site to the FQDN that it will be working with. In the example I have used domain.com.
 
