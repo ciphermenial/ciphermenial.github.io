@@ -18,6 +18,16 @@ Then I switched to the python venv and reran ```pip install -r requirements.txt`
 Now I needed to make modifications to ```src/paperless/settings.py``` because currently Paperless-ngx has no idea about django-allauth.
 The first part I added was right at the start. I added ```import ast``` because that is required for a part I used from Tandoor Recipes. I don't know if it is required because I have no idea what I am doing.
 
+You also need to add allauth to the INSTALLED_APPS section as follows.
+
+```diff
+    "guardian",
++    "allauth",
++    "allauth.account",
++    "allauth.socialaccount",
+    *env_apps,
+```
+
 One of the issues I had was that I have a reverse proxy doing TLS offloading. This caused a problem with django-allauth. I'm not exactly sure what the problem was but when it tried to auth to my Keycloak server it didn't even reach it and redirected back to the Paperless-ngx login. To resolve that I needed to set up settings to make django aware of the reverse proxy.
 
 ```python
@@ -153,7 +163,12 @@ class CustomAccountAdapter(DefaultAccountAdapter):
 
 # urls.py
 This part breaks the pretty login form because it starts to use the default login forms that come with django-allauth. This was changed on ```src/paperless/urls.py```.
-I changed ```path("accounts/", include("django.contrib.auth.urls")),``` to ```path("accounts/", include("allauth.urls")),```.
+Change is as follows.
+
+```diff
+-path("accounts/", include("django.contrib.auth.urls")),
++path("accounts/", include("allauth.urls")),
+```
 
 # paperless.conf
 All of the changes made here are matched up with the changes in settings.py. The only one that needs some explanation is the PAPERLESS_ENABLE_ALLAUTH_PROVIDERS and PAPERLESS_ALLAUTH_PROVIDERS which is explained by [Tandoor Recipes docs](https://docs.tandoor.dev/features/authentication).
