@@ -11,7 +11,7 @@ The problem here is I recently decided to try [Paperless-ngx](https://paperless-
 I thought I would see how that all fit together and try to make django-allauth work with Paperless-ngx. I have managed to make it work (it's not pretty though) and this is what bits I changed.
 
 ## requirements.txt
-The first thing you need to do is make sure django-allauth is installed so Paperless-ngx can access it. To do this I added it to the requirements.txt with the line ```django-allauth==0.51.0```
+The first thing you need to do is make sure django-allauth is installed so Paperless-ngx can access it. To do this I added it to the requirements.txt with the line ```django-allauth==0.54.0```
 Then I switched to the python venv and reran ```pip install -r requirements.txt```. You can simply switch to the venv and install django-allauth instead.
 
 ## settings.py
