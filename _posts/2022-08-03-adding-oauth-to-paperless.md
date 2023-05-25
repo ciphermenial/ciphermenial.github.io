@@ -2,6 +2,8 @@
 title: Adding OAuth to Paperless-ngx
 categories: [Article,Paperless]
 tags: [ubuntu,linux,paperless-ngx,haproxy,django,oauth]
+image:
+  path: /assets/img/oauth-paperless-ngx.png
 ---
 
 When I am deciding on web services to use on my home lab, I lean towards ones that support [SSO](https://en.wikipedia.org/wiki/Single_sign-on). I do this because I have Keycloak configured and working with my Yubikeys for [MFA](https://en.wikipedia.org/wiki/Multi-factor_authentication).
