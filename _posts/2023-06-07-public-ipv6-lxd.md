@@ -6,7 +6,9 @@ image:
   path: /assets/img/public-ipv6-lxd.png
 ---
 I recently gained access to a /48 IPv6 prefix for my connection. I previously had access to a /56 on my old ISP but their implementation of IPv6 is terrible and the /56 was not statically assigned to my connection.
+
 With this proper IPv6 set up I wanted to configure it for complete support of IPv6 on my home lab. I am using a MikroTik hEX S as my router, which isn't great because IPv6 support on RouterOS is only really starting to pick up in their IPv6 development. The main reason I am using the hEX S is because I wanted POE-IN and an SFP port. The SFP port is because I annoyingly only have access to VDSL Internet access and I use a Proscend VDSL SFP in the hEX S.
+
 I decided that I wanted to use IPv6 properly with my LXD host and have public IPs on the containers. I will go through the complete setup, including the RouterOS side.
 
 ## IPv6 on RouterOS
@@ -49,6 +51,7 @@ I am using Ubuntu for my LXD host. To check if you have received an IPv6 address
 ```
 
 In this example my network adapter is named `eno1`. If you don't see your network adapter in this output, you will need to make some changes to your netplan configuration. I am not sure if this is required but I set it up this way.
+
 I modified the config deployed on installation. I use vim when editing files.
 
 ```bash
@@ -69,6 +72,7 @@ network:
 ```
 
 Then you apply this configuration by running `sudo netplan apply`
+
 If you still don't see IPv6 on your adapter, you can disable and enable IPv6. I had to do this at one stage when playing around with making this work.
 
 ```bash
@@ -87,6 +91,7 @@ lxc network set lxdbr0 ipv6.address=2001:db8:1234:1::1/64 ipv6.nat=false
 ```
 
 I am statically assigning a /64 from my /48. You can assign any /64 besides 2001:db8:1234::/64. In the example you can use 2001:db8:1234:1::1/64 or for laughs you could use 2001:db8:1234:b00b::1/64.
+
 If you already had containers up and running and had a default IPv6 install on LXD, you might need to restart the containers to see the IPv6 address updated faster.
 
 ## Route to LXD /64
