@@ -2,6 +2,8 @@
 title:  Install Guacamole on Ubuntu
 categories: [Guides,Guacamole]
 tags: [guides,ubuntu,linux,guacamole,apache,tomcat,totp,mariadb]
+image:
+  path: /assets/img/guacamole-with-sql-and-2fa.png
 ---
 
 This was done to provide remote access to a server and make it as secure as possible.
