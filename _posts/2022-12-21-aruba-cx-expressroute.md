@@ -3,7 +3,7 @@ title: Aruba CX & Azure ExpressRoute
 categories: [Guides,Networking]
 tags: [guides,azure,expressroute,aruba,aos-cx,bgp]
 image:
-  path: /assets/img/cx-expressroute.png
+  path: /assets/img/cx-expressroute.svg
 ---
 
 I recently had to configure BGP on 2 pairs of Aruba CX switches configured as VSX pairs.
