@@ -3,7 +3,7 @@ title: Configure LXD on Ubuntu
 categories: [Guides, LXD]
 tags: [linux, ubuntu, lxd, guides, lxc]
 image:
-  path: /assets/img/configure-lxd-on-ubuntu.png
+  path: /assets/img/configure-lxd-on-ubuntu.svg
 ---
 
 This guide is a look into how I setup my homelab. This is the first part to a group of guides I am writing.
