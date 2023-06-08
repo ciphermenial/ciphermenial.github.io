@@ -7,7 +7,7 @@ image:
 ---
 I recently gained access to a /48 IPv6 prefix for my connection. I previously had access to a /56 on my old ISP but their implementation of IPv6 is terrible and the /56 was not statically assigned to my connection.
 
-With this proper IPv6 set up I wanted to configure it for complete support of IPv6 on my home lab. I am using a MikroTik hEX S as my router, which isn't great because IPv6 support on RouterOS is only really starting to pick up in their IPv6 development. The main reason I am using the hEX S is because I wanted POE-IN and an SFP port. The SFP port is because I annoyingly only have access to VDSL Internet access and I use a Proscend VDSL SFP in the hEX S.
+With this proper IPv6 set up I wanted to configure it for complete support of IPv6 on my home lab. I am using a MikroTik hEX S as my router, which isn't great because IPv6 support on RouterOS is only really starting to pick up. The main reason I am using the hEX S is because I wanted POE-IN and an SFP port. The SFP port is because I annoyingly only have access to VDSL Internet access and I use a Proscend VDSL SFP in the hEX S.
 
 I decided that I wanted to use IPv6 properly with my LXD host and have public IPs on the containers. I will go through the complete setup, including the RouterOS side.
 
