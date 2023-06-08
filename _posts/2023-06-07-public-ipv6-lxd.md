@@ -3,7 +3,7 @@ title: Using Public IPv6 with LXD Containers
 categories: [Guides,LXD]
 tags: [guides,lxd,linux,mikrotik,routeros,ipv6,netplan]
 image: 
-  path: /assets/img/public-ipv6-lxd.png
+  path: /assets/img/public-ipv6-lxd.svg
 ---
 I recently gained access to a /48 IPv6 prefix for my connection. I previously had access to a /56 on my old ISP but their implementation of IPv6 is terrible and the /56 was not statically assigned to my connection.
 
