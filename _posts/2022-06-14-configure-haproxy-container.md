@@ -3,7 +3,7 @@ title: Setup & Configure HAProxy Container with Cloudflare Origins
 categories: [Guides,HAProxy]
 tags: [guides,ubuntu,linux,lxc,lxd,haproxy,cloudflare,certificates]
 image: 
-  path: /assets/img/cloudflare-haproxy.png
+  path: /assets/img/cloudflare-haproxy.svg
 ---
 
 This is the second guide in the series on how I setup my homelab. In my setup I use Cloudflare Origin Server between the world and my home server. My instructions will include all of the necessary configuration besides the required port forwards on your router. In my setup I only foward connections on port 443 from [Cloudflares](https://www.cloudflare.com/ips-v4) IPv4 ranges.
