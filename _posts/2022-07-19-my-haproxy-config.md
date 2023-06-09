@@ -241,6 +241,9 @@ I have placed all the frontends together which might be a bit confusing. The con
 
 The first frontend I have configured is for redirecting HTTP to HTTPS and nothing more.
 
+> If you bind to ':::80 v4v6' IPv4 will present as ::ffff:10.0.0.1 from headers. Doing it as I have done in this configuration will render them correctly.
+{: .prompt-tip }
+
 ```bash
 frontend http-redirect
     bind *:80,:::80 v6only
@@ -256,7 +259,7 @@ The purpose of this frontend is to redirect the connection to a backend based on
 ```bash
 # Frontend for redirecting traffic to the required frontend
 frontend https-redirect
-    bind *:443
+    bind *:443,:::443 v6only
     mode tcp
     option tcplog
     tcp-request inspect-delay 5s
