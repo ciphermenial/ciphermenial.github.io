@@ -13,6 +13,8 @@ Update: I have now added [CrowdSec](https://www.crowdsec.net/) into the mix and 
 
 Update 2: I have massively reduced the size of my configuration file by usings a map for backend selection.
 
+Update 3: Attempting to use IPv6 as much as possible.
+
 Here is a copy of my HAProxy config in full:
 
 ```bash
@@ -60,24 +62,24 @@ listen stats
 
 # Frontend to redirect HTTP to HTTPS with code 301
 frontend http-redirect
-    bind *:80
+    bind *:80,:::80 v6only
     http-request redirect scheme https code 301
 
 # Frontend for redirecting traffic to the required frontend
 frontend https-redirect
-    bind *:443
+    bind *:443,:::443 v6only
     mode tcp
     option tcplog
     tcp-request inspect-delay 5s
     tcp-request content accept if { req_ssl_hello_type 1 }
-    acl internal src 192.168.88.1/24
+    acl internal src 192.168.88.1/24 2001:db8:b00b::/48
     acl cloudflare src -f /etc/haproxy/CF_ips.lst
     use_backend cloudflare if cloudflare
     use_backend internal if internal
 
 # Frontend for external users that a connecting through Cloudflare
 frontend cloudflare
-    bind *:7000 accept-proxy ssl crt domain.com.pem
+    bind ::1:7000 accept-proxy ssl crt domain.com.pem
 
     # CloudFlare CF-Connecting-IP header to source IP for Crowdsec decisions
     http-request set-src req.hdr(CF-Connecting-IP)
@@ -95,7 +97,7 @@ frontend cloudflare
 
 # Frontend for internal users connecting directly to HAProxy
 frontend internal
-    bind *:7001 accept-proxy ssl crt int.domain.com.pem
+    bind ::1:7001 accept-proxy ssl crt int.domain.com.pem
 
     # Select backend based on services.map file or use backend no-match if not found.
     use_backend %[req.hdr(host),lower,map(/etc/haproxy/services.map,no-match)]
@@ -103,11 +105,11 @@ frontend internal
 # Redirect to frontend based on internal or external connections
 backend cloudflare
     mode tcp
-    server loopback-for-tls 127.0.0.1:7000 send-proxy-v2
+    server loopback-for-tls ::1:7000 send-proxy-v2
 
 backend internal
     mode tcp
-    server loopback-for-tls 127.0.0.1:7001 send-proxy-v2
+    server loopback-for-tls ::1:7001 send-proxy-v2
 
 # Normal Backends
 backend no-match
@@ -154,7 +156,7 @@ backend captcha_verifier
 
 # Backend for crowdsec to allow DNS resolution
 backend crowdsec
-    server crowdsec localhost:8080 check
+    server crowdsec ::1:8080 check
 ```
 # Traffic Flow
 
@@ -241,7 +243,7 @@ The first frontend I have configured is for redirecting HTTP to HTTPS and nothin
 
 ```bash
 frontend http-redirect
-    bind *:80
+    bind *:80,:::80 v6only
     http-request redirect scheme https code 301
 ```
 
@@ -259,7 +261,7 @@ frontend https-redirect
     option tcplog
     tcp-request inspect-delay 5s
     tcp-request content accept if { req_ssl_hello_type 1 }
-    acl internal src 192.168.88.1/24
+    acl internal src 192.168.88.1/24 2001:db8:b00b::/48
     acl cloudflare src -f /etc/haproxy/CF_ips.lst
     use_backend cloudflare if cloudflare
     use_backend internal if internal
@@ -282,7 +284,7 @@ As quoted above I went about this in the most complicated way, when all I needed
 ```bash
 # Frontend for external users that a connecting through Cloudflare
 frontend cloudflare
-    bind *:7000 accept-proxy ssl crt domain.com.pem
+    bind ::1:7000 accept-proxy ssl crt domain.com.pem
 
     # CloudFlare CF-Connecting-IP header to source IP for Crowdsec decisions
     http-request set-src req.hdr(CF-Connecting-IP)
@@ -311,7 +313,7 @@ This frontend can be a mirror of the External Frontend if you want all internal 
 
 ```bash
 frontend internal
-    bind *:7001 accept-proxy ssl crt int.domain.com.pem
+    bind ::1:7001 accept-proxy ssl crt int.domain.com.pem
 
     # Select backend based on services.map file or use backend no-match if not found.
     use_backend %[req.hdr(host),lower,map(/etc/haproxy/services.map,no-match)]
@@ -339,11 +341,11 @@ These are the backends that redirect traffic to the necessary frontends based on
 # Redirect to frontend based on internal or external connections
 backend cloudflare
     mode tcp
-    server loopback-for-tls 127.0.0.1:7000 send-proxy-v2
+    server loopback-for-tls ::1:7000 send-proxy-v2
 
 backend internal
     mode tcp
-    server loopback-for-tls 127.0.0.1:7001 send-proxy-v2
+    server loopback-for-tls ::1:7001 send-proxy-v2
 ```
 
 These are set to tcp mode as they don't need to see headers. They are sent to the loopback address of the server so that they then connect to the frontends running on port 7000 or 7001.
