@@ -29,8 +29,8 @@ This will configure a /128 address from your provider and a dynamic IPv6 pool fo
 
 ```
 #    ADDRESS                                      FROM-POOL        INTERFACE  ADVERTISE
-0 DG 2001:db8:1234:1234:1234:1234:1234:1234/128                    sfp1       no       
-1  G 2001:db8:1234::1/64                          ipv6-slaac-pool  bridge     yes 
+0 DG 2001:db8:b00b:b00b:b00b:b00b:b00b:b00b/128                    sfp1       no       
+1  G 2001:db8:b00b::1/64                          ipv6-slaac-pool  bridge     yes 
 ```
 
 At this point, devices connected to your LAN (bridge) will be able to access IPs from this range.
@@ -44,7 +44,7 @@ I am using Ubuntu for my LXD host. To check if you have received an IPv6 address
     inet6 ::1/128 scope host 
        valid_lft forever preferred_lft forever
 2: eno1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 state UP qlen 1000
-    inet6 2001:db8:1234:0:6f1b:64ff:fee0:623a/64 scope global dynamic mngtmpaddr noprefixroute 
+    inet6 2001:db8:b00b:0:6f1b:64ff:fee0:623a/64 scope global dynamic mngtmpaddr noprefixroute 
        valid_lft 2591982sec preferred_lft 604782sec
     inet6 fe80::6f1b:64ff:fee0:623a/64 scope link 
        valid_lft forever preferred_lft forever
@@ -87,19 +87,19 @@ You should now have a public IPv6 address on your host.
 Now to configure LXD to use a public IPv6 range to use on your containers. This turned out to be extremely simple with a single command.
 
 ```bash
-lxc network set lxdbr0 ipv6.address=2001:db8:1234:1::1/64 ipv6.nat=false
+lxc network set lxdbr0 ipv6.address=2001:db8:b00b:1::1/64 ipv6.nat=false
 ```
 
-I am statically assigning a /64 from my /48. You can assign any /64 besides 2001:db8:1234::/64. In the example you can use 2001:db8:1234:1::1/64 or for laughs you could use 2001:db8:1234:b00b::1/64.
+I am statically assigning a /64 from my /48. You can assign any /64 besides 2001:db8:b00b::/64. In the example you can use 2001:db8:b00b:1::1/64 or for laughs you could use 2001:db8:b00b:b00b::1/64.
 
 If you already had containers up and running and had a default IPv6 install on LXD, you might need to restart the containers to see the IPv6 address updated faster.
 
 ## Route to LXD /64
 
-The last thing you need to do is create a route to the newly created IPv6 /64 subnet. You need the IPv6 address of the LXD host, which in my example is `2001:db8:1234:0:6f1b:64ff:fee0:623a`. This is the IP you route to with the following command.
+The last thing you need to do is create a route to the newly created IPv6 /64 subnet. You need the IPv6 address of the LXD host, which in my example is `2001:db8:b00b:0:6f1b:64ff:fee0:623a`. This is the IP you route to with the following command.
 
 ```bash
-ipv6/route/add dst-address=2001:db8:1234:1::1/64 gateway=2001:db8:1234:0:6f1b:64ff:fee0:623a
+ipv6/route/add dst-address=2001:db8:b00b:1::1/64 gateway=2001:db8:b00b:0:6f1b:64ff:fee0:623a
 ```
 
 You will now be able to add firewall rules in to forward traffic through to your container IPs. I would recommend locking down firewalls on the router and the LXD server as much as possible.
