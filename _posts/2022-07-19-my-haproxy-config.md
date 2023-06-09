@@ -241,7 +241,7 @@ I have placed all the frontends together which might be a bit confusing. The con
 
 The first frontend I have configured is for redirecting HTTP to HTTPS and nothing more.
 
-> If you bind to ':::80 v4v6' IPv4 will present as ::ffff:10.0.0.1 from headers. Doing it as I have done in this configuration will render them correctly.
+> If you bind to `:::80 v4v6` IPv4 will present as `::ffff:10.0.0.1` from headers. Doing it as `*:80,:::80 v6only` will render it correctly.
 {: .prompt-tip }
 
 ```bash
