@@ -16,8 +16,8 @@
 # Uncomment and complete the url below to enable more contact options
 #
 - type: mastodon
-icon: 'fab fa-mastodon'   # icons powered by <https://fontawesome.com/>
-url:  'https://mastodon.social/@ciphermenial'                  # Fill with your Mastodon account page, rel="me" will be applied for verification
+  icon: 'fab fa-mastodon'   # icons powered by <https://fontawesome.com/>
+  url:  'https://mastodon.social/@ciphermenial'                  # Fill with your Mastodon account page, rel="me" will be applied for verification
 #
 # - type: linkedin
 #   icon: 'fab fa-linkedin'   # icons powered by <https://fontawesome.com/>
