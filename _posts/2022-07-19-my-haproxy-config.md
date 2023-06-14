@@ -9,11 +9,16 @@ image:
 
 This is an explanation of my [HAProxy](https://www.haproxy.org) config, mostly as a reminder for myself. This has evolved over time. Most recently I have added a redirection for external or internal traffic to backends. The reason for this was due to adding a [Jellyfin](https://jellyfin.org) server and I didn't want that running over [Cloudflare](https://www.cloudflare.com) if the connection was coming from the internal network.
 
-Update: I have now added [CrowdSec](https://www.crowdsec.net/) into the mix and increased security by using [CF-Connecting-IP](https://developers.cloudflare.com/fundamentals/get-started/reference/http-request-headers/#cf-connecting-ip) instead of X-Forwarded-For header for capturing client IPs. See [this article from Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) on why X-Forwarded-For header is insecure.
+> Update: I have now added [CrowdSec](https://www.crowdsec.net/) into the mix and increased security by using [CF-Connecting-IP](https://developers.cloudflare.com/fundamentals/get-started/reference/http-request-headers/#cf-connecting-ip) instead of X-Forwarded-For header for capturing client IPs. See [this article from Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) on why X-Forwarded-For header is insecure.
+{: .prompt-info }
 
-Update 2: I have massively reduced the size of my configuration file by usings a map for backend selection.
+> Update 2: I have massively reduced the size of my configuration file by usings a map for backend selection.
+{: .prompt-info }
 
-Update 3: Attempting to use IPv6 as much as possible.
+> Update 3: Attempting to use IPv6 as much as possible.
+{: .prompt-info }
+
+> Update 4: Switched redirects from `localhost:port` to abstract namespaces i.e. `abns@namespace`.
 
 Here is a copy of my HAProxy config in full:
 
@@ -79,7 +84,7 @@ frontend https-redirect
 
 # Frontend for external users that a connecting through Cloudflare
 frontend cloudflare
-    bind ::1:7000 accept-proxy ssl crt domain.com.pem
+    bind abns@cloudflare accept-proxy ssl crt domain.com.pem
 
     # CloudFlare CF-Connecting-IP header to source IP for Crowdsec decisions
     http-request set-src req.hdr(CF-Connecting-IP)
@@ -97,7 +102,7 @@ frontend cloudflare
 
 # Frontend for internal users connecting directly to HAProxy
 frontend internal
-    bind ::1:7001 accept-proxy ssl crt int.domain.com.pem
+    bind abns@internal accept-proxy ssl crt int.domain.com.pem
 
     # Select backend based on services.map file or use backend no-match if not found.
     use_backend %[req.hdr(host),lower,map(/etc/haproxy/services.map,no-match)]
@@ -105,11 +110,11 @@ frontend internal
 # Redirect to frontend based on internal or external connections
 backend cloudflare
     mode tcp
-    server loopback-for-tls ::1:7000 send-proxy-v2
+    server loopback-for-tls abns@cloudflare send-proxy-v2
 
 backend internal
     mode tcp
-    server loopback-for-tls ::1:7001 send-proxy-v2
+    server loopback-for-tls abns@internal send-proxy-v2
 
 # Normal Backends
 backend no-match
@@ -264,10 +269,11 @@ frontend https-redirect
     option tcplog
     tcp-request inspect-delay 5s
     tcp-request content accept if { req_ssl_hello_type 1 }
-    acl internal src 192.168.88.1/24 2001:db8:b00b::/48
+    acl internal src 192.168.88.1/24
+    acl internalv6 src 2001:db8:b00b::/48
     acl cloudflare src -f /etc/haproxy/CF_ips.lst
     use_backend cloudflare if cloudflare
-    use_backend internal if internal
+    use_backend internal if internal OR internalv6
 ```
 
 This is the default frontend and all traffic going to HTTPS will hit it. This one is configured for tcp mode as it does not need to see anything in the headers.
@@ -284,10 +290,13 @@ This frontend is the one that works with connections coming from Cloudflare. It 
 
 As quoted above I went about this in the most complicated way, when all I needed to do was set CF-Connecting-IP to the source IP. This is how I have done it, thanks to the devs for the bouncer.
 
+> [Abstract namespaces](https://docs.haproxy.org/2.6/configuration.html#11.1) only work on Linux. You will not be able to use this config on [OPNsense](https://opnsense.org) or other BSD configurations. You can use `localhost:port` and select an unused port.
+{: .prompt-danger}
+
 ```bash
 # Frontend for external users that a connecting through Cloudflare
 frontend cloudflare
-    bind ::1:7000 accept-proxy ssl crt domain.com.pem
+    bind abns@cloudflare accept-proxy ssl crt domain.com.pem
 
     # CloudFlare CF-Connecting-IP header to source IP for Crowdsec decisions
     http-request set-src req.hdr(CF-Connecting-IP)
@@ -316,7 +325,7 @@ This frontend can be a mirror of the External Frontend if you want all internal 
 
 ```bash
 frontend internal
-    bind ::1:7001 accept-proxy ssl crt int.domain.com.pem
+    bind abns@internal accept-proxy ssl crt int.domain.com.pem
 
     # Select backend based on services.map file or use backend no-match if not found.
     use_backend %[req.hdr(host),lower,map(/etc/haproxy/services.map,no-match)]
@@ -344,14 +353,14 @@ These are the backends that redirect traffic to the necessary frontends based on
 # Redirect to frontend based on internal or external connections
 backend cloudflare
     mode tcp
-    server loopback-for-tls ::1:7000 send-proxy-v2
+    server loopback-for-tls abns@cloudflare send-proxy-v2
 
 backend internal
     mode tcp
-    server loopback-for-tls ::1:7001 send-proxy-v2
+    server loopback-for-tls abns@internal send-proxy-v2
 ```
 
-These are set to tcp mode as they don't need to see headers. They are sent to the loopback address of the server so that they then connect to the frontends running on port 7000 or 7001.
+These are set to tcp mode as they don't need to see headers.
 
 ### Normal Backends
 
