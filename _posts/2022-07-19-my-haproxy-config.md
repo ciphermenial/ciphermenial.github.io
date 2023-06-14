@@ -19,6 +19,7 @@ This is an explanation of my [HAProxy](https://www.haproxy.org) config, mostly a
 {: .prompt-info }
 
 > Update 4: Switched redirects from `localhost:port` to abstract namespaces i.e. `abns@namespace`.
+{: .prompt-info }
 
 Here is a copy of my HAProxy config in full:
 
