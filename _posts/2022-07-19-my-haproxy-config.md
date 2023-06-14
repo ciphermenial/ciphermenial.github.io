@@ -78,10 +78,11 @@ frontend https-redirect
     option tcplog
     tcp-request inspect-delay 5s
     tcp-request content accept if { req_ssl_hello_type 1 }
-    acl internal src 192.168.88.1/24 2001:db8:b00b::/48
+    acl internal src 192.168.88.1/24
+    acl internalv6 src 2001:db8:b00b::/48
     acl cloudflare src -f /etc/haproxy/CF_ips.lst
     use_backend cloudflare if cloudflare
-    use_backend internal if internal
+    use_backend internal if internal OR internalv6
 
 # Frontend for external users that a connecting through Cloudflare
 frontend cloudflare
