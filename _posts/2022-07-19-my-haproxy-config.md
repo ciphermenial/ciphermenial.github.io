@@ -27,9 +27,9 @@ This shows how traffic flows internally or externally from the user to the servi
 
 ```mermaid
 graph TD
- EU[/External User\] -.http://media.domain.com.-> CF[Cloudflare]
+ EU[/External User\] -.http://media.example.net.-> CF[Cloudflare]
  CF -.-> FE_HTTPS
- IU[/Internal User\] --http://media.domain.com--> FE_HTTP[HTTP Frontend]
+ IU[/Internal User\] --http://media.example.net--> FE_HTTP[HTTP Frontend]
  subgraph HAProxy
  FE_HTTPS -- Internal User? --> INT[Internal Backend]
  FE_HTTP --> FE_HTTPS[HTTPS Frontend]
@@ -154,7 +154,7 @@ As quoted above I went about this in the most complicated way, when all I needed
 ```bash
 # Frontend for external users that a connecting through Cloudflare
 frontend cloudflare
-    bind abns@cloudflare accept-proxy ssl crt domain.com.pem
+    bind abns@cloudflare accept-proxy ssl crt example.net.pem
 
     # CloudFlare CF-Connecting-IP header to source IP for Crowdsec decisions
     http-request set-src req.hdr(CF-Connecting-IP)
@@ -171,7 +171,7 @@ frontend cloudflare
     use_backend %[req.hdr(host),lower,map(/etc/haproxy/services.map,no-match)]
 ```
 
-The domain.com.pem is the Cloudflare origins certificate.
+The example.net.pem is the Cloudflare origins certificate.
 
 Backends are selected based on an SNI match for each ACL.
 
@@ -183,7 +183,7 @@ This frontend can be a mirror of the External Frontend if you want all internal 
 
 ```bash
 frontend internal
-    bind abns@internal accept-proxy ssl crt int.domain.com.pem
+    bind abns@internal accept-proxy ssl crt int.example.net.pem
 
     # Select backend based on services.map file or use backend no-match if not found.
     use_backend %[req.hdr(host),lower,map(/etc/haproxy/services.map,no-match)]
@@ -196,9 +196,9 @@ The bind line is the only part different from Cloudflare Frontend. Every other l
 You will need to create a file named `/etc/haproxy/services.map` and enter in the host to backend information. The first part is the FQDN of the host and the second is the backend name. Example as follows (I have only listed a few and not all backends shown in the config).
 
 ```bash
-recipes.domain.com recipes
-jellyfin.domain.com jellyfin
-paperless.domain.com paperless
+recipes.example.net recipes
+jellyfin.example.net jellyfin
+paperless.example.net paperless
 ```
 
 ## Backends
@@ -289,7 +289,7 @@ frontend https-redirect
 
 # Frontend for external users that a connecting through Cloudflare
 frontend cloudflare
-    bind abns@cloudflare accept-proxy ssl crt domain.com.pem
+    bind abns@cloudflare accept-proxy ssl crt example.net.pem
 
     # CloudFlare CF-Connecting-IP header to source IP for Crowdsec decisions
     http-request set-src req.hdr(CF-Connecting-IP)
@@ -307,7 +307,7 @@ frontend cloudflare
 
 # Frontend for internal users connecting directly to HAProxy
 frontend internal
-    bind abns@internal accept-proxy ssl crt int.domain.com.pem
+    bind abns@internal accept-proxy ssl crt int.example.net.pem
 
     # Select backend based on services.map file or use backend no-match if not found.
     use_backend %[req.hdr(host),lower,map(/etc/haproxy/services.map,no-match)]
@@ -338,7 +338,7 @@ backend phpmyadmin
     # Set root path for redirect
     acl path_root path /
     # Redirect to phpmyadmin subdirectory
-    redirect location https://phpmyadmin.domain.com/phpmyadmin if path_root
+    redirect location https://phpmyadmin.example.net/phpmyadmin if path_root
     server phpmyadmin phpmyadmin.lxd:80 check
 
 backend bookstack
@@ -348,7 +348,7 @@ backend pgadmin
     # Set root path for redirect
     acl path_root path /
     # Redirect to pgadmin4 subdirectory
-    redirect location https://pgadmin.domain.com/pgadmin4 if path_root
+    redirect location https://pgadmin.example.net/pgadmin4 if path_root
     server pgadmin pgadmin.lxd:80 check
 
 backend pi-hole
