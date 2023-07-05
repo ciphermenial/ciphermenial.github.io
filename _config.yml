@@ -53,10 +53,6 @@ google_site_verification: f2GjxrBiTX7lUxvpL1IeScbTTlLSDOy3svr6e-9vb1w # fill in 
 
 google_analytics:
   id: G-7DJVLN834S # fill in your Google Analytics ID
-  # Google Analytics pageviews report settings
-  pv:
-    proxy_endpoint: # fill in the Google Analytics superProxy endpoint of Google App Engine
-    cache_path: # the local PV cache data, friendly to visitors from GFW region
 
 # Prefer color scheme setting.
 #
