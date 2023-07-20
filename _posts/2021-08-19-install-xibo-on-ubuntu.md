@@ -178,6 +178,9 @@ sudo chown www-data:www-data /srv/xibo-cms/vendor/xibosignage/xibo-xmr/bin/confi
 sudo vim /etc/systemd/system/xibo-xmr.service
 ```
 
+> There is an issue with this because it is using php8 by default and you receive the error ```PHP Fatal error:  Unparenthesized `a ? b : c ? d : e` is not supported. Use either `(a ? b : c) ? d : e` or `a ? b : (c ? d : e)` in phar:///srv/xibo-cms/vendor/xibosignage/xibo-xmr/bin/xmr.phar/index.php on line 204```. To Resolve this I have forced it to use php7.4 in the ExecStart command.
+{: .prompt-info }
+
 Enter the following.
 
 ```
@@ -188,7 +191,7 @@ After=network.target
 [Service]
 User=www-data
 Group=www-data
-ExecStart=/usr/bin/php /srv/xibo-cms/vendor/bin/xmr.phar
+ExecStart=/usr/bin/php7.4 /srv/xibo-cms/vendor/bin/xmr.phar
 Restart=always
 KillMode=process
 RestartSec=1
