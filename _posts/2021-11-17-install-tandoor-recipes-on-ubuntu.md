@@ -10,15 +10,29 @@ In this guide we will look at manually installing [Tandoor Recipes](https://docs
 
 ## Notes
 - This install was done in a LXD container.
-- I have a haproxy runing in front of this.
+- I have a haproxy running in front of this.
 - I already have a postgresql server in place and built a database named *recipes* with a user with the same name.
 - I installed Node.js from [NodeSource](https://github.com/nodesource/distributions/blob/master/README.md)
 
 # Installation
-The requirements can be installed using apt and npm. I also am creating a user for this app called recipes. Don't forget to install Node.js.
+The requirements can be installed using apt and npm. I also am creating a user for this app called recipes.
+First I install Node.js.
 
 ```bash
-apt install gettext libjpeg9 libwebp6 build-essential musl-dev cargo python3-venv python3-dev libldap2-dev libssl-dev libsasl2-dev nginx python-is-python3
+apt-get update
+apt-get install -y ca-certificates curl gnupg
+mkdir -p /etc/apt/keyrings
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+NODE_MAJOR=20
+echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+apt-get update
+apt-get install nodejs -y
+```
+
+Now you can install the other requirements.
+
+```bash
+apt install gettext libjpeg9 libwebp7 build-essential musl-dev cargo python3-venv python3-dev libldap2-dev libssl-dev libsasl2-dev nginx python-is-python3
 npm install yarn -g
 useradd recipes
 ```
