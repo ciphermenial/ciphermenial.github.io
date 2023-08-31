@@ -8,13 +8,13 @@ image:
 
 In this guide we will look at manually installing [Tandoor Recipes](https://docs.tandoor.dev/). I have done this in a LXD container but you should be able to follow it using sudo commands for a normal install.
 
-## Notes
+### Notes
 - This install was done in a LXD container.
 - I have a haproxy running in front of this.
 - I already have a postgresql server in place and built a database named *recipes* with a user with the same name.
 - I installed Node.js from [NodeSource](https://github.com/nodesource/distributions/blob/master/README.md)
 
-# Installation
+## Installation
 The requirements can be installed using apt and npm. I also am creating a user for this app called recipes.
 First I install Node.js.
 
@@ -56,7 +56,7 @@ cp ~/recipes/.env.template .env
 
 You will need to now edit the .env file you copied over and change the following sections. Parts in uppercase need to be changed.
 
-## .env file changes
+### .env file changes
 ```bash
 SECRET_KEY=SOMETHING_RANDOM
 
@@ -106,7 +106,7 @@ chmod -R 755 mediafiles
 
 Now you need to create a systemd service for gunicorn. Create and modify a new service file /etc/systemd/system/recipes.service
 
-## recipes.server file contents
+### recipes.server file contents
 
 ```bash
 [Unit]
@@ -160,7 +160,7 @@ systemctl start recipes
 systemctl restart nginx
 ```
 
-# Upgrade
+## Upgrade
 Pull the latest changes for github and copy the necessary files to the install.
 
 ```bash
@@ -190,7 +190,7 @@ Restart the recipes service and you're done.
 systemctl restart recipes
 ```
 
-# Upgrade to Ubuntu 22.04 LTS
+## Upgrade to Ubuntu 22.04 LTS
 I had an issue after upgrading to 22.04 LTS because it went from Python 3.9 to Python 3.10.
 After the upgrade I had to delete and rebuild the Python venv. For some reason I also had to install venv again.
 
