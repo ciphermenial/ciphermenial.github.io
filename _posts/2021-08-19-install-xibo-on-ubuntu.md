@@ -10,7 +10,7 @@ I have installed [Xibo CMS](https://xibo.org.uk/cms) on Ubuntu Server 22.04 usin
 
 This guideis now updated for installing Xibo CMS 4.0.1.
 
-> * The [MariaDB](https://mariadb.com) version installed here are not currently supported by Xibo.
+> * The [MariaDB](https://mariadb.com) version installed here is not currently supported by Xibo.
 > * The library location is /var/www/Library due to the installer writing the install log file to /var/www/library. The installer requires that the library directory is empty.
 > * A local install of [QuickChart](https://quickchart.io) is not covered in this guide but recommended.
 > * Ubuntu 22.04 uses unsupported php8 by default. We will install php8.2 instead.
