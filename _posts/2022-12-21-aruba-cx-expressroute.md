@@ -24,7 +24,7 @@ Microsoft only allow for a single VLAN and /30 for primary and secondary connect
 
 The configuration I am using is as follows:
 
-![](/assets/img/2022-12-21-aruba-cx-expressroute/2022-12-21-expressroute-peering.png)
+![](/assets/img/2022-12-21-aruba-cx-expressroute/expressroute-peering.png)
 
 ## Aruba CX Configuration
 
@@ -46,7 +46,7 @@ I used the following subnets and VLANs for this:
 
 In my configuration it is a bit mixed up with primary and secondary data centres. The VSX pairs primary and secondary is opposite to the ISP Router primary and secondary configuration. The primary ExpressRoute hand-off is connected to the secondary data centre primary switch. Here is a diagram of my configuration:
 
-![](/assets/img/2022-12-21-aruba-cx-expressroute/2022-12-21-aruba-cx-layout.png)
+![](/assets/img/2022-12-21-aruba-cx-expressroute/aruba-cx-layout.png)
 
 ### Configuration
 
