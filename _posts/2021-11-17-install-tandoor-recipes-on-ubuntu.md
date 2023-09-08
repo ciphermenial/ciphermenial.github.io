@@ -3,7 +3,7 @@ title:  Install Tandoor Recipes in Ubuntu
 categories: [Guides,Tandoor Recipes]
 tags: [guides,tandoor recipes,linux,ubuntu,lxd,postgresql]
 image: 
-  path: /assets/img/install-tandoor-recipes-on-ubuntu.svg
+  path: /assets/img/title/install-tandoor-recipes-on-ubuntu.svg
 ---
 
 In this guide we will look at manually installing [Tandoor Recipes](https://docs.tandoor.dev/). I have done this in a LXD container but you should be able to follow it using sudo commands for a normal install.

@@ -3,7 +3,7 @@ title: Configure GPU Passthrough to LXD Container
 categories: [Guides,LXD]
 tags: [guides,ubuntu,linux,jellyfin,nvidia,lxd]
 image: 
-  path: /assets/img/lxd-gpu-passthrough.svg
+  path: /assets/img/title/lxd-gpu-passthrough.svg
 ---
 
 I recently got hold of a mini PC with a Nvidia GPU and wanted to get hardware transcoding working with Jellyfin in an LXD container. I have previously done this on my existing mini PC that only has an Intel iGPU and I will show how to do that also.
