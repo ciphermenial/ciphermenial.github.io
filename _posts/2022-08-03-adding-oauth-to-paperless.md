@@ -3,7 +3,7 @@ title: Adding OAuth to Paperless-ngx
 categories: [Article,Paperless]
 tags: [ubuntu,linux,paperless-ngx,haproxy,django,oauth]
 image:
-  path: /assets/img/oauth-paperless-ngx.svg
+  path: /assets/img/title/oauth-paperless-ngx.svg
 ---
 
 When I am deciding on web services to use on my home lab, I lean towards ones that support [SSO](https://en.wikipedia.org/wiki/Single_sign-on). I do this because I have Keycloak configured and working with my Yubikeys for [MFA](https://en.wikipedia.org/wiki/Multi-factor_authentication).
@@ -199,22 +199,22 @@ PAPERLESS_DEFAULT_FROM_EMAIL=paperless@domain.com
 I then needed to do the configuration in django admin.
 First you need to modify the Site to the FQDN that it will be working with. In the example I have used domain.com.
 
-![](/assets/img/django-allauth-sites.png)
+![](/assets/img/2022-08-03-adding-oauth-to-paperless/django-allauth-sites.png)
 
 Then you need to go to the Social Application section and click on
 
-![](/assets/img/django-allauth-add-socialapp.png)
+![](/assets/img/2022-08-03-adding-oauth-to-paperless/django-allauth-add-socialapp.png)
 
 Fill out the add social application as needed.
 
-![](/assets/img/django-allauth-socialapp.png)
+![](/assets/img/2022-08-03-adding-oauth-to-paperless/django-allauth-socialapp.png)
 
 Next you need to create a user to link to your Keycloak Account. Once the user is created you can go to Social Account section and click on
 
-![](/assets/img/django-allauth-add-socialaccount.png)
+![](/assets/img/2022-08-03-adding-oauth-to-paperless/django-allauth-add-socialaccount.png)
 
 Fill out the add social application as needed.
 
-![](/assets/img/django-allauth-socialaccount.png)
+![](/assets/img/2022-08-03-adding-oauth-to-paperless/django-allauth-socialaccount.png)
 
 You should now be able to sign out and sign back in, by clicking on Keycloak.

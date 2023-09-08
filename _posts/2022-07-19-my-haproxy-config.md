@@ -4,7 +4,7 @@ categories: [Guides,HAProxy]
 tags: [guides,ubuntu,linux,lxc,lxd,haproxy,cloudflare,certificates]
 mermaid: true
 image: 
-  path: /assets/img/haproxy-configuration.svg
+  path: /assets/img/title/haproxy-configuration.svg
 ---
 
 This is an explanation of my [HAProxy](https://www.haproxy.org) config, mostly as a reminder for myself. This has evolved over time. Most recently I have added a redirection for external or internal traffic to backends. The reason for this was due to adding a [Jellyfin](https://jellyfin.org) server and I didn't want that running over [Cloudflare](https://www.cloudflare.com) if the connection was coming from the internal network.
