@@ -27,15 +27,15 @@ This shows how traffic flows internally or externally from the user to the servi
 
 ```mermaid
 graph TD
- EU[/External User\] -.http://media.example.net.-> CF[Cloudflare]
+ EU[/External User\] -."http://media.example.net".-> CF[Cloudflare]
  CF -.-> FE_HTTPS
- IU[/Internal User\] --http://media.example.net--> FE_HTTP[HTTP Frontend]
+ IU[/Internal User\] --"http://media.example.net"--> FE_HTTP[HTTP Frontend]
  subgraph HAProxy
- FE_HTTPS -- Internal User? --> INT[Internal Backend]
+ FE_HTTPS -- "Internal User?" --> INT[Internal Backend]
  FE_HTTP --> FE_HTTPS[HTTPS Frontend]
  EXT -.-> FE_EXT[External Frontend]
  INT --> FE_INT[Internal Frontend]
- FE_HTTPS -. External User? .-> CS_DEC[(CrowdSec Decision)]
+ FE_HTTPS -. "External User?" .-> CS_DEC[(CrowdSec Decision)]
  subgraph CrowdSec
  CS_DEC ==Require CAPTCHA==> CS_CAPTCHA[CAPTCHA Page]
  CS_DEC ==Banned IP==> CS_BAN[Ban Page]
