@@ -6,6 +6,9 @@ image:
   path: /assets/img/title/oauth-paperless-ngx.svg
 ---
 
+> Paperless-ngx now has inbuilt support for this, so you can ignore this entirely.
+{: .prompt-info }
+
 When I am deciding on web services to use on my home lab, I lean towards ones that support [SSO](https://en.wikipedia.org/wiki/Single_sign-on). I do this because I have Keycloak configured and working with my Yubikeys for [MFA](https://en.wikipedia.org/wiki/Multi-factor_authentication).
 
 The problem here is I recently decided to try [Paperless-ngx](https://paperless-ngx.readthedocs.io) since so many people use it in their home labs. It does not have SSO support. However it is built with [django](https://www.djangoproject.com). I have previously configured [Tandoor Recipes](https://docs.tandoor.dev) in my home lab and it also uses django and supports SSO. It supports [OAuth](https://oauth.net) by using the project [django-allauth](https://django-allauth.readthedocs.io).
