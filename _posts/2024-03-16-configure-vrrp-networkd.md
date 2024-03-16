@@ -15,7 +15,7 @@ I have ended up playing around with VRRP on FRRouting and found nothing online o
 
 - Debian is already installed.
 - 2 NICs on each server.
-- Vim is the editor I use.
+- You know how to use vim.
 
 ## Enabling networkd
 
