@@ -4,7 +4,7 @@ categories: [Guides,Networking]
 tags: [guides,frrouting,linux,vrrp,networkd,systemd,incus]
 mermaid: true
 image:
-  path: /asset/img/title/configure-vrrp-networkd.svg
+  path: assets/img/title/configure-vrrp-networkd.svg
 ---
 
 I decided that I wanted to configure my own router without using something like OPNsense. I wanted to do it with iproute2, nftables, frrouting, unbound, and kea. Kea was something I only discovered recently and wanted to give it a go. I decided I would learn how to do this using LXC containers and Incus on Debian. I want to move away from Canonical as much as possible after [LXD was taken out of Linux Containers](https://discuss.linuxcontainers.org/t/lxd-is-no-longer-part-of-the-linux-containers-project/17593).
