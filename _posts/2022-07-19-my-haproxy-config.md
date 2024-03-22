@@ -27,25 +27,45 @@ This shows how traffic flows internally or externally from the user to the servi
 
 ```mermaid
 graph TD
- EU[/External User\] -."http://media.example.net".-> CF[Cloudflare]
- CF -.-> FE_HTTPS
- IU[/Internal User\] --"http://media.example.net"--> FE_HTTP[HTTP Frontend]
- subgraph HAProxy
- FE_HTTPS -- "Internal User?" --> INT[Internal Backend]
- FE_HTTP --> FE_HTTPS[HTTPS Frontend]
- EXT -.-> FE_EXT[External Frontend]
- INT --> FE_INT[Internal Frontend]
- FE_HTTPS -. "External User?" .-> CS_DEC[(CrowdSec Decision)]
- subgraph CrowdSec
- CS_DEC ==Require CAPTCHA==> CS_CAPTCHA[CAPTCHA Page]
- CS_DEC ==Banned IP==> CS_BAN[Ban Page]
- CS_CAPTCHA ==CAPTCHA failed==> CS_DEC
- CS_DEC ==Captcha Remediated==> EXT[External Backend]
- end
- end
- CS_DEC -.Not In Decisions.-> EXT
- FE_EXT -.-> S[Web Service]
- FE_INT --> S
+  ExtUsr[/External User\]
+  IntUsr[/Internal User\]
+  Cloudflare
+  HTTP[HTTP Frontend]
+  HTTPS[HTTPS Frontend]
+  IntBackend[Internal Backend]
+  IntFrontend[Internal Frontend]
+  ExtBackend[External Backend]
+  ExtFrontend[External Frontend]
+  CS_Decision[(Decision)]
+  CS_CAPTCHA[CAPTCHA]
+  CS_Ban[Ban Page]
+  Server[Web Service]
+
+  ExtUsr -."http://host.example.net".-> Cloudflare
+  Cloudflare -."https://host.example.net".-> HTTPS
+  IntUsr --"https://host.example.net"--> HTTPS
+  IntUsr -."http://host.example.net".-> HTTP
+  HTTP -."302 Redirect"...-> IntUsr
+
+  subgraph HAProxy
+    HTTP
+    HTTPS --"Internal User?"--> IntBackend
+    ExtBackend -.-> ExtFrontend
+    IntBackend --> IntFrontend
+    HTTPS -."External User?"..-> CS_Decision
+
+    subgraph CrowdSec
+      CS_Decision ==fa:fa-circle-exclamation===> CS_CAPTCHA
+      CS_Decision ==fa:fa-thumbs-down===> CS_Ban
+      CS_CAPTCHA ==fa:fa-person-circle-question===> CS_Decision
+      CS_Decision ==fa:fa-thumbs-up===> ExtBackend
+
+    end
+  end
+
+ CS_Decision -.fa:fa-circle-check.-> ExtBackend
+ ExtFrontend -.-> Server
+ IntFrontend --> Server
 ```
 
 # Breakdown
