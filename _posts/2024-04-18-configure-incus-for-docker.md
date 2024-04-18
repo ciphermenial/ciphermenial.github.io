@@ -16,7 +16,9 @@ With this guide you will learn how to make Docker run inside an lxc container us
 
 I am creating a container named docker using the Debian Bookworm image. This command also sets the necessary configuration for allowing nesting.
 
-`incus launch images:debian/12 docker -c security.nesting=true -c security.syscalls.intercept.mknod=true -c security.syscalls.intercept.setxattr=true`
+```bash
+incus launch images:debian/12 docker -c security.nesting=true -c security.syscalls.intercept.mknod=true -c security.syscalls.intercept.setxattr=true
+```
 
 ## Configure ZFS Pool Delegation
 
