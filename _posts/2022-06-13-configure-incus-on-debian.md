@@ -3,7 +3,7 @@ title: Configure Incus on Debian
 categories: [Guides, Incus]
 tags: [linux,debian,incus,guides,lxc]
 image:
-  path: /assets/img/title/configure-lxd-on-ubuntu.svg
+  path: /assets/img/title/configure-incus-on-debian.svg
 ---
 > This was previously a guide for Using LXD on Ubuntu.
 {: .prompt-info }
