@@ -28,14 +28,14 @@ When I am configuring server software outside of a package manager I always plac
 ```bash
 sudo mkdir /srv/xibo-cms
 cd /srv/xibo-cms
-sudo wget https://github.com/xibosignage/xibo-cms/releases/download/4.0.8/xibo-cms-4.0.8.tar.gz
+sudo wget https://github.com/xibosignage/xibo-cms/releases/download/4.0.10/xibo-cms-4.0.10.tar.gz
 ```
 
 This extracts the contents of the archive without placing it into a folder
 
 ```bash
-sudo tar -xvzf xibo-cms-4.0.8.tar.gz --strip-components=1
-sudo rm xibo-cms-4.0.8.tar.gz
+sudo tar -xvzf xibo-cms-4.0.10.tar.gz --strip-components=1
+sudo rm xibo-cms-4.0.10.tar.gz
 ```
 
 The apache2 user 'www-data' needs to be set as owner of all the extracted items.
@@ -215,7 +215,7 @@ sudo crontab -u www-data -e
 Select the editor you prefer and then enter the following line.
 
 ```
-* * * * * /usr/bin/php /var/www/bin/xtr.php
+* * * * * /usr/bin/php8.3 /srv/xibo-xmr/bin/xtr.php
 ```
 
 ## Configure Firewall
@@ -255,15 +255,15 @@ Create xibo-cms directory and change to it. Download the new version, in this ex
 ```bash
 sudo mkdir /srv/xibo-cms
 cd /srv/xibo-cms
-sudo wget https://github.com/xibosignage/xibo-cms/releases/download/4.0.1/xibo-cms-4.0.8.tar.gz
-sudo tar -xvzf xibo-cms-4.0.8.tar.gz --strip-components=1
+sudo wget https://github.com/xibosignage/xibo-cms/releases/download/4.0.10/xibo-cms-4.0.10.tar.gz
+sudo tar -xvzf xibo-cms-4.0.10.tar.gz --strip-components=1
 sudo cp /srv/xibo-cms.backup/web/settings.php web/
 sudo cp -r /srv/xibo-cms.backup/Library .
 sudo cp /srv/xibo-cms.backup/vendor/xibosignage/xibo-xmr/bin/config.json vendor/xibosignage/xibo-xmr/bin/
 sudo chown -R www-data:www-data /srv/xibo-cms
 sudo rm web/install/index.php
 ```
-If upgrading between versions i.e. 2.x.x to 3.x.x, you will need to upgrade the database with this command which must be run from /srv/xibo-cms directory.
+If upgrading between versions i.e. 3.x.x to 4.x.x, you will need to upgrade the database with this command which must be run from /srv/xibo-cms directory.
 
 ```bash
 vendor/bin/phinx migrate -c phinx.php
