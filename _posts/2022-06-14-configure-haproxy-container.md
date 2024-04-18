@@ -1,7 +1,7 @@
 ---
 title: Setup & Configure HAProxy Container with Cloudflare Origins
 categories: [Guides,HAProxy]
-tags: [guides,ubuntu,linux,lxc,lxd,haproxy,cloudflare,certificates]
+tags: [guides,debian,linux,lxc,incus,haproxy,cloudflare,certificates]
 image: 
   path: /assets/img/title/cloudflare-haproxy.svg
 ---
@@ -14,34 +14,34 @@ This is the second guide in the series on how I setup my homelab. In my setup I 
 - Public domain name
 - Port 443 forwarded on your router to your LXD server.
 
-# Create HAProxy LXD Container
+# Create HAProxy Incus Container
 
 To create the containers run the following.
 
 ```bash
-lxc launch ubuntu:22.04 haproxy
+incus launch images:debian/12 haproxy
 ```
 
 This will create a new container with the name **haproxy** using a Ubuntu 22.04 image.
 
-# LXC configuration
+# Incus configuration
 
 For this to work port 443 needs to be forwarded to the haproxy container. To do this you need haproxy to have a static IP.
 
 ```bash
-lxc config device override haproxy eth0 ipv4.address 10.10.10.254
-lxc restart haproxy
+incus config device override haproxy eth0 ipv4.address 10.10.10.254
+incus restart haproxy
 ```
 
-You need to forward HTTPS traffic from the host to the container. This creates a rule in nftables to pass the traffic through. You need to use your LXD hosts IP address for the listen address. Make sure your server has a static IP, in my example the server's IP is 10.0.2.15.
+You need to forward HTTPS traffic from the host to the container. This creates a rule in nftables to pass the traffic through. You need to use your Incus hosts IP address for the listen address. Make sure your server has a static IP, in my example the server's IP is 10.0.2.15.
 
 ```bash
-lxc config device add haproxy https proxy listen=tcp:10.0.2.15:443 connect=tcp:10.10.10.254:443 nat=true
+incus config device add haproxy https proxy listen=tcp:10.0.2.15:443 connect=tcp:10.10.10.254:443 nat=true
 ```
 
 At this point all the configuration requirements for the container are complete. IF you want to view the configuration you can do the following.
 
-`lxc config show haproxy`
+`incus config show haproxy`
 
 And the output will look similar to this.
 
@@ -49,23 +49,25 @@ And the output will look similar to this.
 architecture: x86_64
 config:
   image.architecture: amd64
-  image.description: ubuntu 22.04 LTS amd64 (release) (20220604)
-  image.label: release
-  image.os: ubuntu
-  image.release: jammy
-  image.serial: "20220604"
+  image.description: Debian bookworm amd64 (20240416_05:24)
+  image.os: Debian
+  image.release: bookworm
+  image.serial: "20240416_05:24"
   image.type: squashfs
-  image.version: "22.04"
-  volatile.base_image: c73fb1ddeb3ba971b230e79565817cd5a8e6053bfa9526afe19cd10e3008f895
-  volatile.cloud-init.instance-id: 316688ab-7973-4509-bb86-8c143aaa1e03
-  volatile.eth0.host_name: vethac1f936f
-  volatile.eth0.hwaddr: 00:16:3e:2d:1f:3c
+  image.variant: default
+  volatile.base_image: e763cf30d37fa3a77d7c4ed0f74c084ad9480e0ec70ff515426e67a8225317c4
+  volatile.cloud-init.instance-id: b4a2b8ba-0ccb-4cde-84a3-e11be74d00d5
+  volatile.eth0.host_name: veth042b3414
+  volatile.eth0.hwaddr: 00:16:3e:58:ab:47
   volatile.idmap.base: "0"
-  volatile.idmap.current: '[{"Isuid":true,"Isgid":false,"Hostid":1000000,"Nsid":0,"Maprange":1000000000},{"Isuid":false,"Isgid":true,"Hostid":1000000,"Nsid":0,"Maprange":1000000000}]'
-  volatile.idmap.next: '[{"Isuid":true,"Isgid":false,"Hostid":1000000,"Nsid":0,"Maprange":1000000000},{"Isuid":false,"Isgid":true,"Hostid":1000000,"Nsid":0,"Maprange":1000000000}]'
-  volatile.last_state.idmap: '[{"Isuid":true,"Isgid":false,"Hostid":1000000,"Nsid":0,"Maprange":1000000000},{"Isuid":false,"Isgid":true,"Hostid":1000000,"Nsid":0,"Maprange":1000000000}]'
+  volatile.idmap.current: '[{"Isuid":true,"Isgid":false,"Hostid":1000000,"Nsid":0,"Maprange":1000000000},{"Isuid":false,"I
+sgid":true,"Hostid":1000000,"Nsid":0,"Maprange":1000000000}]'
+  volatile.idmap.next: '[{"Isuid":true,"Isgid":false,"Hostid":1000000,"Nsid":0,"Maprange":1000000000},{"Isuid":false,"Isgi
+d":true,"Hostid":1000000,"Nsid":0,"Maprange":1000000000}]'
+  volatile.last_state.idmap: '[]'
   volatile.last_state.power: RUNNING
-  volatile.uuid: 15f9d5e5-86b7-4b4f-8428-5833ab260544
+  volatile.uuid: 2ca6366b-2884-4c46-9791-d28619678059
+  volatile.uuid.generation: 2ca6366b-2884-4c46-9791-d28619678059
 devices:
   eth0:
     ipv4.address: 10.10.10.254
@@ -88,7 +90,7 @@ description: ""
 
 To change to the terminal of the HAProxy container you can do the following.
 
-`lxc exec haproxy bash`
+`incus exec haproxy bash`
 
 Now I update apt repositories and install all updates. Then install haproxy.
 
