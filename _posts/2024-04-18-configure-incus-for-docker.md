@@ -10,7 +10,7 @@ image:
 With this guide you will learn how to make Docker run inside an lxc container using Incus. This uses new functionality in ZFS and Incus (originally introduced in [LXD 5.17](https://github.com/canonical/lxd/releases/tag/lxd-5.17)). [ZFS 2.2](https://github.com/openzfs/zfs/releases/tag/zfs-2.2.0) introduced Linux container support for overlayfs. I have always had issues with running docker inside LXC (probably my own lack of understanding) but with this it works perfectly.
 
 ## Requirements
-- You followed my guide for configuring Incus on Debian with ZFS 2.2
+- You followed my guide for configuring [Incus on Debian with ZFS 2.2](/posts/configure-incus-on-debian/)
 
 ## Create Container
 
