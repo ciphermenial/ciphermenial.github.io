@@ -26,8 +26,10 @@ The delegation of ZFS is done on the volume for the container. I stop the contai
 
 ```bash
 incus stop docker
-incus storage volume set storage container/docker zfs.delegate=true
+incus storage volume set default container/docker zfs.delegate=true
+incus start docker
 ```
+For reference it works like `incus storage volume set <storage name> container/<container name> zfs.delegate=true`
 
 ## Install Docker in the Container
 
