@@ -356,7 +356,7 @@ cd /srv/xibo-cms
 sudo wget https://github.com/xibosignage/xibo-cms/releases/download/4.0.10/xibo-cms-4.0.10.tar.gz
 sudo tar -xvzf xibo-cms-4.0.10.tar.gz --strip-components=1
 sudo cp /srv/xibo-cms.backup/web/settings.php web/
-sudo cp -r /srv/xibo-cms.backup/Library .
+sudo cp -r /srv/xibo-cms.backup/library .
 sudo cp /srv/xibo-cms.backup/vendor/xibosignage/xibo-xmr/bin/config.json vendor/xibosignage/xibo-xmr/bin/
 sudo chown -R www-data:www-data /srv/xibo-cms
 sudo rm web/install/index.php
