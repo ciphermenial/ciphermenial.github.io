@@ -2,7 +2,12 @@
 title: Configure HAProxy for Microsoft ADFS Cluster
 categories: [Guides,HAProxy]
 tags: [guides,ubuntu,haproxy,linux,adfs,keepalived,vrrp,microsoft]
+image:
+  path: /assets/img/title/configure-haproxy-for-adfs-cluster.svg
 ---
+
+> Microsoft is recommending to move away from AD FS. Microsoft highly recommends migrating to Microsoft Entra ID. For more information, see [Resources for decommissioning AD FS](https://learn.microsoft.com/en-us/windows-server/identity/ad-fs/ad-fs-decommission)
+{: .prompt-info }
 
 We had some aging hardware load balancers/reverse proxies that were no longer necessary for our setup. This lead to me working out how to replace them with some Ubuntu VMs.
 In this guide I will include configuration of 2 HAProxy servers using keepalived for failover.
