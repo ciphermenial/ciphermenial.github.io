@@ -66,7 +66,7 @@ inet_protocols = ipv6
 
 ### Configuration Descriptions
 
-It is best to set `myhostname` to the [FQDN](https://en.wikipedia.org/wiki/Fully_qualified_domain_name) to the address you will be using in DNS for both A/AAAA and PTR records. This can help keep your SMTP server off of spam denylists.
+It is best to set `myhostname` to the [FQDN](https://en.wikipedia.org/wiki/Fully_qualified_domain_name) you will be using in DNS for both A/AAAA and PTR records. This can help keep your SMTP server off of spam denylists.
 
 `mynetworks` has to have all the IPs or IP ranges that will be using this server as a relay. In my example I am using my Incus IP ranges for both IPv4 and IPv6. Obviously that is not my IPv6 range that I use with my Incus setup.
 
