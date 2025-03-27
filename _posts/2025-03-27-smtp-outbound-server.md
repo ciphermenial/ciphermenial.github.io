@@ -138,7 +138,7 @@ localhost
 
 I have tested this and the only way the emails are signed is if .incus is included in the InternalHosts configuration for OpenDKIM.
 
-Next we will generate the key for use with signing emails. To do this we use [`opendkim-genkey`](http://www.opendkim.org/opendkim-genkey.8.html).
+Next we will generate the key for use with signing emails. To do this we use [`opendkim-genkey`](https://linux.die.net/man/8/opendkim-genkey).
 
 I have used 
 `smtp` as the selector for my DKIM key. This is the first part of your DNS TXT record associated with DKIM i.e. `smtp._domainkey`.
