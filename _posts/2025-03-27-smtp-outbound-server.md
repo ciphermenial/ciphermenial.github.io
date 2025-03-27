@@ -6,7 +6,7 @@ mermaid: true
 image:
   path: assets/img/title/smtp-outbound-server.svg
 ---
-In this guide I am setting up an Incus container using Debian Bookworm. I will be installing Postfix for SMTP and OpenDKIM for signing emails. This is to setup an SMTP outbound server that can act as a relay for all your Incus LXC and OCI containers, and VMs. I have tested sending to Google's servers and it passes all checks.
+In this guide I am setting up an Incus container for SMTP using Debian Bookworm. I will be installing Postfix for SMTP and OpenDKIM for signing emails. This is to setup an SMTP outbound server that can act as a relay for all your Incus LXC & OCI containers, and VMs. I have tested sending to Google's servers and it passes all checks.
 
 ## Preparation
 On the host create the container and enter the shell of the container.
@@ -27,7 +27,7 @@ apt install mailutils
 apt install postfix
 ```
 
-As part of the installation you be presented with some questions about how you would like to use postfix. The first one is the following:
+As part of the installation you will be presented with some questions about how you would like to use postfix. The first one is the following:
 
 ![](/assets/img/2025-03-27-smtp-outbound-server/mail-configuration.png)
 
@@ -45,7 +45,7 @@ At this point you have completed the install of Postfix
 
 ## Configure Postfix
 
-Edit `/etc/postfix/main.cf` and change the lines as shown here. Replace your domain as needed. To understand this better go look at the [main.cf](https://www.postfix.org/postconf.5.html) parameters.
+Edit `/etc/postfix/main.cf` and change the lines as shown here. Replace your domain as needed. To understand this better go look at [main.cf](https://www.postfix.org/postconf.5.html) parameters.
 
 ```diff
 smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination
@@ -66,9 +66,11 @@ inet_protocols = ipv6
 
 ### Configuration Descriptions
 
-It is best to set `myhostname` to the [FQDN](https://en.wikipedia.org/wiki/Fully_qualified_domain_name) you will be using in DNS for both A/AAAA and PTR records. This can help keep your SMTP server off of spam denylists.
+It is best to set `myhostname` to the [FQDN](https://en.wikipedia.org/wiki/Fully_qualified_domain_name) you will be using in DNS for both A/AAAA and PTR records. This can help keep your SMTP server off spam denylists.
 
-`mynetworks` has to have all the IPs or IP ranges that will be using this server as a relay. In my example I am using my Incus IP ranges for both IPv4 and IPv6. Obviously that is not my IPv6 range that I use with my Incus setup.
+`mynetworks` has to have all the IPs or IP ranges that will be using this server as a relay. In my example I am using my Incus IP ranges for both IPv4 and IPv6. Obviously that is not my IPv6 range (I just like b00b) that I use with my Incus setup.
+
+I also wanted to configure this as an IPv6 only SMTP server, so I have `inet_protocols` set to `ipv6`. Most of the time you will want to set this to `all`. 
 
 ## Install & Configure OpenDKIM
 ### Install
@@ -103,6 +105,9 @@ KeyTable			refile:/etc/opendkim/key.table
 SigningTable			refile:/etc/opendkim/signing.table
 ```
 
+> You can name each of the files under `/etc/opendkim/` to anything you please. You need to make sure that you use the same names with each of the files edited throughout this guide.
+{: .prompt-info }
+
 ### Configuration Descriptions
 - **AutoRestart**: Indicate whether or not the filter should arrange to restart automatically if it crashes.
 - **AutoRestartRate**: Sets the maximum automatic restart rate. See the [opendkim.conf(5) man page](https://linux.die.net/man/5/opendkim.conf) for the format of this parameter.
@@ -125,7 +130,14 @@ SigningTable			refile:/etc/opendkim/signing.table
 More configuration options are shown in the [opendkim.conf.sample](https://raw.githubusercontent.com/cyrusimap/opendkim/refs/heads/master/opendkim/opendkim.conf.sample).
 
 ### Configure Postfix to Use the [Milter](https://en.wikipedia.org/wiki/Milter)
-Edit `/etc/default/opendkim` and add the following line to reflect the Socket configured in `opendkim.conf`
+
+> In a lot of the guides I came across, there is instructions to edit `/etc/default/opendkim`. This is no longer required and the following is stated in that file.
+> ```bash
+> # NOTE: This is a legacy configuration file. It is not used by the opendkim
+> # systemd service. Please use the corresponding configuration parameters in
+> # /etc/opendkim.conf instead.
+> ```
+{: .prompt-info }
 
 ### Create & Configure Keys
 Create the necessary directories. The flag `-p` creates missing intermediate directories as well i.e. it will create the `opendkim`, `keys`, and `example.net` directories.
@@ -134,7 +146,7 @@ Create the necessary directories. The flag `-p` creates missing intermediate dir
 mkdir -p /etc/opendkim/keys/example.net
 ```
 
-Now create and edit `/etc/opendkim/internal.hosts`. I do this with vim. `vim /etc/opendkim/internal.hosts`
+Now create and edit `/etc/opendkim/internal.hosts`.
 
 In this file you need to create hosts that will be allowed to sign emails. This should just be the local server as everything is relayed.
 
@@ -147,7 +159,8 @@ localhost
 .incus
 ```
 
-I have tested this and the only way the emails are signed is if .incus is included in the InternalHosts configuration for OpenDKIM.
+> I have tested this and the only way the emails are signed is if .incus is included in the InternalHosts configuration for OpenDKIM.
+{: .prompt-warning }
 
 Next we will generate the key for use with signing emails. To do this we use [`opendkim-genkey`](https://linux.die.net/man/8/opendkim-genkey).
 
@@ -159,13 +172,14 @@ cd /etc/opendkim/keys/example.net
 opendkim-genkey -s smtp -d example.net
 ```
 
-Now you need to opendkim ownership of the private file created.
+Now you need to give opendkim ownership of the private file created.
 
 ```bash
 chown opendkim: smtp.private
 ```
 
-You do not need to enter `opendkim:opendkim` you only need to place the colon and it will set the group as the same name.
+> You do not need to enter `opendkim:opendkim` you only need to place the colon and it will set the group as the same name.
+{: .prompt-info }
 
 Now you can view the created DKIM key for use in DNS.
 
@@ -182,11 +196,10 @@ yxJEa2N8mk2Gkvhd2otV0la2JiuzQvpvY7HLMgfEt288a2kfnrHi7njvThLlFWMq"
 "rzTGYRrQ8sBfwnmkxjeirlyuSOMfP2s3S1HkFLsD1m+uZ5707N+KoY9hKlKibpm6IavPRIryBPQ2IP/wmQIDAQAB" )  ; ----- DKIM key smtp for example.net
 ```
 
-I had to tidy this up a bit before creating the TXT record on my DNS server. The quotes should only be around the entire data for the record. It should look like this.
+I had to tidy this up a bit before creating the TXT record on my DNS server. The quotes should only be around the entire data for the record. It should be a single line like this:
 
 ```bash
-"v=DKIM1; h=sha256; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDLPQMQ0i1quDOFZXJF8qnI/gt/
-yxJEa2N8mk2Gkvhd2otV0la2JiuzQvpvY7HLMgfEt288a2kfnrHi7njvThLlFWMqrzTGYRrQ8sBfwnmkxjeirlyuSOMfP2s3S1HkFLsD1m+uZ5707N+KoY9hKlKibpm6IavPRIryBPQ2IP/wmQIDAQAB"
+"v=DKIM1; h=sha256; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDLPQMQ0i1quDOFZXJF8qnI/gt/yxJEa2N8mk2Gkvhd2otV0la2JiuzQvpvY7HLMgfEt288a2kfnrHi7njvThLlFWMqrzTGYRrQ8sBfwnmkxjeirlyuSOMfP2s3S1HkFLsD1m+uZ5707N+KoY9hKlKibpm6IavPRIryBPQ2IP/wmQIDAQAB"
 ```
 
 Next we need to configure the KeyTable. We edit the file `/etc/opendkim/key.table`. This defines private keys and their corresponding selector.
