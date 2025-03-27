@@ -106,7 +106,7 @@ SigningTable			refile:/etc/opendkim/signing.table
 ```
 
 > You can name each of the files under `/etc/opendkim/` to anything you please. You need to make sure that you use the same names with each of the files edited throughout this guide.
-{: .prompt-info }
+{: .prompt-tip }
 
 ### Configuration Descriptions
 - **AutoRestart**: Indicate whether or not the filter should arrange to restart automatically if it crashes.
@@ -179,7 +179,7 @@ chown opendkim: smtp.private
 ```
 
 > You do not need to enter `opendkim:opendkim` you only need to place the colon and it will set the group as the same name.
-{: .prompt-info }
+{: .prompt-tip }
 
 Now you can view the created DKIM key for use in DNS.
 
