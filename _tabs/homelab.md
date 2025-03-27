@@ -10,6 +10,7 @@ I am writing a bunch of guides on how I configure my homelab. I will mark off ea
 - [x] [Configure Incus on Debian](/posts/configure-incus-on-debian/)
 - [x] [Setup & Configure HAProxy Container with Cloudflare Origins](/posts/configure-haproxy-container/)
 - [x] [Configure Incus for Docker](/posts/configure-incus-for-docker/)
+- [x] [Setup SMTP Outbound Server with DKIM](/posts/smtp-outbound-server/)
 - [ ] Install & Configure MariaDB Container
 - [ ] Install & Configure PostgreSQL Container
 - [ ] Install & Configure Keycloak Container
