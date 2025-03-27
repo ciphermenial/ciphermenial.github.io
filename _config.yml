@@ -18,14 +18,14 @@ timezone:
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: Cipher Menial
+title: Sifr Moja
 
-tagline: The Zeronought
+tagline: Computer Guy
 
-description: I write stuff.
+description: A blog for walkthroughs about things I have done in work or personal life in IT. I love playing around with Linux and specifically Incus.
 
 # fill in the protocol & hostname for your site, e.g., 'https://username.github.io'
-url: "https://ciphermenial.github.io"
+url: "https://blog.sifrmoja.xyz"
 
 github:
   username: ciphermenial # change to your github username
@@ -75,7 +75,7 @@ theme_mode: # [light | dark]
 img_cdn:
 
 # the avatar on sidebar, support local or CORS resources
-avatar: /assets/img/ciphermenial.png
+avatar: /assets/img/sifrmoja.png
 
 # The URL of the site-wide social preview image used in SEO `og:image` meta tag.
 # It can be overridden by a customized `page.image` in front matter.
