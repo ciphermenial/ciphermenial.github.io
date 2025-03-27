@@ -105,6 +105,9 @@ KeyTable			refile:/etc/opendkim/key.table
 SigningTable			refile:/etc/opendkim/signing.table
 ```
 
+> You can name each of the files under `/etc/opendkim/` to anything you please. You need to make sure that you use the same names with each of the files edited throughout this guide.
+{: .prompt-info }
+
 ### Configuration Descriptions
 - **AutoRestart**: Indicate whether or not the filter should arrange to restart automatically if it crashes.
 - **AutoRestartRate**: Sets the maximum automatic restart rate. See the [opendkim.conf(5) man page](https://linux.die.net/man/5/opendkim.conf) for the format of this parameter.
@@ -156,7 +159,8 @@ localhost
 .incus
 ```
 
-I have tested this and the only way the emails are signed is if .incus is included in the InternalHosts configuration for OpenDKIM.
+> I have tested this and the only way the emails are signed is if .incus is included in the InternalHosts configuration for OpenDKIM.
+{: .prompt-warning }
 
 Next we will generate the key for use with signing emails. To do this we use [`opendkim-genkey`](https://linux.die.net/man/8/opendkim-genkey).
 
@@ -168,13 +172,14 @@ cd /etc/opendkim/keys/example.net
 opendkim-genkey -s smtp -d example.net
 ```
 
-Now you need to opendkim ownership of the private file created.
+Now you need to give opendkim ownership of the private file created.
 
 ```bash
 chown opendkim: smtp.private
 ```
 
-You do not need to enter `opendkim:opendkim` you only need to place the colon and it will set the group as the same name.
+> You do not need to enter `opendkim:opendkim` you only need to place the colon and it will set the group as the same name.
+{: .prompt-info }
 
 Now you can view the created DKIM key for use in DNS.
 
@@ -191,11 +196,10 @@ yxJEa2N8mk2Gkvhd2otV0la2JiuzQvpvY7HLMgfEt288a2kfnrHi7njvThLlFWMq"
 "rzTGYRrQ8sBfwnmkxjeirlyuSOMfP2s3S1HkFLsD1m+uZ5707N+KoY9hKlKibpm6IavPRIryBPQ2IP/wmQIDAQAB" )  ; ----- DKIM key smtp for example.net
 ```
 
-I had to tidy this up a bit before creating the TXT record on my DNS server. The quotes should only be around the entire data for the record. It should look like this.
+I had to tidy this up a bit before creating the TXT record on my DNS server. The quotes should only be around the entire data for the record. It should be a single line like this:
 
 ```bash
-"v=DKIM1; h=sha256; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDLPQMQ0i1quDOFZXJF8qnI/gt/
-yxJEa2N8mk2Gkvhd2otV0la2JiuzQvpvY7HLMgfEt288a2kfnrHi7njvThLlFWMqrzTGYRrQ8sBfwnmkxjeirlyuSOMfP2s3S1HkFLsD1m+uZ5707N+KoY9hKlKibpm6IavPRIryBPQ2IP/wmQIDAQAB"
+"v=DKIM1; h=sha256; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDLPQMQ0i1quDOFZXJF8qnI/gt/yxJEa2N8mk2Gkvhd2otV0la2JiuzQvpvY7HLMgfEt288a2kfnrHi7njvThLlFWMqrzTGYRrQ8sBfwnmkxjeirlyuSOMfP2s3S1HkFLsD1m+uZ5707N+KoY9hKlKibpm6IavPRIryBPQ2IP/wmQIDAQAB"
 ```
 
 Next we need to configure the KeyTable. We edit the file `/etc/opendkim/key.table`. This defines private keys and their corresponding selector.
