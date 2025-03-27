@@ -6,6 +6,8 @@ mermaid: true
 image:
   path: assets/img/title/smtp-outbound-server.svg
 ---
+In this guide I am setting up an Incus container using Debian Bookworm. I will be installing Postfix for SMTP and OpenDKIM for signing emails. This is to setup an SMTP outbound server that can act as a relay for all your Incus LXC and OCI containers, and VMs. I have tested sending to Google's servers and it passes all checks.
+
 ## Preparation
 On the host create the container and enter the shell of the container.
 
@@ -42,6 +44,9 @@ Select **OK**.
 At this point you have completed the install of Postfix
 
 ## Configure Postfix
+
+Edit `/etc/postfix/main.cf` and change the lines as shown here. Replace your domain as needed. To understand this better go look at the [main.cf](https://www.postfix.org/postconf.5.html) parameters.
+
 ```diff
 smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination
 -myhostname = hostname
@@ -199,3 +204,5 @@ systemctl restart opendkim postfix
 ```
 
 At this point everything should be working and you should be able to set smtp.incus as your SMTP server on other containers on your host.
+
+Don't forget to add your IP addresses to your SPF record.
