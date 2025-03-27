@@ -6,7 +6,7 @@ mermaid: true
 image:
   path: assets/img/title/smtp-outbound-server.svg
 ---
-In this guide I am setting up an Incus container using Debian Bookworm. I will be installing Postfix for SMTP and OpenDKIM for signing emails. This is to setup an SMTP outbound server that can act as a relay for all your Incus LXC and OCI containers, and VMs. I have tested sending to Google's servers and it passes all checks.
+In this guide I am setting up an Incus container for SMTP using Debian Bookworm. I will be installing Postfix for SMTP and OpenDKIM for signing emails. This is to setup an SMTP outbound server that can act as a relay for all your Incus LXC & OCI containers, and VMs. I have tested sending to Google's servers and it passes all checks.
 
 ## Preparation
 On the host create the container and enter the shell of the container.
@@ -27,7 +27,7 @@ apt install mailutils
 apt install postfix
 ```
 
-As part of the installation you be presented with some questions about how you would like to use postfix. The first one is the following:
+As part of the installation you will be presented with some questions about how you would like to use postfix. The first one is the following:
 
 ![](/assets/img/2025-03-27-smtp-outbound-server/mail-configuration.png)
 
@@ -45,7 +45,7 @@ At this point you have completed the install of Postfix
 
 ## Configure Postfix
 
-Edit `/etc/postfix/main.cf` and change the lines as shown here. Replace your domain as needed. To understand this better go look at the [main.cf](https://www.postfix.org/postconf.5.html) parameters.
+Edit `/etc/postfix/main.cf` and change the lines as shown here. Replace your domain as needed. To understand this better go look at [main.cf](https://www.postfix.org/postconf.5.html) parameters.
 
 ```diff
 smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination
@@ -66,9 +66,11 @@ inet_protocols = ipv6
 
 ### Configuration Descriptions
 
-It is best to set `myhostname` to the [FQDN](https://en.wikipedia.org/wiki/Fully_qualified_domain_name) you will be using in DNS for both A/AAAA and PTR records. This can help keep your SMTP server off of spam denylists.
+It is best to set `myhostname` to the [FQDN](https://en.wikipedia.org/wiki/Fully_qualified_domain_name) you will be using in DNS for both A/AAAA and PTR records. This can help keep your SMTP server off spam denylists.
 
-`mynetworks` has to have all the IPs or IP ranges that will be using this server as a relay. In my example I am using my Incus IP ranges for both IPv4 and IPv6. Obviously that is not my IPv6 range that I use with my Incus setup.
+`mynetworks` has to have all the IPs or IP ranges that will be using this server as a relay. In my example I am using my Incus IP ranges for both IPv4 and IPv6. Obviously that is not my IPv6 range (I just like b00b) that I use with my Incus setup.
+
+I also wanted to configure this as an IPv6 only SMTP server, so I have `inet_protocols` set to `ipv6`. Most of the time you will want to set this to `all`. 
 
 ## Install & Configure OpenDKIM
 ### Install
@@ -125,7 +127,14 @@ SigningTable			refile:/etc/opendkim/signing.table
 More configuration options are shown in the [opendkim.conf.sample](https://raw.githubusercontent.com/cyrusimap/opendkim/refs/heads/master/opendkim/opendkim.conf.sample).
 
 ### Configure Postfix to Use the [Milter](https://en.wikipedia.org/wiki/Milter)
-Edit `/etc/default/opendkim` and add the following line to reflect the Socket configured in `opendkim.conf`
+
+> In a lot of the guides I came across, there is instructions to edit `/etc/default/opendkim`. This is no longer required and the following is stated in that file.
+> ```bash
+> # NOTE: This is a legacy configuration file. It is not used by the opendkim
+> # systemd service. Please use the corresponding configuration parameters in
+> # /etc/opendkim.conf instead.
+> ```
+{: .prompt-info }
 
 ### Create & Configure Keys
 Create the necessary directories. The flag `-p` creates missing intermediate directories as well i.e. it will create the `opendkim`, `keys`, and `example.net` directories.
@@ -134,7 +143,7 @@ Create the necessary directories. The flag `-p` creates missing intermediate dir
 mkdir -p /etc/opendkim/keys/example.net
 ```
 
-Now create and edit `/etc/opendkim/internal.hosts`. I do this with vim. `vim /etc/opendkim/internal.hosts`
+Now create and edit `/etc/opendkim/internal.hosts`.
 
 In this file you need to create hosts that will be allowed to sign emails. This should just be the local server as everything is relayed.
 
