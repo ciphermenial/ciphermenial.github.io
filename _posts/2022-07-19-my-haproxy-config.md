@@ -41,10 +41,10 @@ graph TD
   CS_Ban[Ban Page]
   Server[Web Service]
 
-  ExtUsr -."http://host.example.net".-> Cloudflare
-  Cloudflare -."https://host.example.net".-> HTTPS
-  IntUsr --"https://host.example.net"--> HTTPS
-  IntUsr -."http://host.example.net".-> HTTP
+  ExtUsr -."http://host.sifrmoja.xyz".-> Cloudflare
+  Cloudflare -."https://host.sifrmoja.xyz".-> HTTPS
+  IntUsr --"https://host.sifrmoja.xyz"--> HTTPS
+  IntUsr -."http://host.sifrmoja.xyz".-> HTTP
   HTTP -."302 Redirect"...-> IntUsr
 
   subgraph HAProxy
