@@ -124,12 +124,17 @@ I have placed all the frontends together which might be a bit confusing. The con
 
 The first frontend I have configured is for redirecting HTTP to HTTPS and nothing more.
 
-> If you bind to `:::80 v4v6` IPv4 will present as `::ffff:10.0.0.1` from headers. Doing it as `*:80,:::80 v6only` will render it correctly.
+> If you bind to `:::80 v4v6` IPv4 will present as `::ffff:10.0.0.1` from headers. The way I found this to work the best was to have it set as:
+> ```bash
+> bind *:80 v4v6
+> bind :::80 v6only
+> ```
 {: .prompt-tip }
 
 ```bash
 frontend http-redirect
-    bind *:80,:::80 v6only
+    bind *:80 v4v6
+    bind :::80 v6only
     http-request redirect scheme https code 301
 ```
 
@@ -142,21 +147,21 @@ The purpose of this frontend is to redirect the connection to a backend based on
 ```bash
 # Frontend for redirecting traffic to the required frontend
 frontend https-redirect
-    bind *:443,:::443 v6only
+    bind *:443 v4v6
+    bind :::443 v6only
     mode tcp
     option tcplog
-    tcp-request inspect-delay 5s
     tcp-request content accept if { req_ssl_hello_type 1 }
-    acl internal src 192.168.88.1/24
-    acl internalv6 src 2001:db8:b00b::/48
-    acl cloudflare src -f /etc/haproxy/CF_ips.lst
+    acl internal src -f /etc/haproxy/internal.lst
+    acl cloudflare src -f /etc/haproxy/cloudflare.lst
     use_backend cloudflare if cloudflare
-    use_backend internal if internal OR internalv6
+    use_backend internal if internal
+    default_backend no-match
 ```
 
 This is the default frontend and all traffic going to HTTPS will hit it. This one is configured for tcp mode as it does not need to see anything in the headers.
 
-I have an ACL configured that matches my internal network range of 192.168.88.0/24
+I have an ACL configured that matches my internal network ranges for both IPv4 and IPv6 listed in a file named `internal.lst`.
 
 It will then redirect traffic to my internal backend (internal) if it matches the rule, otherwise it will send it to my external backend (cloudflare)
 
@@ -164,7 +169,7 @@ It will then redirect traffic to my internal backend (internal) if it matches th
 
 This frontend is the one that works with connections coming from Cloudflare. It has a Cloudflare Origins certificate associated with it.
 
-> The Crowsec configuration is slightly modified from their recommendations. I have an [issue](https://github.com/crowdsecurity/cs-haproxy-bouncer/issues/13) submitted with them around detecting client IPs in a different way to support other configurations.
+> The Crowdsec configuration is slightly modified from their recommendations. I have an [issue](https://github.com/crowdsecurity/cs-haproxy-bouncer/issues/13) submitted with them around detecting client IPs in a different way to support other configurations.
 
 As quoted above I went about this in the most complicated way, when all I needed to do was set CF-Connecting-IP to the source IP. This is how I have done it, thanks to the devs for the bouncer.
 
@@ -282,7 +287,8 @@ defaults
     errorfile 504 /etc/haproxy/errors/504.http
 
 listen stats
-    bind *:8404
+    bind *:8404 v4v6
+    bind :::8404 v6only
     stats enable
     stats hide-version
     stats realm Haproxy\ Statistics
@@ -291,21 +297,22 @@ listen stats
 
 # Frontend to redirect HTTP to HTTPS with code 301
 frontend http-redirect
-    bind *:80,:::80 v6only
+    bind *:80 v4v6
+    bind :::80 v6only
     http-request redirect scheme https code 301
 
 # Frontend for redirecting traffic to the required frontend
 frontend https-redirect
-    bind *:443,:::443 v6only
+    bind *:443 v4v6
+    bind :::443 v6only
     mode tcp
     option tcplog
-    tcp-request inspect-delay 5s
     tcp-request content accept if { req_ssl_hello_type 1 }
-    acl internal src 192.168.88.1/24
-    acl internalv6 src 2001:db8:b00b::/48
-    acl cloudflare src -f /etc/haproxy/CF_ips.lst
+    acl internal src -f /etc/haproxy/internal.lst
+    acl cloudflare src -f /etc/haproxy/cloudflare.lst
     use_backend cloudflare if cloudflare
-    use_backend internal if internal OR internalv6
+    use_backend internal if internal
+    default_backend no-match
 
 # Frontend for external users that a connecting through Cloudflare
 frontend cloudflare
@@ -380,9 +387,9 @@ backend paperless
 backend jellyfin
     server jellyfin jellyfin.lxd:8096 check
     
-# Backend for google to allow DNS resolution if using reCAPTCHA
-backend captcha_verifier
-    server captcha_verifier www.google.com:443 check
+# Backend for captcha using Cloudflare Turnstile
+    backend captcha_verifier
+    server turnstile_verifier challenges.cloudflare.com:443 check
 
 # Backend for crowdsec to allow DNS resolution
 backend crowdsec
