@@ -55,15 +55,15 @@ graph TD
     HTTPS -."External User?"..-> CS_Decision
 
     subgraph CrowdSec
-      CS_Decision ==fa:fa-circle-exclamation===> CS_CAPTCHA
-      CS_Decision ==fa:fa-thumbs-down===> CS_Ban
-      CS_CAPTCHA ==fa:fa-person-circle-question===> CS_Decision
-      CS_Decision ==fa:fa-thumbs-up===> ExtBackend
+      CS_Decision ==> CS_CAPTCHA
+      CS_Decision ==> CS_Ban
+      CS_CAPTCHA ==> CS_Decision
+      CS_Decision ==> ExtBackend
 
     end
   end
 
- CS_Decision -.fa:fa-circle-check.-> ExtBackend
+ CS_Decision -.-> ExtBackend
  ExtFrontend -.-> Server
  IntFrontend --> Server
 ```
