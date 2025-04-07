@@ -49,7 +49,7 @@ graph TD
   HTTP --"302 Redirect"--> IntUsr
 
   subgraph HAProxy
-  style HAProxy color:#f0f2ff,fill:#382d72,stroke:#b7c2c6
+  style HAProxy color:#0d0a19,fill:#5c509c,stroke:#b7c2c6
     HTTP
     HTTPS --"Internal User?"--> IntBackend
     ExtBackend -.-> ExtFrontend
@@ -57,7 +57,7 @@ graph TD
     HTTPS -."External User?"..-> CS_Decision
 
     subgraph CrowdSec
-    style CrowdSec color:#f0f2ff,fill:#5c509c,stroke:#b7c2c6
+    style CrowdSec color:#382d72,fill:#a080e1,stroke:#b7c2c6
       CS_Decision =="Request"===> CS_CAPTCHA
       CS_Decision =="CAPTCHA Fail"===> CS_Ban
       CS_CAPTCHA =="Answer"===> CS_Decision
