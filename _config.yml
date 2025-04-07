@@ -107,7 +107,7 @@ avatar: /assets/img/sifrmoja.png
 social_preview_image: # string, local or CORS resources
 
 # boolean type, the global switch for TOC in posts.
-toc: false
+toc: true
 
 comments:
   provider: giscus # The global switch for posts comments, e.g., 'disqus'.  Keep it empty means disable
