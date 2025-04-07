@@ -45,8 +45,8 @@ graph TD
   ExtUsr -."host.example.net".-> Cloudflare
   Cloudflare -."host.example.net:443".-> HTTPS
   IntUsr --"host.example.net:443"--> HTTPS
-  IntUsr -."host.example.net:80".-> HTTP
-  HTTP -."302 Redirect"...-> IntUsr
+  IntUsr --"host.example.net:80"--> HTTP
+  HTTP --"302 Redirect"--> IntUsr
 
   subgraph HAProxy
     HTTP
