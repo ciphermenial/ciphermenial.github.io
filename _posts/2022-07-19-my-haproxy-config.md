@@ -46,7 +46,7 @@ graph TD
   Cloudflare -."host.example.net:443".-> HTTPS
   IntUsr --"host.example.net:443"--> HTTPS
   IntUsr --"host.example.net:80"--> HTTP
-  HTTP --"302 Redirect"--> IntUsr
+  HTTP --"301 Redirect"--> IntUsr
 
   subgraph HAProxy
   style HAProxy color:#0d0a19,fill:#5c509c,stroke:#b7c2c6
