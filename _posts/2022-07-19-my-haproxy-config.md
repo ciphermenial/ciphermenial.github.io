@@ -3,6 +3,7 @@ title: My HAProxy Configuration
 categories: [Guides,HAProxy]
 tags: [guides,ubuntu,linux,lxc,lxd,haproxy,cloudflare,certificates]
 mermaid: true
+toc: false
 image: 
   path: /assets/img/title/haproxy-configuration.svg
 ---
@@ -12,7 +13,7 @@ This is an explanation of my [HAProxy](https://www.haproxy.org) config, as a rem
 > Update: I have now added [CrowdSec](https://www.crowdsec.net/) into the mix and increased security by using [CF-Connecting-IP](https://developers.cloudflare.com/fundamentals/get-started/reference/http-request-headers/#cf-connecting-ip) instead of X-Forwarded-For header for capturing client IPs. See [this article from Mozilla](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For) on why X-Forwarded-For header is insecure.
 {: .prompt-info }
 
-> Update 2: I have massively reduced the size of my configuration file by usings a map for backend selection.
+> Update 2: I have massively reduced the size of my configuration file by using a map for backend selection.
 {: .prompt-info }
 
 > Update 3: Attempting to use IPv6 as much as possible.
