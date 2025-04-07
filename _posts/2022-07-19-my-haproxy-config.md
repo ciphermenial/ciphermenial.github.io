@@ -21,7 +21,7 @@ This is an explanation of my [HAProxy](https://www.haproxy.org) config, as a rem
 > Update 4: Switched redirects from `localhost:port` to abstract namespaces i.e. `abns@namespace`.
 {: .prompt-info }
 
-# Traffic Flow
+## Traffic Flow
 
 This shows how traffic flows internally or externally from the user to the services behind my HAProxy server.
 
@@ -42,9 +42,9 @@ graph TD
   Server[Web Service]
 
   ExtUsr -."host.example.net:80".-> Cloudflare
-  Cloudflare -."host.sifrmoja.xyz:443".-> HTTPS
-  IntUsr --"host.sifrmoja.xyz:443"--> HTTPS
-  IntUsr -."host.sifrmoja.xyz:443".-> HTTP
+  Cloudflare -."host.example.net:443".-> HTTPS
+  IntUsr --"host.example.net:443"--> HTTPS
+  IntUsr -."host.example.net:443".-> HTTP
   HTTP -."302 Redirect"...-> IntUsr
 
   subgraph HAProxy
@@ -68,11 +68,11 @@ graph TD
  IntFrontend --> Server
 ```
 
-# Breakdown
+## Breakdown
 
 These are some brief explanations on important sections of my configuration. For an explanation of the important parts of the configuration in general; [This](https://www.haproxy.com/blog/the-four-essential-sections-of-an-haproxy-configuration) is an excellent write-up of how each section functions. My configuration in full is available at the bottom or you can click [HERE](#complete-configuration-file) to be taken to it.
 
-## Global
+### Global
 
 In this section all the bits that globally apply to HAProxy are entered.
 
@@ -92,7 +92,7 @@ global
 
 Most of this is standard in an Ubuntu install of HAProxy. The only part I added was the base location for the certificates I use.
 
-## Defaults
+### Defaults
 
 I only use a single defaults section since there are only a small amount of deviations from them in the frontends and backends.
 
@@ -112,15 +112,15 @@ Because most of my frontends and backends use http mode I set it here.
 
 All the rest is common configuration.
 
-## Stats Page
+### Stats Page
 
 I am using an almost default set-up for the listen for statistics page.
 
-## Frontends
+### Frontends
 
 I have placed all the frontends together which might be a bit confusing. The confusing part is how the Redirect Frontend sends to a backend depending on IP, that then sends the traffic to frontends for internal or external traffic.
 
-### HTTP Frontend
+#### HTTP Frontend
 
 The first frontend I have configured is for redirecting HTTP to HTTPS and nothing more.
 
@@ -165,7 +165,7 @@ I have an ACL configured that matches my internal network ranges for both IPv4 a
 
 It will then redirect traffic to my internal backend (internal) if it matches the rule, otherwise it will send it to my external backend (cloudflare)
 
-### Cloudflare Frontend
+#### Cloudflare Frontend
 
 This frontend is the one that works with connections coming from Cloudflare. It has a Cloudflare Origins certificate associated with it.
 
@@ -202,7 +202,7 @@ Backends are selected based on an SNI match for each ACL.
 
 If it doesn't match any of the ACLs it will send it to a backend that shows a failure page.
 
-### Internal Frontend
+#### Internal Frontend
 
 This frontend can be a mirror of the External Frontend if you want all internal connection to come through it. This is using the same map as the cloudflare frontend.
 
@@ -226,9 +226,9 @@ jellyfin.example.net jellyfin
 paperless.example.net paperless
 ```
 
-## Backends
+### Backends
 
-### Redirect Backends
+#### Redirect Backends
 
 These are the backends that redirect traffic to the necessary frontends based on the certificate that needs to be supplied. This uses the proxy protocol (send-proxy-v2) to make sure the IP is passed through to the backends. The frontends accept the proxy protocol.
 
@@ -245,11 +245,11 @@ backend internal
 
 These are set to tcp mode as they don't need to see headers.
 
-### Normal Backends
+#### Normal Backends
 
 The remaining backends are pretty standard. There is nothing special that needs to be explained there.
 
-## Complete Configuration File
+### Complete Configuration File
 
 ```bash
 global
