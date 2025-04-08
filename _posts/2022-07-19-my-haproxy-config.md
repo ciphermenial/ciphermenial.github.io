@@ -3,7 +3,6 @@ title: My HAProxy Configuration
 categories: [Guides,HAProxy]
 tags: [guides,ubuntu,linux,lxc,lxd,haproxy,cloudflare,certificates]
 mermaid: true
-toc: false
 image: 
   path: /assets/img/title/haproxy-configuration.svg
 ---
@@ -74,7 +73,7 @@ graph TD
 
 These are some brief explanations on important sections of my configuration. For an explanation of the important parts of the configuration in general; [This](https://www.haproxy.com/blog/the-four-essential-sections-of-an-haproxy-configuration) is an excellent write-up of how each section functions. My configuration in full is available at the bottom or you can click [HERE](#complete-configuration-file) to be taken to it.
 
-### Global
+### Global Section
 
 In this section all the bits that globally apply to HAProxy are entered.
 
