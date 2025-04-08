@@ -3,7 +3,6 @@ title: My HAProxy Configuration
 categories: [Guides,HAProxy]
 tags: [guides,ubuntu,linux,lxc,lxd,haproxy,cloudflare,certificates]
 mermaid: true
-toc: false
 image: 
   path: /assets/img/title/haproxy-configuration.svg
 ---
