@@ -15,7 +15,7 @@ I use my homelab to learn new things that I often end up implementing in my work
 - [x] [Setup & Configure HAProxy Container with Cloudflare Origins](/posts/configure-haproxy-container/)
 - [x] [Configure Incus for Docker](/posts/configure-incus-for-docker/)
 - [x] [Setup SMTP Outbound Server with DKIM](/posts/smtp-outbound-server/)
-- [ ] Install & Configure MariaDB Container
+- [x] [Install & Configure MariaDB Container](/posts/install-mariadb-debian/)
 - [ ] Install & Configure PostgreSQL Container
 - [ ] Install & Configure Keycloak Container
 - [ ] Install & Configure Apache Guacamole Container
