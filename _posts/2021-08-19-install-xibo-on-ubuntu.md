@@ -19,7 +19,7 @@ This guide is now updated for installing Xibo CMS 4.0.10.
 All of the requirements can be installed using apt.
 
 ```bash
-sudo apt install apache2 cron libapache2-mod-{xsendfile,php8.2} mariadb-server mariadb-client nftables php8.2-{cli,gd,mysql,zip,soap,curl,simplexml,mbstring,zmq} wget
+sudo apt install apache2 cron libapache2-mod-{xsendfile,php8.2} mariadb-server mariadb-client nftables php8.2-{cli,gd,dom,pdo,gettext,iconv,ctype,fileinfo,xml,mysql,zip,soap,curl,simplexml,mbstring,zmq,memcached,phar,opcache,mongodb,gnupg} wget
 ```
 
 ## Install Xibo CMS
@@ -28,14 +28,14 @@ When I am configuring server software outside of a package manager I always plac
 ```bash
 sudo mkdir /srv/xibo-cms
 cd /srv/xibo-cms
-sudo wget https://github.com/xibosignage/xibo-cms/releases/download/4.0.10/xibo-cms-4.0.10.tar.gz
+sudo wget https://github.com/xibosignage/xibo-cms/releases/download/4.2.2/xibo-cms-4.2.2.tar.gz
 ```
 
 This extracts the contents of the archive without placing it into a folder
 
 ```bash
-sudo tar -xvzf xibo-cms-4.0.10.tar.gz --strip-components=1
-sudo rm xibo-cms-4.0.10.tar.gz
+sudo tar -xvzf xibo-cms-4.2.2.tar.gz --strip-components=1
+sudo rm xibo-cms-4.2.2.tar.gz
 ```
 
 The apache2 user 'www-data' needs to be set as owner of all the extracted items.
@@ -185,12 +185,12 @@ sed -i 's/upload_max_filesize = .*$/upload_max_filesize = 2G/g' /etc/php/8.2/cli
 sudo vim /srv/xibo-cms/vendor/xibosignage/xibo-xmr/bin/config.json
 ```
 
-Enter the following information and change the `pubOn` IP address to the public IP of the server. You can view this by running the command "ip address"
+Enter the following information and change the `pubOn` IP address to the public IP of the server. You can view this by running the command "ip address". You can also set it to `0.0.0.0`.
 
 ```json
 {
     "listenOn": "tcp://127.0.0.1:50001",
-    "pubOn": ["tcp://192.168.1.1:9505"],
+    "pubOn": ["tcp://0.0.0.0:9505"],
     "debug": false
 }
 ```
@@ -252,7 +252,7 @@ sudo crontab -u www-data -e
 Select the editor you prefer and then enter the following line.
 
 ```
-* * * * * /usr/bin/php8.2 /srv/xibo-xmr/bin/xtr.php
+* * * * * /usr/bin/php8.2 /srv/xibo-cms/bin/xtr.php
 ```
 
 ## Configure Firewall
