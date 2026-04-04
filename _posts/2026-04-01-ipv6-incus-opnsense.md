@@ -11,4 +11,7 @@ I have previously written about configuring IPv6 on a Mikrotik router and an LXD
 I luckily purchased an Aoostar N1 Pro mini PC in October last year (2025) for AUD$220. This was a steal considering it comes with 12GB memory, 2x2.5gb Intel NICs, and a 256GB M.2 SSD. It's sad that you can't buy these anymore because they are a fatastic little device for OPNsense.
 
 ## IPv6 on OPNsense
-First part is configuring the WAN interface.
+There is nothing special about configuring this on OPNsense. The only bit that is different to the current [documentaion](https://docs.opnsense.org/manual/ipv6.html) on configuring 
+
+### WAN Configuration
+
