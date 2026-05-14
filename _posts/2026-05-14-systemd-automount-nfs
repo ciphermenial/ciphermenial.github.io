@@ -6,7 +6,7 @@ image:
   path: assets/img/title/systemd-automount-nfs.svg
 ---
 
-This is another reminder for me in how I have mounted my NFS shares.
+This is a reminder for me about how I have mounted my NFS shares.
 
 When creating systemd unit files, you should put them in `/etc/systemd/system/` if they are for system-wide us. You can learn more about the loction of unit files [here](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Unit%20File%20Load%20Path). You can have systemd mount and automount unit files created [automatically from fstab](https://www.freedesktop.org/software/systemd/man/latest/systemd.mount.html#fstab) too, but I prefer to create the unit files myself.
 
