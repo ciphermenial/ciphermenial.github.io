@@ -21,12 +21,6 @@ I already have a [PostgreSQL](https://www.postgresql.org/) LXC container and a [
 
 I have created a directory under my users home e.g. `/home/user/immich/` with the .env file and a data folder.
 
-### Launch OCI Image
-```
-incus launch ghcr:immich-app/immich-server:v2.7.5 --environment-file=/home/user/immich/.env
-```
-As of writing v2.7.5 is the current release. You will need to change that in the command as necessary.
-
 ### Configuration
 
 #### PostgreSQL
@@ -48,7 +42,7 @@ bind * -::*
 aclfile /etc/valkey/users.acl
 ```
 
-The ACL file looks like this but you can set the passwords how you please.
+The ACL file looks like this. Make sure to change the password.
 ```bash
 user default on +@all ~* >ThisIsAPassword
 user immich on >ThisIsAPassword +@all ~* &*
@@ -72,22 +66,37 @@ ones#List
 TZ=Australia/Adelaide
 
 DB_USERNAME=immich
-DB_PASSWORD=InsertPassword
+DB_PASSWORD=ThisIsAPassword
 DB_DATABASE_NAME=immich
 DB_HOSTNAME=postgresql.incus
 
-REDIS_HOSTNAME=valkey.incus
 REDIS_USERNAME=immich
-REDIS_PASSWORD=InsertPassword
+REDIS_PASSWORD=ThisIsAPassword
+REDIS_HOSTNAME=valkey.incus
 ```
 
+### Launch OCI Image
 
+```
+incus launch ghcr:immich-app/immich-server:v2.7.5 --environment-file=/home/user/immich/.env
+```
+
+As of writing v2.7.5 is the current release. You will need to change that in the command as necessary.
+
+### Data Directory
+
+Stop the container and add the data directory.
 
 ```
 incus config device add immich data disk path=/data source=/home/user/immich-app/data shift=true
 ```
+
 This is mounting /data in the container to the data folder under my user folder. You can set this to any directory you choose.
 
-> If you are using a diretory on an NFS mounted share `shift=true` will stop the container from starting. [Here](https://discuss.linuxcontainers.org/t/add-a-mounted-to-host-nfs-target-as-disk-to-the-container-shift-true-got-error/24668) is a discussion about that.
+> If you are using a directory on an NFS mounted share `shift=true` will stop the container from starting. [Here](https://discuss.linuxcontainers.org/t/add-a-mounted-to-host-nfs-target-as-disk-to-the-container-shift-true-got-error/24668) is a discussion about that.
 {: .prompt-tip }
 
+Start immich again and you can now access the web UI.
+
+## Immich Machine Learning Container
+This install is done on a machine with an Nvidia Quadro card.
