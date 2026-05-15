@@ -43,6 +43,7 @@ aclfile /etc/valkey/users.acl
 ```
 
 The ACL file looks like this. Make sure to change the password.
+
 ```bash
 user default on +@all ~* >ThisIsAPassword
 user immich on >ThisIsAPassword +@all ~* &*
@@ -100,3 +101,25 @@ Start immich again and you can now access the web UI.
 
 ## Immich Machine Learning Container
 This install is done on a machine with an Nvidia Quadro card.
+
+### GPU Profile
+To make things a bit easier I have created a profile with the parts for gpu passthrough. For more information about these commands, [I have an post that explains it](https://blog.sifrmoja.xyz/posts/jellyfin-gpu-passthrough/).
+
+```bash
+incus profile create nvidia-gpu
+incus profile device add nvidia-gpu nvidia-gpu gpu pci=0000:01:00.0
+incus profile set nvidia-gpu nvidia.runtime=true
+incus profile set nvidia-gpu nvidia.require.cuda=true
+incus profile set nvidia-gpu nvidia.driver.capabilities=all
+```
+
+> Make sure you have nvidia-container-tools installed. The instance will fail to start otherwise.
+{: .prompt-tip }
+
+### Launch OCI Image
+
+```bash
+incus launch ghcr:immich-app/immich-machine-learning:v2.7.5-cuda immich-ml --profile default --profile nvidia-gpu
+```
+
+It takes a decent amount of time for this container to build. If everything is configured correctly, you should be able to point your Immich server at this server and it will start working.
