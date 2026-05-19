@@ -1,7 +1,7 @@
 ---
 title: Using systemd to Automount an NFS Share
 categories: [Guides,systemd]
-tags: [guides,incus,linux,debian,oci]
+tags: [guides,systemd,linux,debian,nfs,storage]
 image:
   path: assets/img/title/systemd.svg
 ---
