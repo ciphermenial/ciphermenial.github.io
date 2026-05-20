@@ -6,7 +6,7 @@ image:
   path: assets/img/title/incus-oci-immich.svg
 ---
 
-I originally install [Immich](https://immich.app/) on my Incus setup with Docker inside an LXC Container. Since I have been using OCI containers more I thought I would try get Immich running like that. In my setup I am installing Immich server on my main Incus host and the Immich Machine Learning on a secondary host that has an Nvidia GPU.
+I originally installed [Immich](https://immich.app/) on my Incus setup with Docker inside an LXC Container. Since I have been using OCI containers more I thought I would try get Immich running on them instead. In my setup I am installing Immich server on my main Incus host and the Immich Machine Learning on a secondary host that has an Nvidia GPU.
 
 ## Immich Server Container
 ### Prerequisites
@@ -14,12 +14,9 @@ I originally install [Immich](https://immich.app/) on my Incus setup with Docker
 - PostgreSQL DB
 - Valkey or Redis
 - [GitHub Container Repository added to Incus](https://blog.sifrmoja.xyz/posts/incus-oci/#add-an-oci-remote)
-
-I already have a [PostgreSQL](https://www.postgresql.org/) LXC container and a [Valkey](https://valkey.io/) LXC container.
-
+    - I already have a [PostgreSQL](https://www.postgresql.org/) LXC container and a [Valkey](https://valkey.io/) LXC container.
 - A location to use for storage.
-
-I have created a directory under my users home e.g. `/home/user/immich/` with the .env file and a data folder.
+    - I have created a directory under my users home e.g. `/home/user/immich/` with the .env file and a data folder.
 
 ### Configuration
 
@@ -34,7 +31,7 @@ The extensions that you will need to add to the database manually are:
 - vector
 
 #### Redis/Valkey
-I bind my Valkey server to all available interfaces. I then use ACLs to allow connections to the Valkey.
+I bind my Valkey server to all available interfaces. I then use ACLs to allow connections to the Valkey container.
 This means you need to set the following in the `/etc/valkey/valkey.conf`
 
 ```bash
@@ -42,9 +39,9 @@ bind * -::*
 aclfile /etc/valkey/users.acl
 ```
 
-The ACL file looks like this. Make sure to change the password.
+The ACL file located at `/etc/valey/users.acl` looks like the following. Make sure to change the password.
 
-```bash
+```users.acl
 user default on +@all ~* >ThisIsAPassword
 user immich on >ThisIsAPassword +@all ~* &*
 ```
