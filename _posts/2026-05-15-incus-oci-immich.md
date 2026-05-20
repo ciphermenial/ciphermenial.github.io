@@ -16,7 +16,7 @@ I originally installed [Immich](https://immich.app/) on my Incus setup with Dock
 - [GitHub Container Repository added to Incus](https://blog.sifrmoja.xyz/posts/incus-oci/#add-an-oci-remote)
     - I already have a [PostgreSQL](https://www.postgresql.org/) LXC container and a [Valkey](https://valkey.io/) LXC container.
 - A location to use for storage.
-    - I have created a directory under my users home e.g. `/home/user/immich/` with the .env file and a data folder.
+    - I have created a directory under my users home e.g. `/home/user/immich/`{: .filepath} with the .env file and a data folder.
 
 ### Configuration
 
@@ -32,25 +32,26 @@ The extensions that you will need to add to the database manually are:
 
 #### Redis/Valkey
 I bind my Valkey server to all available interfaces. I then use ACLs to allow connections to the Valkey container.
-This means you need to set the following in the `/etc/valkey/valkey.conf`
+This means you need to set the following in the `/etc/valkey/valkey.conf`{: .filepath}
 
 ```bash
 bind * -::*
 aclfile /etc/valkey/users.acl
 ```
 
-The ACL file located at `/etc/valey/users.acl` looks like the following. Make sure to change the password.
+The ACL file located at `/etc/valey/users.acl`{: .filepath} looks like the following. Make sure to change the password.
 
-```users.acl
+```
 user default on +@all ~* >ThisIsAPassword
 user immich on >ThisIsAPassword +@all ~* &*
 ```
+{: file='/etc/valkey/users.acl'}
 
 #### Environment File
 
 This is the bits necessary to include in the .env file.
 
-```bash
+```
 # You can find documentation for all the supported env variables at https://docs.immich.app/install/environment-variables
 
 # The location where your uploaded files are stored
@@ -72,10 +73,11 @@ REDIS_USERNAME=immich
 REDIS_PASSWORD=ThisIsAPassword
 REDIS_HOSTNAME=valkey.incus
 ```
+{: file='/home/user/immich/.env'}
 
 ### Launch OCI Image
 
-```
+```bash
 incus launch ghcr:immich-app/immich-server:v2.7.5 --environment-file=/home/user/immich/.env
 ```
 
@@ -85,7 +87,7 @@ As of writing v2.7.5 is the current release. You will need to change that in the
 
 Stop the container and add the data directory.
 
-```
+```bash
 incus config device add immich data disk path=/data source=/home/user/immich-app/data shift=true
 ```
 
@@ -94,7 +96,7 @@ This is mounting /data in the container to the data folder under my user folder.
 > If you are using a directory on an NFS mounted share `shift=true` will stop the container from starting. [Here](https://discuss.linuxcontainers.org/t/add-a-mounted-to-host-nfs-target-as-disk-to-the-container-shift-true-got-error/24668) is a discussion about that.
 {: .prompt-tip }
 
-Start immich again and you can now access the web UI.
+Start immich again and you can now access the web UI. I have the webui accessible through [HAProxy]
 
 ## Immich Machine Learning Container
 This install is done on a machine with an Nvidia Quadro card.
