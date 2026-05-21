@@ -38,6 +38,7 @@ This means you need to set the following in the `/etc/valkey/valkey.conf`{: .fil
 bind * -::*
 aclfile /etc/valkey/users.acl
 ```
+{: file='/etc/valkey/valkey.conf'}
 
 The ACL file located at `/etc/valey/users.acl`{: .filepath} looks like the following. Make sure to change the password.
 
@@ -96,13 +97,13 @@ This is mounting /data in the container to the data folder under my user folder.
 > If you are using a directory on an NFS mounted share `shift=true` will stop the container from starting. [Here](https://discuss.linuxcontainers.org/t/add-a-mounted-to-host-nfs-target-as-disk-to-the-container-shift-true-got-error/24668) is a discussion about that.
 {: .prompt-tip }
 
-Start immich again and you can now access the web UI. I have the webui accessible through [HAProxy]
+Start immich again and you can now access the web UI. I have the webui accessible through [HAProxy](/posts/my-haproxy-config/).
 
 ## Immich Machine Learning Container
 This install is done on a machine with an Nvidia Quadro card.
 
 ### GPU Profile
-To make things a bit easier I have created a profile with the parts for gpu passthrough. For more information about these commands, [I have an post that explains it](https://blog.sifrmoja.xyz/posts/jellyfin-gpu-passthrough/).
+To make things a bit easier I have created a profile with the parts for gpu passthrough. For more information about these commands, [I have an post that explains it](/posts/jellyfin-gpu-passthrough/).
 
 ```bash
 incus profile create nvidia-gpu
