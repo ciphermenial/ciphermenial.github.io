@@ -1,8 +1,11 @@
 ---
 title: Access Your Modem Through OpenWrt Router
-categories: [Guides,OpenWrt]
+categories: [Archived,OpenWrt]
 tags: [openwrt,guides,modem,network,firewall]
 ---
+
+> This guide should still be accurate. Things might look a bit different on current versions of OpenWrt. I am marking this as archived.
+{: .prompt-warning }
 
 This guide goes through how to configure your OpenWrt router to allow access to the web interface of your bridged xDSL modem.
 
