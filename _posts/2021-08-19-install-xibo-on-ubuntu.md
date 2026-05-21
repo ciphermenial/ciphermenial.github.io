@@ -22,7 +22,7 @@ sudo apt install apache2 cron libapache2-mod-{xsendfile,php8.2} mariadb-server m
 ```
 
 ## Install Xibo CMS
-When I am configuring server software outside of a package manager I always place it under the /srv folder. I will be installing Xibo under /srv/xibo-cms.
+When I am configuring server software outside of a package manager I always place it under the `/srv`{: .filepath} folder. I will be installing Xibo under `/srv/xibo-cms`{: .filepath}.
 
 ```bash
 sudo mkdir /srv/xibo-cms
@@ -43,7 +43,7 @@ The apache2 user 'www-data' needs to be set as owner of all the extracted items.
 sudo chown -R www-data: /srv/xibo-cms
 ```
 
-This deletes the existing /var/www directory and creates a symlink to /srv/xibo-cms.
+This deletes the existing `/var/www`{: .filepath} directory and creates a symlink to `/srv/xibo-cms`{: .filepath}.
 
 ```bash
 sudo rm -r /var/www
@@ -57,8 +57,6 @@ This enables the necessary apache2 modules and creates a site configuration usin
 sudo a2enmod rewrite ssl session headers
 sudo vim /etc/apache2/sites-available/xibo-cms.conf
 ```
-
-#### xibo-cms.conf
 
 ```apache
 <VirtualHost *:80>
@@ -92,6 +90,7 @@ sudo vim /etc/apache2/sites-available/xibo-cms.conf
     </Directory>
 </VirtualHost>
 ```
+{: file="/etc/apache2/sites-available/xibo-cms.conf" }
 
 This disables the default site and enables the newly created xibo-cms site configuration.
 
@@ -133,6 +132,7 @@ session.gc_maxlifetime = 1440
 session.gc_probability = 1
 upload_max_filesize = 2G
 ```
+{: file="/etc/php/8.2/apache2/php.ini" }
 
 And also for cli.
 
@@ -150,6 +150,7 @@ session.gc_divisor = 100
 session.gc_probability = 1
 upload_max_filesize = 2G
 ```
+{: file="/etc/php/8.2/cli/php.ini" }
 
 You can do all this quickly with sed.
 
@@ -184,7 +185,7 @@ sed -i 's/upload_max_filesize = .*$/upload_max_filesize = 2G/g' /etc/php/8.2/cli
 sudo vim /srv/xibo-cms/vendor/xibosignage/xibo-xmr/bin/config.json
 ```
 
-Enter the following information and change the `pubOn` IP address to the public IP of the server. You can view this by running the command "ip address". You can also set it to `0.0.0.0`.
+Enter the following information and change the `pubOn` IP address to the public IP of the server. You can view this by running the command `ip address`. You can also set it to `0.0.0.0`.
 
 ```json
 {
@@ -193,6 +194,7 @@ Enter the following information and change the `pubOn` IP address to the public 
     "debug": false
 }
 ```
+{: file="/srv/xibo-cms/vendor/xibosignage/xibo-xmr/bin/config.json" }
 
 Set www-data as the owner of the file.
 
@@ -227,6 +229,7 @@ RestartSec=1
 [Install]
 WantedBy=multi-user.target
 ```
+{: file="/etc/systemd/system/xibo-xmr.service" }
 
 Start the service
 
@@ -318,6 +321,7 @@ table inet firewall {
     # no need to define output chain, default policy is accept if undefined.
 }
 ```
+{: file="/etc/nftables.conf" }
 
 Restart nftables service to apply.
 
@@ -337,7 +341,7 @@ You can now browse to the server at the location you configured in the xibo-cms.
 
 ### Backup
 
-The simplest thing to do is to stop apache2 and xibo-xmr service, moving the /srv/xibo-cms directory, and backing up the database.
+The simplest thing to do is to stop apache2 and xibo-xmr service, moving the `/srv/xibo-cms`{: .filepath} directory, and backing up the database.
 
 ```bash
 sudo systemctl stop apache2 xibo-xmr
@@ -360,7 +364,7 @@ sudo cp /srv/xibo-cms.backup/vendor/xibosignage/xibo-xmr/bin/config.json vendor/
 sudo chown -R www-data:www-data /srv/xibo-cms
 sudo rm web/install/index.php
 ```
-If upgrading between versions i.e. 3.x.x to 4.x.x, you will need to upgrade the database with this command which must be run from /srv/xibo-cms directory.
+If upgrading between versions i.e. 3.x.x to 4.x.x, you will need to upgrade the database with this command which must be run from `/srv/xibo-cms`{: .filepath} directory.
 
 ```bash
 vendor/bin/phinx migrate -c phinx.php

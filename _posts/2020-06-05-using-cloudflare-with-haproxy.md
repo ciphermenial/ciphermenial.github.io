@@ -1,8 +1,11 @@
 ---
-title: Using Cloudflare With HAProxy
-categories: [Guides,HAProxy]
+title: Using Cloudflare With HAProxy on OpenWrt
+categories: [Archived,HAProxy]
 tags: [guides,haproxy,linux,cloudflare,openwrt]
 ---
+
+> The information in this post is out of date and won't be updated. I have updated guides on how I use HAProxy.
+{: .prompt-warning }
 
 A while ago I switched to using [Cloudflare](https://www.cloudflare.com) for my domain names [DNS](https://en.wikipedia.org/wiki/Domain_Name_System). The main reason I did this was for dynamic DNS since I had a dynamic IP on my home Internet connection. I then looked into what else I could use Cloudflare for and over time have taken advantage of more of their free options.
 
@@ -20,7 +23,7 @@ After you have followed through the [Cloudflare Getting Started guide.](https://
 
 You will then need to configure [Cloudflare's Universal SSL](https://blog.cloudflare.com/universal-ssl-encryption-all-the-way-to-the-origin-for-free) by following the guide [https://support.cloudflare.com/hc/en-us/articles/115000479507](https://support.cloudflare.com/hc/en-us/articles/115000479507) to create a Cloudflare Origin Certificate to install onto your router.
 
-Once you have the certificate and key, you can combine them together to create a .pem file. You will then copy this .pem to somewhere on your router. I've placed mine under ```/etc/ssl/cloudflare/domain.com.pem```
+Once you have the certificate and key, you can combine them together to create a .pem file. You will then copy this .pem to somewhere on your router. I've placed mine under `/etc/ssl/cloudflare/domain.com.pem`{: .filepath}
 
 Also remember to backup this file somewhere secure as in that location it won't be saved during an upgrade of OpenWrt.
 
@@ -31,9 +34,9 @@ This is the configuration I have used but I am not sure if it is the best way to
 opkg install haproxy
 ```
 
-The haproxy configuration file is located at `/etc/haproxy.cfg`
+The haproxy configuration file is located at `/etc/haproxy.cfg`{: .filepath}
 
-> This is a poor configuration that I used when still learning. I have changed a lot of what I do since then. You can see that [here](https://ciphermenial.github.io/posts/my-haproxy-config/).
+> This is a poor configuration that I used when still learning. I have changed a lot of what I do since then. You can see that [here](/posts/my-haproxy-config/).
 {: .prompt-warning }
 
 ```
@@ -148,6 +151,7 @@ backend backend_5
     mode http
     server server01 10.0.0.10:8082 check
 ```
+{: file="/etc/haproxy.cfg" }
 
 With this you can also make the LuCI interface available externally and know that the traffic will all be encrypted. This setup offloads all the TLS encryption.
 You will need to also go to System > Startup in LuCI and start the haproxy service.
@@ -160,16 +164,18 @@ Thanks to Cloudflare having a nice text list of their IP ranges it is trivial to
 
 In the standard OpenWrt install it will not have all the packages required for this step. Install the required packages from command line or in LuCI
 
+```bash
 opkg install curl
 opkg install ipset
+```
 
 ## Scheduled Task
 To configure a scheduled task in OpenWrt is really simple. I did it through the Web UI as follows
 
 1. Open up the Web UI
 2. Go to System > Scheduled Tasks
-3. In the input window paste in the following\
-```0 0 * * * curl https://www.cloudflare.com/ips-v4 > /etc/cfip.v4```
+3. In the input window paste in the following:
+    - `0 0 * * * curl https://www.cloudflare.com/ips-v4 > /etc/cfip.v4`:
 4. Click Submit
 5. Go to System > Startup
 6. Restart cron
@@ -183,7 +189,7 @@ curl https://www.cloudflare.com/ips-v4 > /etc/cfip.v4
 ```
 
 ## ipset Configuration
-ipset can be configured like you would on any iptables firewall but I have used OpenWrt config method. It is as simple as modifying the /etc/config/firewall file and adding the following.
+ipset can be configured like you would on any iptables firewall but I have used OpenWrt config method. It is as simple as modifying the `/etc/config/firewall`{: .filepath} file and adding the following.
 
 ```
 config ipset
@@ -200,6 +206,7 @@ config ipset
     option name 'Cloudflare Inbound'
     option ipset 'cf'
 ```
+{: file="/etc/config/firewall" }
 
 You will then need to restart the firewall service
 
