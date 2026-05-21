@@ -12,7 +12,7 @@ image:
 We had some aging hardware load balancers/reverse proxies that were no longer necessary for our setup. This lead to me working out how to replace them with some Ubuntu VMs.
 In this guide I will include configuration of 2 HAProxy servers using keepalived for failover.
 
-# Prerequisites
+## Prerequisites
 - 2 Ubuntu 20.04 Servers
 - 3 available IP Addresses (Here we are using the 10.0.0.0/24 subnet)
     - 10.0.0.100 for keepalived
@@ -20,14 +20,14 @@ In this guide I will include configuration of 2 HAProxy servers using keepalived
     - 10.0.0.102 for the BACKUP server
 - An ADFS Cluster
 
-# Instructions
+## Instructions
 First you will need to install keepalived and haproxy onto each server
 
 ```bash
 sudo apt install keepalived haproxy
 ```
 
-## keepalived Configuration
+### keepalived Configuration
 Create a user for running keepalived scripts. This will add a user without a home directory and disable login.
 
 ```bash
@@ -41,7 +41,7 @@ Create the necessary configuration file on each server.
 sudo vim /etc/keepalived/keepalived.conf
 ```
 
-### MASTER Configuration File
+#### MASTER Configuration File
 Bits you will need to modify for your particular configuration:
 - interface may be something other than ens160
 - auth_pass can be changed to something random
@@ -79,7 +79,7 @@ vrrp_instance haproxy {
 ```
 {: file="/etc/keepalived/keepalived.conf" }
 
-### BACKUP Configuration File
+#### BACKUP Configuration File
 ```
 global_defs {
     router_id haproxy
@@ -133,7 +133,7 @@ The result of keepalived should look similar to this:
              └─3893 /usr/sbin/keepalived --dont-fork
 ```
 
-## HAProxy Configuration
+### HAProxy Configuration
 This assumes you have the necessary certificate created and located under /etc/ssl/domain.com/certificate.pem
 
 ```bash
