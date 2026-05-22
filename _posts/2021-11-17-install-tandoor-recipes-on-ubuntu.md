@@ -8,10 +8,10 @@ image:
 
 In this guide we will look at manually installing [Tandoor Recipes](https://docs.tandoor.dev/). I have done this in a LXD container but you should be able to follow it using sudo commands for a normal install.
 
-### Notes
-- This install was done in a LXD container.
-- I have a haproxy running in front of this.
-- I already have a postgresql server in place and built a database named *recipes* with a user with the same name.
+## Notes
+- This install was done in a LXC instant on an LXD host.
+- I have HAProxy running in front of this.
+- I already have a PostgreSQL server in place and built a database named **recipes** with a user with the same name.
 - I installed Node.js from [NodeSource](https://github.com/nodesource/distributions/blob/master/README.md)
 
 ## Installation
@@ -70,6 +70,7 @@ POSTGRES_USER=recipes
 POSTGRES_PASSWORD=YOUR_PASSWORD
 POSTGRES_DB=recipes
 ```
+{: file="/srv/recipes/.env"
 
 Now create a Python virtual env. and install the requirements.
 
@@ -104,7 +105,7 @@ chown -R recipes:www-data /srv/recipes
 chmod -R 755 mediafiles
 ```
 
-Now you need to create a systemd service for gunicorn. Create and modify a new service file /etc/systemd/system/recipes.service
+Now you need to create a systemd service for gunicorn. Create and modify a new service file `/etc/systemd/system/recipes.service`{: .filepath}
 
 ### recipes.server file contents
 
