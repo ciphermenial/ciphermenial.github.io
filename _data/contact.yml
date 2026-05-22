@@ -24,9 +24,9 @@
 #   icon: 'fab fa-stack-overflow'
 #   url:  ''                  # Fill with your stackoverflow homepage
 #
-- type: bluesky
-  icon: 'fa-brands fa-bluesky'
-  url: 'https://bsky.app/profile/sifrmoja.xyz'
+# - type: bluesky
+#   icon: 'fa-brands fa-bluesky'
+#   url: ''
 #
 # - type: reddit
 #   icon: 'fa-brands fa-reddit'
