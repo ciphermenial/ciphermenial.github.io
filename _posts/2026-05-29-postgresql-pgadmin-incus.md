@@ -1,6 +1,6 @@
 ---
 title: Installing PostgreSQL and PGAdmin with Incus
-categories: [Guides,PKI]
+categories: [Guides,Incus]
 tags: [guides,incus,linux,debian,postgresql,lxc,postgresql,pgadmin4]
 image:
   path: assets/img/title/postgresql-pgadmin-incus.svg
