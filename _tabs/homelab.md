@@ -15,9 +15,9 @@ I use my homelab to learn new things that I often end up implementing in my work
 - [x] [Setup & Configure HAProxy Container with Cloudflare Origins](/posts/configure-haproxy-container/)
 - [x] [Configure Incus for Docker](/posts/configure-incus-for-docker/)
 - [x] [Setup SMTP Outbound Server with DKIM](/posts/smtp-outbound-server/)
-- [x] [Install & Configure MariaDB Container](/posts/install-mariadb-debian/)
-- [ ] Install & Configure PostgreSQL Container
-- [ ] Install & Configure Keycloak Container
-- [ ] Install & Configure Apache Guacamole Container
+- [x] [Install & Configure MariaDB Instance](/posts/install-mariadb-debian/)
+- [x] Install & Configure PostgreSQL Instance(/posts/postgresql-pgadmin-incus/)
+- [ ] Install & Configure Keycloak Instance
+- [ ] Install & Configure Apache Guacamole Instance
 
 [^footnote]: Aussie Broadband is still a fantastic choice. My reason for switching was purely pricing.
