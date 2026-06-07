@@ -1,5 +1,5 @@
 ---
-title: Installing PostgreSQL and PGAdmin with Incus
+title: Installing PostgreSQL and PGAdmin
 categories: [Guides,Incus]
 tags: [guides,incus,linux,debian,postgresql,lxc,postgresql,pgadmin4]
 image:
@@ -80,17 +80,21 @@ local   all             postgres                              peer
 
 # "local" is for Unix domain socket connections only
 local   all             all                                   peer
+
 # IPv4 local connections:
-host    all             all             127.0.0.1/32          md5
+host    all             all             127.0.0.1/32          scram-sha-256
+
 # IPv6 local connections:
-host    all             all             ::1/128               md5
+host    all             all             ::1/128               scram-sha-256
+
 # IPv6 remote connections:
 host    all             all             2001:db8:1:b33f::/64  scram-sha-256
+
 # Allow replication connections from localhost, by a user with the
 # replication privilege.
 local   replication     all                                   peer
-host    replication     all             127.0.0.1/32          md5
-host    replication     all             ::1/128               md5
+host    replication     all             127.0.0.1/32          scram-sha-256
+host    replication     all             ::1/128               scram-sha-256
 ```
 {: file="/etc/postgresql/18/main/pg_hba.conf" }
 
