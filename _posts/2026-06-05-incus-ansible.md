@@ -79,7 +79,7 @@ To check you can view the remotes added with `incus remote list` which will outp
 
 ### Install Ansible
 
-[Here are the instructions](https://docs.ansible.com/projects/ansible/latest/installation_guide/intro_installation.html#pipx-install) for installing Ansible with from the doco.
+[Here are the instructions](https://docs.ansible.com/projects/ansible/latest/installation_guide/intro_installation.html#pipx-install) for installing Ansible with [pipx](https://pipx.pypa.io/stable/) from the doco.
 
 ```bash
 apt install pipx
@@ -88,4 +88,40 @@ pipx install --include-deps ansible
 ```
 
 ## Configuring Ansible
+
+I create a folder named ansible in the root directory and change to it. Then create and edit `ansible.cfg`{: .filepath} with vim.
+
+```bash
+mkdir ansible
+cd ansible
+vim ansible.cfg
+```
+
+I originally copied a generic configuration from somewhere and ended up needing to set it as follows.
+
+```ini
+[defaults]
+interpreter_python = /usr/bin/python3
+timeout = 30
+forks = 10
+
+[inventory]
+enable_plugins = community.general.incus, yaml
+```
+{: file="ansible/ansible.cfg" }
+
+I add `interpreter_python = /usr/bin/python3` to stop a warning about the python version discovered because it was python3.13 and that could change.
+`enable_plugins = community.general.incus, yaml` is added for obvious reasons.
+
+### Creating the Inventory
+
+Inventory is all the hosts you want to run playbooks against. I created an inventory directory and added 3 inventory yaml files.
+
+```bash
+mkdir inventory
+cd inventory
+touch hosts.yaml incus1.incus.yaml incus2.incus.yaml
+```
+
+The Incus inventory plugin requires the inventory file to include incus.yaml or incus.yml in the name, otherwise it ignores it.
 
