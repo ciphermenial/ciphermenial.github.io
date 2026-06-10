@@ -16,7 +16,7 @@ I use my homelab to learn new things that I often end up implementing in my work
 - [x] [Configure Incus for Docker](/posts/configure-incus-for-docker/)
 - [x] [Setup SMTP Outbound Server with DKIM](/posts/smtp-outbound-server/)
 - [x] [Install & Configure MariaDB Instance](/posts/install-mariadb-debian/)
-- [x] Install & Configure PostgreSQL Instance(/posts/postgresql-pgadmin-incus/)
+- [x] [Install & Configure PostgreSQL Instance](/posts/postgresql-pgadmin-incus/)
 - [ ] Install & Configure Keycloak Instance
 - [ ] Install & Configure Apache Guacamole Instance
 
