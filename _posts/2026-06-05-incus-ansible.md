@@ -124,7 +124,7 @@ touch inventory/hosts.yaml inventory/incus1.incus.yaml inventory/incus2.incus.ya
 
 > The Incus inventory plugin requires the inventory file to include incus.yaml or incus.yml in the name, otherwise it ignores it with the message:
 > `Skipping due to inventory source not ending in "incus.yaml" nor "incus.yml"`
-{: .prompt-warn }
+{: .prompt-warning }
 
 The contents of the incus.yaml files are as follows.
 
