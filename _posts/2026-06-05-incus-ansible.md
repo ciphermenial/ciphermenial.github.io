@@ -113,14 +113,13 @@ enable_plugins = community.general.incus, yaml
 I add `interpreter_python = /usr/bin/python3` to stop a warning about the python version discovered because it was python3.13 and that could change.
 `enable_plugins = community.general.incus, yaml` is added for obvious reasons.
 
-### Creating the Inventory
+### Ansible Inventory
 
 Inventory is all the hosts you want to run playbooks against. I created an inventory directory and added 3 inventory yaml files.
 
 ```bash
 mkdir inventory
-cd inventory
-touch hosts.yaml incus1.incus.yaml incus2.incus.yaml
+touch inventory/hosts.yaml inventory/incus1.incus.yaml inventory/incus2.incus.yaml
 ```
 
 > The Incus inventory plugin requires the inventory file to include incus.yaml or incus.yml in the name, otherwise it ignores it with the message:
@@ -167,7 +166,7 @@ That way I can create a group for virtual machines by adding the line `vms: "'di
 
 I checked that it was working with the command `ansible-inventory -i inventory --graph`
 
-This output something like the following.
+This outputs something like the following. You will see that a lot of the Instances listed are not included in the final **lxc** group because they are not lxc instances.
 
 ```bash
 @all:
@@ -208,3 +207,113 @@ This output something like the following.
   |  |--smtp.pri.incus
   |  |--prometheus.sec.incus
 ```
+
+### Ansible Playbooks
+
+After a lot of messing around I ended up with 2 playbooks. One is to install python in my lxc instances if it is not currently installed and the other updates all packages with apt.
+
+I created a folder named playbooks and created 2 files.
+
+```bash
+mkdir playbooks
+touch playbooks/install-python.yaml playbooks/update-apt-packages
+```
+
+#### Install Python on Instances
+
+The contents of the `ansible/playbooks/install-python.yaml`{: .filepath} are as follows.
+
+```yaml
+- name: Install Python on remote LXC instances
+  hosts: lxc
+  connection: community.general.incus
+  gather_facts: false # Fact gathering requires Python
+
+  tasks:
+    - name: Install Python 3 if not present (Debian/Ubuntu)
+      raw: test -e /usr/bin/python3 || (apt update && apt install -y python3-minimal python3-apt)
+      register: apt_output
+      changed_when: "'Installing' in apt_output.stdout or 'Setting up' in apt_output.stdout"
+      when: ansible_os_family is not defined # Fallback if OS is unknown
+
+    - name: Install Python 3 if not present (RHEL/CentOS/Rocky Linux)
+      raw: test -e /usr/bin/python3 || (dnf install -y python3)
+      register: dnf_output
+      changed_when: "'Installing' in dnf_output.stdout or 'Complete!' in dnf_output.stdout"
+      ignore_errors: true # Prevents failure if the system does not use DNF
+
+- name: Verify Python installation
+  hosts: lxc
+  connection: community.general.incus
+  gather_facts: true
+  
+  tasks:
+    - name: Test Python with inbuilt Ansible ping module
+      ansible.builtin.ping:
+```
+{: file="ansible/playbooks/install-python.yaml" }
+
+This installs Python if not present and then does a test afterwards using ansible.builtin.ping module.
+
+#### Update LXC Instances
+
+The contents of the `ansible/playbooks/update-apt-packages.yaml`{: .filepath} are as follows.
+
+```yaml
+- name: Apply all updates
+  hosts: lxc
+  connection: community.general.incus
+  gather_facts: true
+  gather_subset:
+    - "distribution_release"
+  order: shuffle
+  any_errors_fatal: true
+  tasks:
+    - name: Check if distribution is supported
+      ansible.builtin.meta: end_play
+      when: 'ansible_facts["distribution"] not in ("Ubuntu", "Debian")'
+      register: result
+      retries: 3
+      delay: 3
+      until: result is success
+
+    - name: Update apt repo and cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      register: result
+      retries: 3
+      delay: 3
+      until: result is success
+
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        upgrade: dist
+      register: result
+      retries: 3
+      delay: 3
+      until: result is success
+
+    - name: Remove redundant packages
+      ansible.builtin.apt:
+        autoremove: yes
+        purge: true
+      register: result
+      retries: 3
+      delay: 3
+      until: result is success
+```
+{: file="ansible/playbooks/update-apt-packages.yaml" }
+
+#### Run Playbooks
+
+I make sure I am in the `ansible`{: .filepath} directory and run the following for each playbook.
+
+```bash
+ansible-playbook -i inventory playbooks/install-python.yaml
+ansible-playbook -i inventory playbooks/update-apt-packages.yaml
+```
+
+## Next Steps
+
+Now I need to learn more about ansible to automate more of my setup. I also need to learn Terraform/OpenTofu because there is no Incus plugin for ansible to create instances.
