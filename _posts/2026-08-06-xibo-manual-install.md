@@ -193,7 +193,7 @@ vim /srv/xibo-cms/web/settings.php
 defined('XIBO') or die(__("Sorry, you are not allowed to directly access this page.") . "<br />" . __("Please press the back button in your browser."));
 
 $dbhost = 'localhost';
-$dbuser = 'root';
+$dbuser = 'xibo-cms';
 $dbpass = 'MY_NEW_PASSWORD';
 $dbname = 'xibo-cms';
 $dbport = '3306';
