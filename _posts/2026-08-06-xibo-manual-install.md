@@ -1,7 +1,7 @@
 ---
 title:  Install Xibo on Debian
 categories: [Guides,Xibo]
-tags: [debian,linux,xibo,signage,mariadb,apache,nftables]
+tags: [debian,linux,xibo,signage,mariadb,apache,nftables,php]
 image:
   path: /assets/img/title/install-xibo-on-ubuntu.svg
 ---
@@ -429,8 +429,22 @@ Sign in with the default admin username and password which is xibo_admin and pas
 2. Select Settings.
 3. Enter `/var/lib/xibo-cms`{: .filepath} into the Library Location field.
 4. Create a random Secret Key for adding Players.
+5. Click Save.
 
+![](/assets/img/2026-08-06-xibo-manual-install/xibo-library-location.png)
 
+#### Configure Displays
+
+1. Select Displays from Administration > Settings page.
+2. Enter http://localhost:8081 for the XMR Private Address. This is the API access and is only needed from the CMS to XMR.
+3. Enter ws://[IP Address clients can access the server from]:8080 into the XMR WebSocket Address.
+   - In my example the server is accessible on the local network on 10.0.0.100.
+5. Enter tcp://[IP Address clients can access the server from]:9505.
+6. Click Save.
+
+![](/assets/img/2026-08-06-xibo-manual-install/xibo-displays-config.png)
+
+You can now start adding clients.
 
 ## Upgrading
 
