@@ -158,18 +158,83 @@ sed -i 's/upload_max_filesize = .*$/upload_max_filesize = 2G/g' /etc/php/8.4/cli
 When I am configuring server software outside of a package manager I always place it under the `/srv`{: .filepath} folder. I will be installing Xibo under `/srv/xibo-cms`{: .filepath}. I will also be creating the library directory for Xibo under `/var/lib/xibo-cms/`{: .filepath}. I open a shell using the www-data user to save on have to change ownership of the files later.
 
 ```bash
-sudo mkdir /srv/xibo-cms
-chown www-data: /srv/xibo-cms
+sudo mkdir /srv/xibo-cms /var/lib/xibo-cms
+chown www-data: /srv/xibo-cms /var/lib/xibo-cms
 cd /srv/xibo-cms
 sudo -u www-data -s
-wget https://github.com/xibosignage/xibo-cms/releases/download/4.4.4/xibo-cms-4.4.4.tar.gz
+curl -OJL https://github.com/xibosignage/xibo-cms/releases/download/4.5./xibo-cms-4.5.0.tar.gz
 ```
 
 This extracts the contents of the archive without placing it into a folder
 
 ```bash
-tar -xzf xibo-cms-4.4.4.tar.gz --strip-components=1
-rm xibo-cms-4.4.4.tar.gz
+tar -xzf xibo-cms-4.5.0.tar.gz --strip-components=1
+rm xibo-cms-4.5.0.tar.gz
+```
+
+Download the complete xibo-cmr archive to extract some extra parts that are required.
+
+```bash
+curl -OJL https://github.com/xibosignage/xibo-cms/archive/refs/tags/4.5.0.tar.gz
+tar -C /var/lib/xibo-cms -xvzf xibo-cms-4.5.0.tar.gz --strip-components=2 docker/brand
+rm xibo-cms-4.5.0.tar.gz
+```
+
+Create the required settings.php file and enter in the database details from earlier.
+
+```bash
+vim /srv/xibo-cms/web/settings.php
+```
+
+```
+<?php
+defined('XIBO') or die(__("Sorry, you are not allowed to directly access this page.") . "<br />" . __("Please press the back button in your browser."));
+
+$dbhost = 'localhost';
+$dbuser = 'xibo-cms';
+$dbpass = 'MY_NEW_PASSWORD';
+$dbname = 'xibo-cms';
+$dbport = '3306';
+
+define('SECRET_KEY', '');
+
+if (file_exists(dirname(__FILE__) . '/settings-custom.php')) {
+    include_once dirname(__FILE__) . '/settings-custom.php';
+}
+```
+{: file="/srv/xibo-cms/web/settings.php" }
+
+Add a required random secret key.
+
+```bash
+SECRET_KEY=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 8)
+/bin/sed -i "s/define('SECRET_KEY','');/define('SECRET_KEY','$SECRET_KEY');/" /srv/xibo-cms/web/settings.php
+```
+
+### Initialise the Database
+
+This requires the command you need to run anytime you upgrade versions.
+
+```bash
+php /srv/xibo-cms/vendor/bin/phinx migrate -c "/srv/xibo-cms/phinx.php"
+```
+
+### Add Certificates
+
+This is a new requirement for layout management. I haven't looked into exactly what it is encrypting but you are unable to manage layouts without them.
+
+```bash
+  mkdir -p /var/lib/xibo-cms/certs
+  openssl genrsa -out /var/lib/xibo-cms/certs/private.key 2048
+  openssl rsa -in /var/lib/xibo-cms/certs/private.key -pubout -out /var/lib/xibo-cms/certs/public.key
+  php -r 'echo base64_encode(random_bytes(32)), PHP_EOL;' >> /var/lib/xibo-cms/certs/encryption.key
+```
+
+Set the correct permissions for these certificates.
+
+```bash
+chmod 600 /var/lib/xibo-cms/certs/private.key
+chmod 660 /var/lib/xibo-cms/certs/public.key
 ```
 
 ### Configure XMR
@@ -184,7 +249,7 @@ curl -OJL https://github.com/xibosignage/xibo-xmr/releases/download/1.3/xmr.phar
 #### Create XMR Configuration File
 
 ```bash
-sudo vim /srv/xibo-cms/vendor/bin/config.json
+vim /srv/xibo-cms/vendor/bin/config.json
 ```
 
 Enter the following information.
@@ -202,8 +267,10 @@ Enter the following information.
 {: file="/srv/xibo-cms/vendor/bin/config.json" }
 
 #### Create XMR service
+Exit out of the www-data user shell and create the new systemd unit.
 
 ```bash
+exit
 sudo vim /etc/systemd/system/xibo-xmr.service
 ```
 
@@ -303,7 +370,7 @@ table inet firewall {
 
         # Allow SSH on port TCP/22 and allow HTTP(S) TCP/80 and TCP/443
         # for IPv4 and IPv6.
-        tcp dport { 22, 80, 443, 9505, 8080 } accept
+        tcp dport { 22, 443, 9505, 8080 } accept
 
         # Uncomment to enable logging of denied inbound traffic
         # log prefix "[nftables] Inbound Denied: " counter drop
@@ -350,7 +417,7 @@ The simplest thing to do is to stop apache2 and xibo-xmr service, moving the `/s
 ```bash
 sudo systemctl stop apache2 xibo-xmr
 sudo mv /srv/xibo-cms /srv/xibo-cms.backup
-sudo mysqldump xibo-cms > xibo-cms.sql
+sudo mysqldump -p xibo-cms > xibo-cms.sql
 ```
 
 Create xibo-cms directory and change to it. Download the new version, in this example 4.0.8 extract it and copy back the necessary files. You will also need to delete the install/index.php file to stop a warning from appearing.
@@ -359,16 +426,16 @@ Create xibo-cms directory and change to it. Download the new version, in this ex
 
 ```bash
 sudo mkdir /srv/xibo-cms
+sudo chown www-data: /srv/xibo-cms
 cd /srv/xibo-cms
-sudo wget https://github.com/xibosignage/xibo-cms/releases/download/4.4.4/xibo-cms-4.4.4.tar.gz
-sudo tar -xvzf xibo-cms-4.4.4.tar.gz --strip-components=1
-sudo cp /srv/xibo-cms.backup/web/settings.php web/
-sudo cp -r /srv/xibo-cms.backup/library .
-sudo cp /srv/xibo-cms.backup/vendor/bin/config.json vendor/bin/
-sudo chown -R www-data:www-data /srv/xibo-cms
-sudo rm web/install/index.php
+sudo -u www-data -s
+curl -OJL https://github.com/xibosignage/xibo-cms/releases/download/4.5.0/xibo-cms-4.5.0.tar.gz
+tar -xvzf xibo-cms-4.4.4.tar.gz --strip-components=1
+cp /srv/xibo-cms.backup/web/settings.php web/
+cp /srv/xibo-cms.backup/vendor/bin/config.json vendor/bin/
+cp /srv/xibo-cms.backup/vendor/bin/xmr.phar vendor/bin
 ```
-If upgrading between versions i.e. 3.x.x to 4.x.x, you will need to upgrade the database with this command which must be run from `/srv/xibo-cms`{: .filepath} directory.
+Upgrade the database with this command which must be run from `/srv/xibo-cms`{: .filepath} directory.
 
 ```bash
 vendor/bin/phinx migrate -c phinx.php
@@ -377,6 +444,7 @@ vendor/bin/phinx migrate -c phinx.php
 Start up the services again.
 
 ```bash
+exit
 sudo systemctl start apache2 xibo-xmr
 ```
 
