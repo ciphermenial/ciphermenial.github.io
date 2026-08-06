@@ -431,7 +431,7 @@ Sign in with the default admin username and password which is xibo_admin and pas
 4. Create a random Secret Key for adding Players.
 5. Click Save.
 
-![](/assets/img/2026-08-06-xibo-manual-install/xibo-library-location.png)
+![](/assets/img/2026-08-06-xibo-manual-install/xibo-library.png)
 
 #### Configure Displays
 
@@ -443,7 +443,7 @@ Sign in with the default admin username and password which is xibo_admin and pas
 5. Enter tcp://[IP Address clients can access the server from]:9505.
 6. Click Save.
 
-![](/assets/img/2026-08-06-xibo-manual-install/xibo-displays-config.png)
+![](/assets/img/2026-08-06-xibo-manual-install/xibo-displays.png)
 
 You can now start adding clients.
 
