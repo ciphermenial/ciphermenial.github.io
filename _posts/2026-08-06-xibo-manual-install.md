@@ -20,7 +20,7 @@ This guide is updated for installing [Xibo CMS 4.5.0](https://xibosignage.com/bl
 All of the requirements can be installed using apt.
 
 ```bash
-sudo apt install apache2 cron libapache2-mod-{xsendfile,php8.4} mariadb-server mariadb-client nftables php8.4-{cli,gd,dom,pdo,gettext,iconv,ctype,fileinfo,xml,mysql,zip,soap,curl,simplexml,mbstring,zmq,memcached,phar,opcache,mongodb,gnupg} wget
+sudo apt install apache2 cron libapache2-mod-{xsendfile,php8.4} mariadb-server mariadb-client nftables php8.4-{cli,gd,xml,mysql,zip,soap,curl,mbstring,zmq,memcached,opcache,mongodb,gnupg} curl
 ```
 
 ## Configure Required Services
@@ -43,7 +43,7 @@ sudo vim /etc/apache2/sites-available/xibo-cms.conf
     LimitRequestBody 0
 
     XSendFile on
-    XSendFilePath /var/www/cms/library
+    XSendFilePath /var/lib/xibo-cms
 
     SSLEngine on
     SSLCertificateFile "/etc/ssl/certs/ssl-cert-snakeoil.pem"
@@ -79,7 +79,9 @@ sudo a2ensite xibo-cms.conf
 This configures a root password for MariaDB. Make sure to change MY_NEW_PASSWORD to your password of choice. First enter mariadb/mysql console by runinng `sudo mysql`, then run these SQL commands.
 
 ```sql
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'MY_NEW_PASSWORD';
+CREATE USER 'xibo-cms'@'localhost' IDENTIFIED BY 'MY_NEW_PASSWORD';
+CREATE DATABASE `xibo-cms`;
+GRANT ALL PRIVILEGES ON `xibo-cms`.* TO 'xibo-cms'@'localhost';
 FLUSH PRIVILEGES;
 quit;
 ```
@@ -159,10 +161,10 @@ When I am configuring server software outside of a package manager I always plac
 
 ```bash
 sudo mkdir /srv/xibo-cms /var/lib/xibo-cms
-chown www-data: /srv/xibo-cms /var/lib/xibo-cms
+sudo chown www-data: /srv/xibo-cms /var/lib/xibo-cms
 cd /srv/xibo-cms
 sudo -u www-data -s
-curl -OJL https://github.com/xibosignage/xibo-cms/releases/download/4.5./xibo-cms-4.5.0.tar.gz
+curl -OJL https://github.com/xibosignage/xibo-cms/releases/download/4.5.0/xibo-cms-4.5.0.tar.gz
 ```
 
 This extracts the contents of the archive without placing it into a folder
@@ -176,7 +178,7 @@ Download the complete xibo-cmr archive to extract some extra parts that are requ
 
 ```bash
 curl -OJL https://github.com/xibosignage/xibo-cms/archive/refs/tags/4.5.0.tar.gz
-tar -C /var/lib/xibo-cms -xvzf xibo-cms-4.5.0.tar.gz --strip-components=2 docker/brand
+tar -C /var/lib/xibo-cms -xvzf xibo-cms-4.5.0.tar.gz --strip-components=2 xibo-cms-4.5.0/docker/brand
 rm xibo-cms-4.5.0.tar.gz
 ```
 
@@ -191,12 +193,12 @@ vim /srv/xibo-cms/web/settings.php
 defined('XIBO') or die(__("Sorry, you are not allowed to directly access this page.") . "<br />" . __("Please press the back button in your browser."));
 
 $dbhost = 'localhost';
-$dbuser = 'xibo-cms';
+$dbuser = 'root';
 $dbpass = 'MY_NEW_PASSWORD';
 $dbname = 'xibo-cms';
 $dbport = '3306';
 
-define('SECRET_KEY', '');
+define('SECRET_KEY','');
 
 if (file_exists(dirname(__FILE__) . '/settings-custom.php')) {
     include_once dirname(__FILE__) . '/settings-custom.php';
@@ -408,6 +410,28 @@ sudo systemctl restart apache2
 
 You can now browse to the server at the location you configured in the xibo-cms.conf. You will need to point it at the database and use the password you created earlier. You can use most defaults as you go through the rest of the configuration.
 
+### Web UI Configuration
+
+Connect to the server in a web browser.
+
+Sign in with the default admin username and password which is xibo_admin and password.
+
+#### Change Admin Password
+
+1. Click on the user icon in the top right that says **XI**.
+2. Click the pencil/edit icon.
+3. Enter old and new password.
+4. Click Save.
+
+#### Configure Library Location
+
+1. Click on Administration on the menu.
+2. Select Settings.
+3. Enter `/var/lib/xibo-cms`{: .filepath} into the Library Location field.
+4. Create a random Secret Key for adding Players.
+
+
+
 ## Upgrading
 
 ### Backup
@@ -417,7 +441,7 @@ The simplest thing to do is to stop apache2 and xibo-xmr service, moving the `/s
 ```bash
 sudo systemctl stop apache2 xibo-xmr
 sudo mv /srv/xibo-cms /srv/xibo-cms.backup
-sudo mysqldump -p xibo-cms > xibo-cms.sql
+sudo mysqldump xibo-cms > xibo-cms.sql
 ```
 
 Create xibo-cms directory and change to it. Download the new version, in this example 4.0.8 extract it and copy back the necessary files. You will also need to delete the install/index.php file to stop a warning from appearing.
