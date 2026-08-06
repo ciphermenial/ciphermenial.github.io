@@ -436,8 +436,9 @@ Sign in with the default admin username and password which is xibo_admin and pas
 #### Configure Displays
 
 1. Select Displays from Administration > Settings page.
-2. Enter http://localhost:8081 for the XMR Private Address. This is the API access and is only needed from the CMS to XMR.
-3. Enter ws://[IP Address clients can access the server from]:8080 into the XMR WebSocket Address.
+2. Select the Default Folder for new Displays if it is not selected. I have set it to Root Folder.
+3. Enter http://localhost:8081 for the XMR Private Address. This is the API access and is only needed from the CMS to XMR.
+4. Enter ws://[IP Address clients can access the server from]:8080 into the XMR WebSocket Address.
    - In my example the server is accessible on the local network on 10.0.0.100.
 5. Enter tcp://[IP Address clients can access the server from]:9505.
 6. Click Save.
