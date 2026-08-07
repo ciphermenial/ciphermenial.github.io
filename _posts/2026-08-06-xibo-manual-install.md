@@ -447,6 +447,44 @@ Sign in with the default admin username and password which is xibo_admin and pas
 
 You can now start adding clients.
 
+## SMTP Configuration
+
+Install msmtp MTA with apt and create and edit `/etc/msmtprc`{: .filepath}.
+
+```bash
+sudo apt install msmtp-mta
+sudo vim /etc/msmtprc
+```
+
+Add the following and edit as needed. For more information about msmtp configuration see the [debian wiki](https://wiki.debian.org/msmtp).
+
+```ini
+account cms
+
+host smtp.gmail.com
+port 587
+auth off
+user example
+password password
+tls on
+tls_starttls on
+maildomain gmail.com
+domain gmail.com
+from cms@example.com
+
+account default : cms
+```
+{: file="/etc/msmtprc" }
+
+Enable and start the MTA.
+
+```bash
+sudo systemctl enable msmtpd
+sudo systemctl start msmtpd
+```
+
+The only way to test is to enable Password Reminder under Administration > Settings > Users > Password Policy. You can now sign out and click on **Forgot Password?** and send a password reset email.
+
 ## Upgrading
 
 ### Backup
