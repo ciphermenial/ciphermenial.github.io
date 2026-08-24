@@ -76,7 +76,7 @@ sudo a2ensite xibo-cms.conf
 ```
 
 ### Configure MariaDB
-This configures a root password for MariaDB. Make sure to change MY_NEW_PASSWORD to your password of choice. First enter mariadb/mysql console by runinng `sudo mysql`, then run these SQL commands.
+This creates a user named xibo-cms and sets a password in MariaDB. Make sure to change MY_NEW_PASSWORD to your password of choice. First enter mariadb/mysql console by runinng `sudo mysql`, then run these SQL commands.
 
 ```sql
 CREATE USER 'xibo-cms'@'localhost' IDENTIFIED BY 'MY_NEW_PASSWORD';
@@ -87,13 +87,13 @@ quit;
 ```
 
 ### Configure PHP
-PHP configuration needs to be modified to allow upload of larger files and a few other parts I pulled from Xibo's [Dockerfile](https://github.com/xibosignage/xibo-cms/blob/develop/Dockerfile).
+The PHP configuration needs to be modified to allow upload of larger files and a few other parts I pulled from Xibo's [Dockerfile](https://github.com/xibosignage/xibo-cms/blob/develop/Dockerfile).
 
 ```bash
 sudo vim /etc/php/8.4/apache2/php.ini
 ```
 
-You need to modify the file to change the following settings
+You need to modify the file to change the following settings. To simplify this you can use sed. See below for those commands.
 
 ```ini
 allow_url_fopen = Off
@@ -130,7 +130,7 @@ upload_max_filesize = 2G
 ```
 {: file="/etc/php/8.4/cli/php.ini" }
 
-You can do all this quickly with sed.
+Using sed will replace the necessarry information in the files quickly.
 
 ```bash
 sed -i "s/allow_url_fopen = .*$/allow_url_fopen = Off/" /etc/php/8.4/apache2/php.ini
@@ -157,7 +157,7 @@ sed -i 's/upload_max_filesize = .*$/upload_max_filesize = 2G/g' /etc/php/8.4/cli
 ```
 
 ## Install Xibo CMS
-When I am configuring server software outside of a package manager I always place it under the `/srv`{: .filepath} folder. I will be installing Xibo under `/srv/xibo-cms`{: .filepath}. I will also be creating the library directory for Xibo under `/var/lib/xibo-cms/`{: .filepath}. I open a shell using the www-data user to save on have to change ownership of the files later.
+When I am configuring server software outside of a package manager I always place it under the `/srv`{: .filepath} folder. I will be installing Xibo CMS under `/srv/xibo-cms`{: .filepath}. I will also be creating the library directory for Xibo under `/var/lib/xibo-cms/`{: .filepath}. I open a shell using the www-data user to save on having to change ownership of the files later.
 
 ```bash
 sudo mkdir /srv/xibo-cms /var/lib/xibo-cms
@@ -167,14 +167,14 @@ sudo -u www-data -s
 curl -OJL https://github.com/xibosignage/xibo-cms/releases/download/4.5.0/xibo-cms-4.5.0.tar.gz
 ```
 
-This extracts the contents of the archive without placing it into a folder
+This extracts the contents of the archive without placing it into a folder.
 
 ```bash
 tar -xzf xibo-cms-4.5.0.tar.gz --strip-components=1
 rm xibo-cms-4.5.0.tar.gz
 ```
 
-Download the complete xibo-cmr archive to extract some extra parts that are required.
+Download the complete xibo-cms archive to extract some extra parts that are required.
 
 ```bash
 curl -OJL https://github.com/xibosignage/xibo-cms/archive/refs/tags/4.5.0.tar.gz
@@ -215,7 +215,7 @@ SECRET_KEY=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 8)
 
 ### Initialise the Database
 
-This requires the command you need to run anytime you upgrade versions.
+This requires the command you need to run anytime you upgrade.
 
 ```bash
 php /srv/xibo-cms/vendor/bin/phinx migrate -c "/srv/xibo-cms/phinx.php"
@@ -408,13 +408,13 @@ Restart Apache2
 sudo systemctl restart apache2
 ```
 
-You can now browse to the server at the location you configured in the xibo-cms.conf. You will need to point it at the database and use the password you created earlier. You can use most defaults as you go through the rest of the configuration.
+You can now browse to the server at the location you configured in the xibo-cms.conf. You will need to configure the settigns following for everything to load properly. In the docker installation it does this with SQL commands. Once you have completed these settings you will need to reload the page.
 
 ### Web UI Configuration
 
 Connect to the server in a web browser.
 
-Sign in with the default admin username and password which is xibo_admin and password.
+Sign in with the default admin username and password which is **xibo_admin** and **password**.
 
 #### Change Admin Password
 
@@ -438,8 +438,10 @@ Sign in with the default admin username and password which is xibo_admin and pas
 1. Select Displays from Administration > Settings page.
 2. Select the Default Folder for new Displays if it is not selected. I have set it to Root Folder.
 3. Enter http://localhost:8081 for the XMR Private Address. This is the API access and is only needed from the CMS to XMR.
+   - If you see errors in the even log related to connections to this address, you might need to set it to the IP of the server.
 4. Enter ws://[IP Address clients can access the server from]:8080 into the XMR WebSocket Address.
    - In my example the server is accessible on the local network on 10.0.0.100.
+   - You can also set it to **wss** for connections over TLS.
 5. Enter tcp://[IP Address clients can access the server from]:9505.
 6. Click Save.
 
@@ -483,7 +485,7 @@ sudo systemctl enable msmtpd
 sudo systemctl start msmtpd
 ```
 
-The only way to test is to enable Password Reminder under Administration > Settings > Users > Password Policy. You can now sign out and click on **Forgot Password?** and send a password reset email.
+The only way to test is to enable **Password Reminder** under **Administration** > **Settings** > **Users** > **Password Policy**. You can now sign out and click on **Forgot Password?** and send a password reset email.
 
 ## Upgrading
 
@@ -524,5 +526,3 @@ Start up the services again.
 exit
 sudo systemctl start apache2 xibo-xmr
 ```
-
-After you have logged back in you may see no Layouts. Press Shift+F5 to clear cache on your browser and reload the page.
