@@ -21,6 +21,9 @@ This is an explanation of my [HAProxy](https://www.haproxy.org) config, as a rem
 > Update 4: Switched redirects from `localhost:port` to abstract namespaces i.e. `abns@namespace`.
 {: .prompt-info }
 
+> Update 5: Switched to using [Crowdsec SPOA bouncer](https://docs.crowdsec.net/u/bouncers/haproxy_spoa/).
+{: .prompt-info }
+
 ## Traffic Flow
 
 This shows how traffic flows internally or externally from the user to the services behind my HAProxy server.
@@ -170,9 +173,7 @@ It will then redirect traffic to my internal backend (internal) if it matches th
 
 This frontend is the one that works with connections coming from Cloudflare. It has a Cloudflare Origins certificate associated with it.
 
-> The Crowdsec configuration is slightly modified from their recommendations. I have an [issue](https://github.com/crowdsecurity/cs-haproxy-bouncer/issues/13) submitted with them around detecting client IPs in a different way to support other configurations.
-
-As quoted above I went about this in the most complicated way, when all I needed to do was set CF-Connecting-IP to the source IP. This is how I have done it, thanks to the devs for the bouncer.
+I previously used the old Crowdsec HAProxy Bouncer but have now moved to the new SPOA version which works much better.
 
 > [Abstract namespaces](https://docs.haproxy.org/2.6/configuration.html#11.1) only work on Linux. You will not be able to use this config on [OPNsense](https://opnsense.org) or other BSD configurations. You can use `localhost:port` and select an unused port.
 {: .prompt-danger}
@@ -182,16 +183,53 @@ As quoted above I went about this in the most complicated way, when all I needed
 frontend cloudflare
     bind abns@cloudflare accept-proxy ssl crt example.net.pem
 
-    # CloudFlare CF-Connecting-IP header to source IP for Crowdsec decisions
-    http-request set-src req.hdr(CF-Connecting-IP)
+    http-request set-header x-forwarded-proto https
 
-    # Crowdsec bouncer
-    stick-table type ip size 10k expire 30m # declare a stick table to cache captcha verifications
-    http-request lua.crowdsec_allow # action to identify crowdsec remediation
-    http-request track-sc0 src if { var(req.remediation) -m str "captcha-allow" } # cache captcha allow decision
-    http-request redirect location %[var(req.redirect_uri)] if { var(req.remediation) -m str "captcha-allow" } # redirect to initial url
-    http-request use-service lua.reply_captcha if { var(req.remediation) -m str "captcha" } # serve captcha template if remediation is captcha
-    http-request use-service lua.reply_ban if { var(req.remediation) -m str "ban" } # serve ban template if remediation is ban
+ # Crowdsec HAProxy bouncer configuration
+    option http-buffer-request
+    
+    unique-id-format %[uuid()]
+    unique-id-header X-Unique-ID
+    filter spoe engine crowdsec config /etc/haproxy/crowdsec.cfg
+
+    ## Body size limit: stay safely under SPOE fram limit (~50 KB)
+    acl body_within_limit req.body_size -m int le 51200
+
+    ## HTML-capable client detection
+    acl render_html req.hdr_cnt(Accept) eq 0
+    acl render_html req.hdr(Accept) -m sub text/html
+    acl render_html req.hdr(Accept) -m sub */*
+    acl html_rejected req.hdr(Accept) -m reg "text/html;q=0"
+
+    acl has_contact_url var(txn.crowdsec.contact_us_url) -m found
+    acl empty_contact_url var(txn.crowdsec.contact_us_url) -m str ""
+
+    http-request send-spoe-group crowdsec crowdsec-http-body if body_within_limit || !{ req.body_size -m found }
+    http-request send-spoe-group crowdsec crowdsec-http-no-body if !body_within_limit { req.body_size -m found }
+
+    http-request set-header X-Crowdsec-Remediation %[var(txn.crowdsec.remediation)] if { var(txn.crowdsec.remediation) -m found }
+    http-request set-header X-Crowdsec-IsoCode %[var(txn.crowdsec.isocode)] if { var(txn.crowdsec.isocode) -m found }
+
+    ### Redirect after successful captcha validation
+    http-request redirect code 302 location %[url] if { var(txn.crowdsec.remediation) -m str "allow" } { var(txn.crowdsec.redirect) -m found }
+
+    ### Serve remediation pages with native HAProxy lf-file directives (no Lua needed)
+    http-request return status 200 content-type "text/html; charset=utf-8" hdr Cache-Control "no-cache, no-store" lf-file /var/lib/crowdsec-haproxy-spoa-bouncer/html/captcha.html if { var(txn.crowdsec.remediation) -m str "captcha" } render_html !html_rejected
+    http-request return status 403 content-type "text/html; charset=utf-8" hdr Cache-Control "no-cache, no-store" lf-file /var/lib/crowdsec-haproxy-spoa-bouncer/html/ban-with-contact.html if { var(txn.crowdsec.remediation) -m str "ban" } render_html !html_rejected has_contact_url !empty_contact_url
+    http-request return status 403 content-type "text/html; charset=utf-8" hdr Cache-Control "no-cache, no-store" lf-file /var/lib/crowdsec-haproxy-spoa-bouncer/html/ban.html if { var(txn.crowdsec.remediation) -m str "ban" } render_html !html_rejected !has_contact_url
+    http-request return status 403 content-type "text/html; charset=utf-8" hdr Cache-Control "no-cache, no-store" lf-file /var/lib/crowdsec-haproxy-spoa-bouncer/html/ban.html if { var(txn.crowdsec.remediation) -m str "ban" } render_html !html_rejected empty_contact_url
+    ### Plain-text fallback for non-HTML clients
+    http-request return status 200 content-type text/plain hdr Cache-Control "no-cache, no-store" string "Captcha required\n" if { var(txn.crowdsec.remediation) -m str "captcha" } !render_html
+    http-request return status 200 content-type text/plain hdr Cache-Control "no-cache, no-store" string "Captcha required\n" if { var(txn.crowdsec.remediation) -m str "captcha" } html_rejected
+    http-request return status 403 content-type text/plain hdr Cache-Control "no-cache, no-store" string "Forbidden\n" if { var(txn.crowdsec.remediation) -m str "ban" } !render_html
+    http-request return status 403 content-type text/plain hdr Cache-Control "no-cache, no-store" string "Forbidden\n" if { var(txn.crowdsec.remediation) -m str "ban" } html_rejected
+
+    ### Captcha cookie management
+    http-after-response set-header Set-Cookie %[var(txn.crowdsec.captcha_cookie)] if { var(txn.crowdsec.captcha_status) -m found } { var(txn.crowdsec.captcha_cookie) -m found }
+    http-after-response set-header Set-Cookie %[var(txn.crowdsec.captcha_cookie)] if { var(txn.crowdsec.captcha_cookie) -m found } !{ var(txn.crowdsec.captcha_status) -m found }
+
+    # CloudFlare CF-Connecting-IP header to source IP for Crowdsec decisions
+    http-request set-src req.hdr(cf-connecting-ip)
 
     # Select backend based on services.map file or use backend no-match if not found.
     use_backend %[req.hdr(host),lower,map(/etc/haproxy/services.map,no-match)]
@@ -211,6 +249,8 @@ This frontend can be a mirror of the External Frontend if you want all internal 
 frontend internal
     bind abns@internal accept-proxy ssl crt int.example.net.pem
 
+    http-request set-header x-forwarded-proto https
+
     # Select backend based on services.map file or use backend no-match if not found.
     use_backend %[req.hdr(host),lower,map(/etc/haproxy/services.map,no-match)]
 ```
@@ -222,9 +262,9 @@ The bind line is the only part different from Cloudflare Frontend. Every other l
 You will need to create a file named `/etc/haproxy/services.map` and enter in the host to backend information. The first part is the FQDN of the host and the second is the backend name. Example as follows (I have only listed a few and not all backends shown in the config).
 
 ```bash
-recipes.example.net recipes
-jellyfin.example.net jellyfin
-paperless.example.net paperless
+host1.example.net host1
+host2.example.net host2
+host3.example.net host3
 ```
 
 ### Backends
