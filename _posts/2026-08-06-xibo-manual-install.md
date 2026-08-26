@@ -164,22 +164,22 @@ sudo mkdir /srv/xibo-cms /srv/xibo-xmr /var/lib/xibo-cms
 sudo chown www-data: /srv/xibo-cms /var/lib/xibo-cms
 cd /srv/xibo-cms
 sudo -u www-data -s
-curl -OJL https://github.com/xibosignage/xibo-cms/releases/download/4.5.0/xibo-cms-4.5.0.tar.gz
+curl -OJL https://github.com/xibosignage/xibo-cms/releases/download/4.5.1/xibo-cms-4.5.1.tar.gz
 ```
 
 This extracts the contents of the archive without placing it into a folder.
 
 ```bash
-tar -xzf xibo-cms-4.5.0.tar.gz --strip-components=1
-rm xibo-cms-4.5.0.tar.gz
+tar -xzf xibo-cms-4.5.1.tar.gz --strip-components=1
+rm xibo-cms-4.5.1.tar.gz
 ```
 
 Download the complete xibo-cms archive to extract some extra parts that are required.
 
 ```bash
-curl -OJL https://github.com/xibosignage/xibo-cms/archive/refs/tags/4.5.0.tar.gz
-tar -C /var/lib/xibo-cms -xvzf xibo-cms-4.5.0.tar.gz --strip-components=2 xibo-cms-4.5.0/docker/brand
-rm xibo-cms-4.5.0.tar.gz
+curl -OJL https://github.com/xibosignage/xibo-cms/archive/refs/tags/4.5.1.tar.gz
+tar -C /var/lib/xibo-cms -xvzf xibo-cms-4.5.1.tar.gz --strip-components=2 xibo-cms-4.5.1/docker/brand
+rm xibo-cms-4.5.1.tar.gz
 ```
 
 Create the required settings.php file and enter in the database details from earlier.
@@ -522,8 +522,8 @@ sudo mkdir /srv/xibo-cms
 sudo chown www-data: /srv/xibo-cms
 sudo -u www-data -s
 cd /srv/xibo-cms
-curl -OJL https://github.com/xibosignage/xibo-cms/releases/download/4.5.0/xibo-cms-4.5.0.tar.gz
-tar -xvzf xibo-cms-4.4.4.tar.gz --strip-components=1
+curl -OJL https://github.com/xibosignage/xibo-cms/releases/download/4.5.1/xibo-cms-4.5.1.tar.gz
+tar -xvzf xibo-cms-4.5.1.tar.gz --strip-components=1
 cp /srv/xibo-cms.backup/web/settings.php web/
 ```
 Upgrade the database with this command which must be run from `/srv/xibo-cms`{: .filepath} directory.
