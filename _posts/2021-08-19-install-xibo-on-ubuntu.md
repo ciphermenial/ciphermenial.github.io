@@ -1,6 +1,6 @@
 ---
-title:  Install Xibo on Debian
-categories: [Guides,Xibo]
+title:  Install Xibo on Debian (Archived)
+categories: [Archived,Xibo]
 tags: [debian,linux,xibo,signage,mariadb,apache,nftables]
 image:
   path: /assets/img/title/install-xibo-on-ubuntu.svg
