@@ -160,7 +160,7 @@ sed -i 's/upload_max_filesize = .*$/upload_max_filesize = 2G/g' /etc/php/8.4/cli
 When I am configuring server software outside of a package manager I always place it under the `/srv`{: .filepath} folder. I will be installing Xibo CMS under `/srv/xibo-cms`{: .filepath}. I will also be creating the library directory for Xibo under `/var/lib/xibo-cms/`{: .filepath}. I open a shell using the www-data user to save on having to change ownership of the files later.
 
 ```bash
-sudo mkdir /srv/xibo-cms /var/lib/xibo-cms
+sudo mkdir /srv/xibo-cms /srv/xibo-xmr /var/lib/xibo-cms
 sudo chown www-data: /srv/xibo-cms /var/lib/xibo-cms
 cd /srv/xibo-cms
 sudo -u www-data -s
@@ -244,17 +244,17 @@ chmod 660 /var/lib/xibo-cms/certs/public.key
 The binary required for this is not in the xibo-cms package anymore. You need to download it to the `vendor/bin` directory.
 
 ```bash
-cd /srv/xibo-cms/vendor/bin
+cd /srv/xibo-xmr/
 curl -OJL https://github.com/xibosignage/xibo-xmr/releases/download/1.3/xmr.phar
 ```
 
 #### Create XMR Configuration File
 
 ```bash
-vim /srv/xibo-cms/vendor/bin/config.json
+vim /srv/xibo-xmr/config.json
 ```
 
-Enter the following information.
+Enter the following information. You can configure this all with IPv6, which is what I have done on my server.
 
 ```json
 {
@@ -266,7 +266,21 @@ Enter the following information.
     "debug": true
 }
 ```
-{: file="/srv/xibo-cms/vendor/bin/config.json" }
+{: file="/srv/xibo-xmr/config.json" }
+
+There is other configuration I found but I can't find anything in the documentation about it.
+
+```json
+{
+  "debug": true,
+  "queuePoll": 5,
+  "queueSize": 10,
+  "ipv6PubSupport": false,
+  "relayOldMessages": false,
+  "relayMessages": false
+}
+```
+{: file="/srv/xibo-xmr/config.json" }
 
 #### Create XMR service
 Exit out of the www-data user shell and create the new systemd unit.
@@ -286,7 +300,7 @@ After=network.target
 [Service]
 User=www-data
 Group=www-data
-ExecStart=/usr/bin/php8.4 /srv/xibo-cms/vendor/bin/xmr.phar
+ExecStart=/usr/bin/php8.4 /srv/xibo-xmr/xmr.phar
 Restart=always
 KillMode=process
 RestartSec=1
@@ -506,13 +520,11 @@ Create xibo-cms directory and change to it. Download the new version, in this ex
 ```bash
 sudo mkdir /srv/xibo-cms
 sudo chown www-data: /srv/xibo-cms
-cd /srv/xibo-cms
 sudo -u www-data -s
+cd /srv/xibo-cms
 curl -OJL https://github.com/xibosignage/xibo-cms/releases/download/4.5.0/xibo-cms-4.5.0.tar.gz
 tar -xvzf xibo-cms-4.4.4.tar.gz --strip-components=1
 cp /srv/xibo-cms.backup/web/settings.php web/
-cp /srv/xibo-cms.backup/vendor/bin/config.json vendor/bin/
-cp /srv/xibo-cms.backup/vendor/bin/xmr.phar vendor/bin
 ```
 Upgrade the database with this command which must be run from `/srv/xibo-cms`{: .filepath} directory.
 
@@ -524,5 +536,5 @@ Start up the services again.
 
 ```bash
 exit
-sudo systemctl start apache2 xibo-xmr
+sudo systemctl start apache2
 ```
