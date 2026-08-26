@@ -241,7 +241,7 @@ chmod 660 /var/lib/xibo-cms/certs/public.key
 
 ### Configure XMR
 
-The binary required for this is not in the xibo-cms package anymore. You need to download it to the `vendor/bin` directory.
+The binary required for this is not in the xibo-cms package anymore. You need to download it to the `/srv/xibo-xmr`{: .filepath} directory.
 
 ```bash
 cd /srv/xibo-xmr/
