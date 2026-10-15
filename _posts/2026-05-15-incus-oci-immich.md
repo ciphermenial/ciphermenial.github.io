@@ -109,7 +109,6 @@ To make things a bit easier I have created a profile with the parts for gpu pass
 incus profile create nvidia-gpu
 incus profile device add nvidia-gpu nvidia-gpu gpu pci=0000:01:00.0
 incus profile set nvidia-gpu nvidia.runtime=true
-incus profile set nvidia-gpu nvidia.require.cuda=true
 incus profile set nvidia-gpu nvidia.driver.capabilities=all
 ```
 
